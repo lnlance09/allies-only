@@ -1,0 +1,29 @@
+.authComponent {
+    .header.huge {
+        font-size: 40px;
+    }
+
+    @media only screen and (max-width: 767px) {
+        .header.huge {
+            margin-bottom: 0;
+        }
+    }
+
+    .authSegment {
+        border: none !important;
+        margin: 0 auto;
+
+        .error.message {
+            margin-bottom: 14px;
+        }
+    }
+
+    .registerText {
+        margin-top: 4px;
+
+        .registerLink {
+            border-bottom: solid 1px $white;
+            cursor: pointer;
+        }
+    }
+}

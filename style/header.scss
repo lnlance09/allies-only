@@ -1,0 +1,164 @@
+@import url('https://fonts.googleapis.com/css2?family=Ubuntu+Condensed&display=swap');
+  
+@keyframes increase {
+   from {
+       left: -5%;
+       width: 5%;
+    }
+    
+    to {
+       left: 130%;
+       width: 100%;
+    }
+}
+
+@keyframes decrease {
+    from { 
+        left: -80%;
+        width: 80%;
+    }
+
+    to {
+        left: 110%;
+        width: 10%;
+    }
+}
+
+.pageHeader {
+    .rainbow {
+        background-image: -webkit-gradient(linear, left top, right top, color-stop(0, #f22), color-stop(0.15, #f2f), color-stop(0.3, #22f), color-stop(0.45, #2ff), color-stop(0.6, #2f2),color-stop(0.75, #2f2), color-stop(0.9, #ff2), color-stop(1, #f22));
+        background-image: gradient(linear, left top, right top, color-stop(0, #f22), color-stop(0.15, #f2f), color-stop(0.3, #22f), color-stop(0.45, #2ff), color-stop(0.6, #2f2),color-stop(0.75, #2f2), color-stop(0.9, #ff2), color-stop(1, #f22));
+        color: transparent;
+        height: 5px !important;
+        // opacity: 0.7;
+        position: fixed;
+        top: 0;
+        width: 100%;
+        z-index: 99999;
+    }
+
+    .subline {
+        background: $lightGrey;
+        height: 5px;
+        position: fixed;
+        top: 0;
+        z-index: 999999;
+    }
+
+    .inc {
+        animation: increase 2s infinite;
+    }
+
+    .dec {
+        animation: decrease 2s 0.5s infinite;
+    }
+
+    .headerLogo {
+        cursor: pointer;
+        height: 50px;
+        line-height: 4;
+        margin-right: 12px;
+        width: 50px;
+
+        &.basic {
+            height: 64px;
+            line-height: 64px;
+            margin-right: 0;
+            width: 64px;
+        }
+    }
+
+    .menu.globalHeader {
+        background: $white;
+        // border-bottom: dotted 1px $grey;
+        box-shadow: none;
+        height: 72px;
+        margin-top: 5px;
+        z-index: 1001 !important;
+
+        &.inverted {
+            background: $invertedBackgroundColor;
+            // border-bottom: solid 2px $white;
+        }
+    }
+
+    .headerContainer {
+        &.basic {
+            padding-bottom: 10px;
+            padding-top: 16px;
+        }
+
+        .responsive {
+            display: flex;
+            width: 100%;
+        }
+
+        .headerMenuItem {
+            margin-right: 0 !important;
+
+            @media only screen and (max-width: 767px) {
+                &.create, &.explore {
+                    padding: 4px;
+
+                    a {
+                        margin-left: 8px;
+                    }
+                }
+
+                &.home {
+                    padding-right: 0;
+                }
+            }
+
+            a {
+                color: $black;
+                font-size: 15px !important;
+                font-weight: bold !important;
+                margin-left: 18px;
+
+                &.logoText {
+                    color: $black;
+                    font-weight: normal;
+                    font-family: "Ubuntu Condensed", sans-serif;
+                    font-size: 36px !important;
+                    margin: 0;
+                    position: relative;
+
+                    @media only screen and (max-width: 767px) {
+                        display: none;
+                    }
+                }
+            }
+        }
+
+        .loginItem {
+            // padding-right: 0;
+        }
+
+        .dropDownMenu {
+            &.inverted {
+                .menu {
+                    background: lighten($invertedBackgroundColor, 4%);
+
+                    &:before, &:after {
+                        background: lighten($invertedBackgroundColor, 4%);
+                    }
+
+                    .item {
+                        color: $white !important;
+
+                        &:hover {
+                            background: lighten($invertedBackgroundColor, 8%);
+                            color: $offWhite !important;
+                        }
+                    }
+                }
+            }
+
+            .menu.visible {
+                min-width: 150px;
+                z-index: 1001;
+            }
+        }
+    }
+}

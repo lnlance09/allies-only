@@ -1,0 +1,13 @@
+.usersList {
+    .items.inverted {
+        .item {
+            .header, .meta, .description {
+                color: $white !important;
+            }
+        }
+    }
+
+    .item {
+        cursor: pointer;
+    }
+}

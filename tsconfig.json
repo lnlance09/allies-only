@@ -1,0 +1,79 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": false,
+    "strictNullChecks": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve"
+  },
+  "paths": {
+    "@actions/*": [
+      "redux/actions/*"
+    ],
+    "@components/*": [
+      "components/*"
+    ],
+    "@controllers/*": [
+      "controllers/*"
+    ],
+    "@layouts/*": [
+      "layouts/*"
+    ],
+    "@lib/*": [
+      "lib/*"
+    ],
+    "@models/*": [
+      "models/*"
+    ],
+    "@options/*": [
+      "options/*"
+    ],
+    "@public/*": [
+      "public/*"
+    ],
+    "@reducers/*": [
+      "redux/reducers/*"
+    ],
+    "@redux/*": [
+      "redux/*"
+    ],
+    "@static/*": [
+      "static/*"
+    ],
+    "@store/*": [
+      "store/*"
+    ],
+    "@style": [
+      "style/*"
+    ],
+    "@utils": [
+      "utils/*"
+    ],
+    "@dummy/*": [
+      "__dummy__/*"
+    ]
+  },
+  "exclude": [
+    "node_modules"
+  ],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx"
+  ]
+}
