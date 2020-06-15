@@ -1,3 +1,4 @@
+// Auth
 export const CHANGE_PASSWORD = "authentication:CHANGE_PASSWORD"
 export const LOGOUT = "authentication:LOGOUT"
 export const RESET_PASSWORD_PROPS = "authentication:RESET_PASSWORD_PROPS"
@@ -7,20 +8,32 @@ export const SET_USER_DATA = "authentication:SET_USER_DATA"
 export const SET_VERIFICATION_ERROR = "authentication:SET_VERIFICATION_ERROR"
 export const VERIFY_EMAIL = "authentication:VERIFY_EMAIL"
 
-export const GET_MEME = "meme:GET_MEME"
-export const RESET_MEME_TO_INITIAL = "meme:RESET_MEME_TO_INITIAL"
-export const SET_MEME_FETCH_ERROR = "meme:SET_MEME_FETCH_ERROR"
-export const UPDATE_MEME = "meme:UPDATE_MEME"
-export const UPDATE_MEME_IMG = "meme:UPDATE_MEME_IMG"
+// Deparment
+export const GET_DEPARTMENT = "department:GET_DEPARTMENT"
+export const RESET_DEPARTMENT_TO_INITIAL = "department:RESET_DEPARTMENT_TO_INITIAL"
+export const SEARCH_DEPARTMENTS = "department:SEARCH_DEPARTMENTS"
+export const SET_DEPARTMENT_CREATE_ERROR = "department:SET_DEPARTMENT_CREATE_ERROR"
+export const SET_DEPARTMENT_FETCH_ERROR = "department:SET_DEPARTMENT_FETCH_ERROR"
+export const UPDATE_DEPARTMENT = "department:UPDATE_DEPARTMENT"
 
-export const SEARCH_ARTISTS = "search:SEARCH_ARTISTS"
-export const SEARCH_MEMES = "search:SEARCH_MEMES"
-export const SEARCH_TEMPLATES = "search:SEARCH_TEMPLATES"
+// Interaction
+export const GET_INTERACTION = "interaction:GET_INTERACTION"
+export const RESET_INTERACTION_TO_INITIAL = "interaction:RESET_INTERACTION_TO_INITIAL"
+export const SEARCH_INTERACTIONS = "interaction:SEARCH_INTERACTIONS"
+export const SET_INTERACTION_CREATE_ERROR = "interaction:SET_INTERACTION_CREATE_ERROR"
+export const SET_INTERACTION_FETCH_ERROR = "interaction:SET_INTERACTION_FETCH_ERROR"
+export const UPDATE_INTERACTION = "interaction:UPDATE_INTERACTION"
 
-export const GET_TEMPLATE = "template:GET_TEMPLATE"
-export const SET_TEMPLATE_FETCH_ERROR = "template:SET_TEMPLATE_FETCH_ERROR"
-export const UPDATE_TEMPLATE = "template:UPDATE_TEMPLATE"
+// Officer
+export const GET_OFFICER = "officer:GET_OFFICER"
+export const RESET_OFFICER_TO_INITIAL = "officer:RESET_OFFICER_TO_INITIAL"
+export const SEARCH_OFFICERS = "officer:SEARCH_OFFICERS"
+export const SET_OFFICER_CREATE_ERROR = "officer:SET_OFFICER_CREATE_ERROR"
+export const SET_OFFICER_FETCH_ERROR = "officer:SET_OFFICER_FETCH_ERROR"
+export const UPDATE_OFFICER = "officer:UPDATE_OFFICER"
+export const UPDATE_OFFICER_IMG = "officer:UPDATE_OFFICER_IMG"
 
+// User
 export const CHANGE_PROFILE_PIC = "user:CHANGE_PROFILE_PIC"
 export const GET_USER = "user:GET_USER"
 export const GET_USER_MEMES = "user:GET_USER_MEMES"

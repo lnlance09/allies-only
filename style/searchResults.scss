@@ -1,44 +1,24 @@
-@keyframes fadeInOpacity {
-	0% {
-		opacity: 0;
-	}
-	100% {
-		opacity: 1;
-	}
-}
+.searchResults {
+	.resultsList {
+		&.inverted {
+			.item {
+				background: lighten($invertedBackgroundColor, 2%);
+				border: solid 1px $black;
+				cursor: pointer;
+				padding: 15px;
 
-.searchResultsMasonryGrid {
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: flex;
-    margin-left: -30px;
-    width: auto;
+				&:hover {
+					background: $invertedBackgroundColor;
+					transition: 0.3s;
+				}
 
-	.searchResultsMasonryGridColumn {
-		background-clip: padding-box;
-		padding-left: 30px;
+				.header {
+					color: $offWhite !important;
+				}
 
-		.gridElementText {
-			font-size: 16px;
-			padding: 6px 8px 0 6px;
-
-			&.inverted {
-				color: $white !important;
-			}
-		}
-
-		> div {
-			background: #offWhite;
-			cursor: pointer;
-			margin-bottom: 25px;
-
-			img {
-				animation-name: fadeInOpacity;
-				animation-iteration-count: 1;
-				animation-timing-function: ease-in;
-				animation-duration: 0.85s;
-				border: solid 2px $lightGrey;
-				opacity: 1;
+				.meta {
+					color: $offWhite !important;
+				}
 			}
 		}
 	}

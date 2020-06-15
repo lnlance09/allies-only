@@ -55,6 +55,8 @@ const DefaultLayout: React.FunctionComponent = ({
 				<link rel="shortcut icon" href="/favicon.ico?v=3" />
 				<link rel="apple-touch-icon" sizes="128x128" href="/favicon.ico?v=3" />
 
+				<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDArCL_59nenZmhsD8v2NsbpuJzi9VRucg&libraries=places"></script>
+
 				<title>{title} - Brandy</title>
 			</Head>
 

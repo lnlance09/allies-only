@@ -7,76 +7,6 @@
 @import './usersList.scss';
 @import './searchResults.scss';
 
-@font-face {
-	font-family: OswaldBold;
-	src: url("../public/fonts/oswald/OswaldBold.ttf");
-}
-
-@font-face {
-	font-family: OswaldBoldItalic;
-	src: url("../public/fonts/oswald/OswaldBoldItalic.ttf");
-}
-
-@font-face {
-	font-family: OswaldExtraLight;
-	src: url("../public/fonts/oswald/OswaldExtraLight.ttf");
-}
-
-@font-face {
-	font-family: OswaldExtraLightItalic;
-	src: url("../public/fonts/oswald/OswaldExtraLightItalic.ttf");
-}
-
-@font-face {
-	font-family: OswaldHeavy;
-	src: url("../public/fonts/oswald/OswaldHeavy.ttf");
-}
-
-@font-face {
-	font-family: OswaldHeavyItalic;
-	src: url("../public/fonts/oswald/OswaldHeavyItalic.ttf");
-}
-
-@font-face {
-	font-family: OswaldLight;
-	src: url("../public/fonts/oswald/OswaldLight.ttf");
-}
-
-@font-face {
-	font-family: OswaldLightItalic;
-	src: url("../public/fonts/oswald/OswaldLightItalic.ttf");
-}
-
-@font-face {
-	font-family: OswaldMedium;
-	src: url("../public/fonts/oswald/OswaldMedium.ttf");
-}
-
-@font-face {
-	font-family: OswaldMediumItalic;
-	src: url("../public/fonts/oswald/OswaldMediumItalic.ttf");
-}
-
-@font-face {
-	font-family: OswaldRegular;
-	src: url("../public/fonts/oswald/OswaldRegular.ttf");
-}
-
-@font-face {
-	font-family: OswaldRegularItalic;
-	src: url("../public/fonts/oswald/OswaldRegularItalic.ttf");
-}
-
-@font-face {
-	font-family: OswaldSemiBold;
-	src: url("../public/fonts/oswald/OswaldSemiBold.ttf");
-}
-
-@font-face {
-	font-family: OswaldSemiBoldItalic;
-	src: url("../public/fonts/oswald/OswaldSemiBoldItalic.ttf");
-}
-
 @keyframes fadeInOpacity {
 	0% {
 		opacity: 0;
@@ -112,7 +42,9 @@ body {
 }
 
 .segment.inverted {
-	background: darken($invertedBackgroundColor, 0%) !important;
+	background: $invertedBackgroundColor !important;
+	// background: lighten($invertedBackgroundColor, 2%);
+	// border: solid 1px $black;
 }
 
 .errorMsgContainer {
@@ -135,8 +67,8 @@ body {
 
 .mainContainer {
 	min-height: 100vh;
-	margin-top: 5.5em;
-	padding: 20px 15px;
+	margin-top: 5.9em;
+	padding: 20px 3px;
 
 	&.inverted {
 		background: $invertedBackgroundColor;
@@ -150,238 +82,30 @@ body {
 	}
 
 	&.homePage {
-		width: 100%;
-		padding: 0;
-
-		.homePageHeroImage {
-			/*
-			background-color: #330055;
-			background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 1000'%3E%3Cg %3E%3Ccircle fill='%23330055' cx='50' cy='0' r='50'/%3E%3Cg fill='%233a015d' %3E%3Ccircle cx='0' cy='50' r='50'/%3E%3Ccircle cx='100' cy='50' r='50'/%3E%3C/g%3E%3Ccircle fill='%23410165' cx='50' cy='100' r='50'/%3E%3Cg fill='%2348026e' %3E%3Ccircle cx='0' cy='150' r='50'/%3E%3Ccircle cx='100' cy='150' r='50'/%3E%3C/g%3E%3Ccircle fill='%23500376' cx='50' cy='200' r='50'/%3E%3Cg fill='%2357047e' %3E%3Ccircle cx='0' cy='250' r='50'/%3E%3Ccircle cx='100' cy='250' r='50'/%3E%3C/g%3E%3Ccircle fill='%235f0587' cx='50' cy='300' r='50'/%3E%3Cg fill='%2367068f' %3E%3Ccircle cx='0' cy='350' r='50'/%3E%3Ccircle cx='100' cy='350' r='50'/%3E%3C/g%3E%3Ccircle fill='%236f0798' cx='50' cy='400' r='50'/%3E%3Cg fill='%237707a0' %3E%3Ccircle cx='0' cy='450' r='50'/%3E%3Ccircle cx='100' cy='450' r='50'/%3E%3C/g%3E%3Ccircle fill='%238008a9' cx='50' cy='500' r='50'/%3E%3Cg fill='%238909b1' %3E%3Ccircle cx='0' cy='550' r='50'/%3E%3Ccircle cx='100' cy='550' r='50'/%3E%3C/g%3E%3Ccircle fill='%239109ba' cx='50' cy='600' r='50'/%3E%3Cg fill='%239a09c3' %3E%3Ccircle cx='0' cy='650' r='50'/%3E%3Ccircle cx='100' cy='650' r='50'/%3E%3C/g%3E%3Ccircle fill='%23a309cb' cx='50' cy='700' r='50'/%3E%3Cg fill='%23ad09d4' %3E%3Ccircle cx='0' cy='750' r='50'/%3E%3Ccircle cx='100' cy='750' r='50'/%3E%3C/g%3E%3Ccircle fill='%23b608dc' cx='50' cy='800' r='50'/%3E%3Cg fill='%23c007e5' %3E%3Ccircle cx='0' cy='850' r='50'/%3E%3Ccircle cx='100' cy='850' r='50'/%3E%3C/g%3E%3Ccircle fill='%23c905ee' cx='50' cy='900' r='50'/%3E%3Cg fill='%23d303f6' %3E%3Ccircle cx='0' cy='950' r='50'/%3E%3Ccircle cx='100' cy='950' r='50'/%3E%3C/g%3E%3Ccircle fill='%23D0F' cx='50' cy='1000' r='50'/%3E%3C/g%3E%3C/svg%3E");
-			background-attachment: fixed;
-			background-size: contain;
-			*/
-
-			background: $blue;
-			height: 250px;
-			position: relative;
-			width: 100%;
-		}
-
-		.heroHeader {
-			color: $white;
-			font-size: 56px;
-			margin: 0;
-			position: relative;
-			// text-shadow: 2px 2px $grey;
-			top: 50%;
-			transform: translateY(-50%);
-			-ms-transform: translateY(-50%);
-		}
-
-		@media only screen and (max-width: 767px) {
-			.heroHeader {
-				font-size: 42px;
-			}
-		}
-	}
-
-	&.templatePage {
 		padding: 0;
 		width: 100%;
+	}
 
-		.templatePageHero {
-			background: $darkWhite;
-			padding: 30px 15px;
-			position: relative;
-			width: 100%;
-
-			&.inverted {
-				background: $invertedBackgroundColor;
-			}
-		}
-
-		.editTemplateNameInput {
-			margin-bottom: 10px;
-
-			input {
-				font-size: 24px;
-				padding: 14px;
-			}
-		}
+	.addButton {
+		float: right;
+		margin-right: 0;
 	}
 }
 
-#memeContainer {
-	.draggableWrapper {
-		position: relative;
-
-		.dragWrapper {
-			display: block;
-			height: 100%;
-			position: absolute;
-			width: 100%;
-		}
-
-		.memeImg {
-			cursor: pointer;
-			width: 100%;
-			z-index: 998;
-			
-			&.editable {
-				animation: none;
-			}
-		
-			&.active {
-				border: solid 5px $lightBlue;
-			}
-		}
-		
-		.memeText {
-			cursor: move;
-			left: 20px;
-			line-height: 0.8;
-			position: absolute;
-			max-width: 94%;
-			word-wrap: break-word;
-			z-index: 999;
-
-			&.disabled {
-				cursor: default;
-			}
-		}
-	}
-
-	&:not(.downloading) {
-		.memeImg {
-			animation-name: fadeInOpacity;
-			animation-iteration-count: 1;
-			animation-timing-function: ease-in;
-			animation-duration: 1.2s;
-			opacity: 1;
-		}
-	}
-}
-
-.colorSelectionWrapper {
-	background: $white;
-	border: solid 1px rgba(34, 36, 38, 0.15);
-	border-radius: 4px;
-	cursor: pointer;
-	display: inline-block;
-	padding: 5px;
-	width: 100%;
-
-	.colorSelection {
-		border-radius: 4px;
-		height: 26px;
-		width: 100%;
-	}
-}
-
-.colorPickerWrapper {
-	position: absolute;
-	z-index: 1000;
-
-	.colorPickerOverlay {
-		bottom: 0;
-		left: 0;
-		position: fixed;
-		right: 0;
-		top: 0;
-	}
-}
-
-.addAnotherImage {
-	margin-top: 10px;
-	text-align: center;
-
-	span {
-		color: $white;
-		cursor: pointer;
-		display: inline-block;
-		font-size: 16px;
-
-		&:hover {
-			border-bottom: solid 1px $white;
-		}
-	}
-}
-
-.artistPage {
-	.artistProfileList {
-		&.inverted {
-			.item {
-				color: $white;
-
-				&.active {
-					border-bottom: solid 1px $white;
-				}
-			}
-		}
-
+.gridList {
+	&.inverted {
 		.item {
-			cursor: pointer;
-		}
-	}
-}
+			color: $white;
 
-.createPage {
-	.memeConfig {
-		.segment {
-			border: solid 1px $grey;
-			box-shadow: none !important;
-		}
-	}
-}
-
-.explorePage {
-	@media only screen and (max-width: 767px) {
-		.exploreFilterBtnGroup {
-			display: inline-flex;
-			flex-direction: column;
-
-			.button {
-				width: 100% !important;
-			}
-		}
-	}
-
-	.exploreFilterBtnGroup {
-		.button {
 			&.active {
-				
+				border-bottom: solid 1px $white;
 			}
 		}
 	}
-}
 
-.memePage {
-	.templateImages {
-		.image {
-			animation-name: fadeInOpacity;
-	        animation-iteration-count: 1;
-	        animation-timing-function: ease-in;
-	        animation-duration: 0.85s;
-			cursor: pointer;
-			margin-bottom: 0;
-			margin-top: 0;
-			opacity: 1;
-		}
+	.item {
+		cursor: pointer;
 	}
-
-	.memeCaption {
-		font-weight: normal;
-		margin-bottom: 40px;
-	}
-
-	.memeUpdateButton {
-		margin-top: 15px;
-	}
-}
-
-span.editMeme, span.editTemplate {
-	color: $blue;
-	cursor: pointer;
 }
 
 .signInPage {
@@ -391,72 +115,6 @@ span.editMeme, span.editTemplate {
 	@media only screen and (max-width: 767px) {
 		&.ui.container {
 			margin: 0 !important;
-		}
-	}
-}
-
-@media only screen and (max-width: 767px) {
-	.ui.form .fields.colorFields {
-		margin-bottom: 1em !important;
-	}
-}
-
-.fontSelection {
-	.item {
-		&:nth-of-type(1) {
-			font-family: OswaldRegular !important;
-		}
-
-		&:nth-of-type(2) {
-			font-family: OswaldRegularItalic !important;
-		}
-
-		&:nth-of-type(3) {
-			font-family: OswaldLight !important;
-		}
-
-		&:nth-of-type(4) {
-			font-family: OswaldLightItalic !important;
-		}
-
-		&:nth-of-type(5) {
-			font-family: OswaldExtraLight !important;
-		}
-
-		&:nth-of-type(6) {
-			font-family: OswaldExtraLightItalic !important;
-		}
-
-		&:nth-of-type(7) {
-			font-family: OswaldMedium !important;
-		}
-
-		&:nth-of-type(8) {
-			font-family: OswaldMediumItalic !important;
-		}
-
-		&:nth-of-type(9) {
-			font-family: OswaldHeavy !important;
-		}
-
-		&:nth-of-type(10) {
-			font-family: OswaldHeavyItalic !important;
-		}
-
-		&:nth-of-type(11) {
-			font-family: OswaldSemiBold !important;
-		}
-
-		&:nth-of-type(12) {
-			font-family: OswaldSemiBoldItalic !important;
-		}
-
-		&:nth-of-type(13) {
-			font-family: OswaldBold !important;
-		}
-
-		&:nth-of-type(14) {
-			font-family: OswaldBoldItalic !important;
 		}
 	}
 }

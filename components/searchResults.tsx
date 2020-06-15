@@ -1,81 +1,106 @@
-import { Container, Header, Image, Placeholder, Segment, Visibility } from "semantic-ui-react"
+import { Container, Header, Item, Label, Placeholder, Segment, Visibility } from "semantic-ui-react"
 import { s3BaseUrl } from "@options/config"
 import DefaultPic from "@public/images/placeholders/placeholder-dark.jpg"
 import LinkedText from "@components/linkedText"
-import Masonry from "react-masonry-css"
 import Moment from "react-moment"
 import PropTypes from "prop-types"
 import React, { Fragment, useState } from "react"
 import Router from "next/router"
 
-const MemeCard = ({ loading, inverted, description }) => {
-	if (loading) {
-		return (
-			<Placeholder>
-				<Placeholder.Header>
-					<Placeholder.Line length="very long" />
-					<Placeholder.Line length="long" />
-				</Placeholder.Header>
-				<Placeholder.Paragraph>
-					<Placeholder.Line length="medium" />
-				</Placeholder.Paragraph>
-			</Placeholder>
-		)
-	}
-
-	return (
-		<div className={`gridElementText ${inverted ? "inverted" : ""}`}>
-			<LinkedText text={description} />
-		</div>
-	)
-}
-
-MemeCard.propTypes = {
-	description: PropTypes.string,
-	inverted: PropTypes.bool,
-	loading: PropTypes.bool
-}
-
 const SearchResults: React.FunctionComponent = ({
 	hasMore,
 	inverted,
-	justImages,
 	loading,
 	loadMore,
 	page,
 	q,
 	results,
-	templateId,
-	type,
-	userId
+	type
 }) => {
 	const [fetching, setFetching] = useState(false)
 
-	const getCardData = (type, result) => {
-		if (type === "memes") {
-			return {
-				description: result.caption,
-				link: `/meme/${result.id}`,
-				subtitle: (
-					<Fragment>
-						<Moment date={result.createdAt} fromNow /> • {result.views} views
-					</Fragment>
-				),
-				title: result.name === null ? `Meme #${result.id}` : result.name
-			}
-		}
-
-		if (type === "templates") {
-			return {
-				link: `/template/${result.id}`
-			}
-		}
-
-		return null
-	}
-
 	const getCardImage = (s3Link) => {
 		return s3Link === null ? DefaultPic : `${s3BaseUrl}${s3Link}`
+	}
+
+	const renderDepartmentsList = () => {
+		return (
+			<Item.Group className={`resultsList ${inverted ? "inverted" : ""}`}>
+				{results.map((result) => {
+					if (loading) {
+						console.log("loading")
+						return (
+							<Item key={`resultsListItem${result.id}`}>
+								<Item.Content>
+									<Placeholder inverted={inverted}>
+										<Placeholder.Header>
+											<Placeholder.Line length="very long" />
+											<Placeholder.Line length="long" />
+										</Placeholder.Header>
+										<Placeholder.Paragraph>
+											<Placeholder.Line length="medium" />
+										</Placeholder.Paragraph>
+									</Placeholder>
+								</Item.Content>
+							</Item>
+						)
+					}
+
+					let meta = result.state
+					if (result.type === 2) {
+						meta = `${result.city}, ${result.state}`
+					}
+					return (
+						<Item
+							key={`resultsListItem${result.id}`}
+							onClick={() => Router.push(`/departments/${result.id}`)}
+						>
+							<Item.Content>
+								<Item.Header>{result.name}</Item.Header>
+								<Item.Meta>
+									<span>{meta}</span>
+								</Item.Meta>
+								<Item.Description>
+									<Label color="orange">52 interactions</Label>
+									<Label color="blue">52 officers</Label>
+								</Item.Description>
+							</Item.Content>
+						</Item>
+					)
+				})}
+			</Item.Group>
+		)
+	}
+
+	const renderOfficersList = () => {
+		return (
+			<Item.Group className={`resultsList ${inverted ? "inverted" : ""}`}>
+				{results.map((result) => {
+					return (
+						<Item
+							key={`resultsListItem${result.id}`}
+							onClick={() => Router.push(`/officers/${result.slug}`)}
+						>
+							<Item.Image
+								onError={(i) => (i.target.src = DefaultPic)}
+								src={result.img === null ? DefaultPic : result.img}
+							/>
+							<Item.Content>
+								<Item.Header>
+									{result.firstName} {result.lastName}
+								</Item.Header>
+								<Item.Meta>{result.departmentName}</Item.Meta>
+								<Item.Description>
+									<Label color="orange">
+										{result.interactionCount} interactions
+									</Label>
+								</Item.Description>
+							</Item.Content>
+						</Item>
+					)
+				})}
+			</Item.Group>
+		)
 	}
 
 	return (
@@ -84,7 +109,7 @@ const SearchResults: React.FunctionComponent = ({
 				<Container textAlign="center">
 					<Segment inverted={inverted} placeholder>
 						<Header icon size="huge">
-							No results...
+							No {type} yet...
 						</Header>
 					</Segment>
 				</Container>
@@ -94,52 +119,13 @@ const SearchResults: React.FunctionComponent = ({
 					onBottomVisible={async () => {
 						if (hasMore && !fetching) {
 							setFetching(true)
-							await loadMore({ page, q, templateId, userId })
+							await loadMore({ page, q })
 							setFetching(false)
 						}
 					}}
 				>
-					<Masonry
-						breakpointCols={3}
-						className="searchResultsMasonryGrid"
-						columnClassName="searchResultsMasonryGridColumn"
-					>
-						{results.map((result, i) => {
-							const { description, link } = getCardData(type, result)
-							const img = getCardImage(result.s3Link)
-
-							if (typeof result.id === "undefined") {
-								return
-							}
-
-							return (
-								<div
-									className="gridElement"
-									key={`${type}_${i}`}
-									onClick={() => Router.push(link)}
-								>
-									{loading ? (
-										<Placeholder inverted={inverted}>
-											<Placeholder.Image square />
-										</Placeholder>
-									) : (
-										<Image
-											onError={(i) => (i.target.src = DefaultPic)}
-											src={img}
-										/>
-									)}
-
-									{!justImages && !loading ? (
-										<MemeCard
-											description={description}
-											inverted={inverted}
-											loading={loading}
-										/>
-									) : null}
-								</div>
-							)
-						})}
-					</Masonry>
+					{type === "departments" && renderDepartmentsList()}
+					{type === "officers" && renderOfficersList()}
 				</Visibility>
 			)}
 		</div>
@@ -149,7 +135,6 @@ const SearchResults: React.FunctionComponent = ({
 SearchResults.propTypes = {
 	hasMore: PropTypes.bool,
 	inverted: PropTypes.bool,
-	justImages: PropTypes.bool,
 	loading: PropTypes.bool,
 	loadMore: PropTypes.func,
 	page: PropTypes.number,
@@ -157,10 +142,6 @@ SearchResults.propTypes = {
 	results: PropTypes.arrayOf(
 		PropTypes.oneOfType([
 			PropTypes.bool,
-			PropTypes.shape({
-				name: PropTypes.number,
-				s3Link: PropTypes.string
-			}),
 			PropTypes.shape({
 				caption: PropTypes.string,
 				createdAt: PropTypes.string,
@@ -182,11 +163,7 @@ SearchResults.propTypes = {
 			})
 		])
 	),
-	templateId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-	type: PropTypes.oneOf(["artists", "memes", "templates"]),
-	userId: PropTypes.number
+	type: PropTypes.oneOf(["departments", "interactions", "officers"])
 }
-
-SearchResults.defaultProps = {}
 
 export default SearchResults

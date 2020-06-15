@@ -30,7 +30,7 @@ const Header: React.FunctionComponent = ({ basic, inverted, loading, logout }) =
 	const { username } = user
 
 	const LoginButton = () => {
-		if (authenticated === true) {
+		if (authenticated) {
 			const trigger = (
 				<Image
 					avatar
@@ -67,20 +67,16 @@ const Header: React.FunctionComponent = ({ basic, inverted, loading, logout }) =
 			)
 		}
 
-		if (authenticated === false) {
-			return (
-				<Menu.Item className="headerMenuItem signInLink" direction="right" position="right">
-					<Button
-						color="blue"
-						content="Sign In"
-						inverted={inverted}
-						onClick={() => router.push("/signin?type=join")}
-					/>
-				</Menu.Item>
-			)
-		}
-
-		return null
+		return (
+			<Menu.Item className="headerMenuItem signInLink" direction="right" position="right">
+				<Button
+					color="blue"
+					content="Become an ally"
+					inverted={inverted}
+					onClick={() => router.push("/signin?type=join")}
+				/>
+			</Menu.Item>
+		)
 	}
 
 	return (
@@ -114,23 +110,32 @@ const Header: React.FunctionComponent = ({ basic, inverted, loading, logout }) =
 						>
 							<Container className="headerContainer">
 								<Menu.Item className="headerMenuItem home">
-									<Image
-										className="headerLogo"
-										onClick={() => router.push("/")}
-										src={Logo}
-									/>
-									<Link href="/">
-										<a className="logoText">Brandy</a>
+									<div className="parallelogram">
+										<Link href="/">
+											<span className="alliesText">
+												<a>Allies</a>
+											</span>
+										</Link>
+										<Link href="/">
+											<span className="onlyText">
+												<a>Only</a>
+											</span>
+										</Link>
+									</div>
+								</Menu.Item>
+								<Menu.Item className="headerMenuItem departments">
+									<Link href="/departments">
+										<a>Departments</a>
 									</Link>
 								</Menu.Item>
-								<Menu.Item className="headerMenuItem create">
-									<Link href="/create">
-										<a>Create</a>
+								<Menu.Item className="headerMenuItem officers">
+									<Link href="/officers">
+										<a>Officers</a>
 									</Link>
 								</Menu.Item>
-								<Menu.Item className="headerMenuItem explore">
-									<Link href="/explore/memes">
-										<a>Explore</a>
+								<Menu.Item className="headerMenuItem interactions">
+									<Link href="/interactions">
+										<a>Interactions</a>
 									</Link>
 								</Menu.Item>
 								{LoginButton()}

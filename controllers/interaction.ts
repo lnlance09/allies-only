@@ -7,59 +7,32 @@ const randomize = require("randomatic")
 const sha1 = require("sha1")
 const validator = require("validator")
 /* eslint-enable */
-const MemeTemplate = db.memeTemplate
-const Template = db.template
-const User = db.user
+const Department = db.department
+const Interaction = db.interaction
+const Officer = db.officer
 const Op = db.Sequelize.Op
 
 exports.create = async (req, res) => {
-	const { img, name } = req.body
+	const { file } = req.files
+	const { description, officerId } = req.body
 	const { authenticated, user } = Auth.parseAuthentication(req)
 
-	if (typeof img === "undefined" || img === "") {
-		return res.status(422).send({ error: true, msg: "You must provide an image" })
+	if (typeof officerId === "undefined" || officerId === "") {
+		return res
+			.status(422)
+			.send({ error: true, msg: "You must link this interaction to an officer" })
 	}
 
-	let image = img
+	const image = file.data
 	const timestamp = new Date().getTime()
-	const fileName = `templates/${randomize("aa", 24)}-${timestamp}.png`
-	const hash = sha1(image)
+	const fileName = `interactions/${randomize("aa", 24)}-${timestamp}.png`
+	await Aws.uploadToS3(image, fileName, false)
 
-	const templateId = await Template.findAll({
-		required: true,
-		attributes: ["id"],
-		where: {
-			hash
-		},
-		raw: true
-	}).then((template) => {
-		if (template.length === 1) {
-			return template[0].id
-		}
-
-		return false
-	})
-
-	if (templateId) {
-		return res.status(200).send({
-			error: false,
-			id: templateId,
-			msg: "success"
-		})
-	}
-
-	if (validator.isURL(img)) {
-		const imageFromUrl = await axios.get(img, { responseType: "arraybuffer" })
-		image = Buffer.from(imageFromUrl.data).toString("base64")
-	}
-
-	await Aws.uploadToS3(image, fileName)
-
-	Template.create({
-		createdBy: authenticated ? user.id : 1,
-		hash,
-		name,
-		s3Link: fileName
+	Interaction.create({
+		description,
+		officerId,
+		userId: authenticated ? user.data.id : 1,
+		video: ""
 	})
 		.then((data) => {
 			const { id } = data.dataValues
@@ -78,7 +51,7 @@ exports.create = async (req, res) => {
 }
 
 exports.findAll = (req, res) => {
-	const { page, q, userId } = req.query
+	const { departmentId, officerId, page, q, userId } = req.query
 
 	const limit = 10
 	let where = {
@@ -91,27 +64,31 @@ exports.findAll = (req, res) => {
 		where = {}
 	}
 
-	if (typeof userId !== "undefined" && userId !== "") {
-		where.createdBy = userId
+	if (typeof state !== "undefined" && state !== "") {
+		where.state = state
 	}
 
-	Template.findAll({
-		required: true,
-		attributes: ["id", "name", "s3Link"],
-		where,
-		offset: page * limit,
+	if (typeof type !== "undefined" && type !== "") {
+		where.type = type
+	}
+
+	Interaction.findAll({
+		attributes: ["id", "createdAt", "description", "video", "views"],
 		limit,
+		offset: page * limit,
 		order: [["createdAt", "DESC"]],
-		raw: true
+		raw: true,
+		required: true,
+		where
 	})
-		.then((templates) => {
-			const hasMore = templates.length === limit
+		.then((interactions) => {
+			const hasMore = interactions.length === limit
 			return res.status(200).send({
 				error: false,
 				hasMore,
+				interactions,
 				msg: "Success",
-				page: parseInt(page) + 1,
-				templates
+				page: parseInt(page) + 1
 			})
 		})
 		.catch((err) => {
@@ -125,8 +102,7 @@ exports.findAll = (req, res) => {
 exports.findOne = (req, res) => {
 	const { id } = req.params
 
-	Template.findAll({
-		required: true,
+	Interaction.findAll({
 		attributes: [
 			["id", "templateId"],
 			"createdAt",
@@ -137,41 +113,33 @@ exports.findOne = (req, res) => {
 			"user.name",
 			"user.username"
 		],
-		where: {
-			id
-		},
-		raw: true,
 		include: [
 			{
 				model: User,
 				required: true,
 				attributes: []
 			}
-		]
+		],
+		raw: true,
+		required: true,
+		where: {
+			id
+		}
 	})
-		.then(async (template) => {
-			if (template.length === 0) {
+		.then(async (interactions) => {
+			if (interactions.length === 0) {
 				return res.status(404).send({
 					error: true,
-					msg: "That template does not exist"
+					msg: "That department does not exist"
 				})
 			}
 
-			const count = await MemeTemplate.count({
-				where: {
-					templateId: id
-				},
-				distinct: true,
-				col: "memeTemplate.memeId"
-			}).then((count) => count)
-
-			const templateData = template[0]
-			templateData.memeCount = count
+			const interactionData = interactions[0]
 
 			return res.status(200).send({
 				error: false,
-				msg: "Success",
-				template: templateData
+				interaction: interactionData,
+				msg: "Success"
 			})
 		})
 		.catch((err) => {
@@ -184,42 +152,42 @@ exports.findOne = (req, res) => {
 
 exports.update = async (req, res) => {
 	const { id } = req.params
-	const { name } = req.body
+	const { description, officerId } = req.body
 	const { authenticated, user } = Auth.parseAuthentication(req)
 
 	if (!authenticated) {
 		return res.status(401).send({ error: true, msg: "You must be logged in" })
 	}
 
-	const count = await Template.count({
+	const count = await Interaction.count({
 		where: {
 			createdBy: user.data.id,
 			id
 		},
 		distinct: true,
-		col: "template.id"
+		col: "interaction.id"
 	}).then((count) => count)
 
 	if (count === 0) {
 		return res
 			.status(401)
-			.send({ error: true, msg: "You don't have permission to edit this template" })
+			.send({ error: true, msg: "You don't have permission to edit this interaction" })
 	}
 
-	const updateData = {}
-	if (typeof name !== "undefined" && name !== "") {
-		updateData.name = name
+	const updateData = {
+		description,
+		officerId
 	}
 
-	Template.update(updateData, {
+	Interaction.update(updateData, {
 		where: { id }
 	})
 		.then(async () => {
-			const template = await Template.findByPk(id, { raw: true })
+			const interaction = await Interaction.findByPk(id, { raw: true })
 			return res.status(200).send({
 				error: false,
 				msg: "Success",
-				template
+				interaction
 			})
 		})
 		.catch(() => {
@@ -228,4 +196,15 @@ exports.update = async (req, res) => {
 				msg: "There was an error"
 			})
 		})
+}
+
+exports.updateViews = async (req, res) => {
+	const { id } = req.params
+
+	Interaction.increment("views", { where: { id } })
+
+	return res.status(200).send({
+		error: false,
+		msg: "Views updated"
+	})
 }

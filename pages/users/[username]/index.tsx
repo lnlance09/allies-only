@@ -26,7 +26,7 @@ import React, { Fragment, useCallback, useEffect, useState } from "react"
 import SearchResults from "@components/searchResults"
 import store from "@store"
 
-const Artist: React.FunctionComponent = ({
+const User: React.FunctionComponent = ({
 	changeProfilePic,
 	error,
 	getUser,
@@ -218,7 +218,7 @@ const Artist: React.FunctionComponent = ({
 	)
 }
 
-Artist.propTypes = {
+User.propTypes = {
 	changeProfilePic: PropTypes.func,
 	error: PropTypes.bool,
 	errorMsg: PropTypes.string,
@@ -268,7 +268,7 @@ Artist.propTypes = {
 	})
 }
 
-Artist.defaultProps = {
+User.defaultProps = {
 	changeProfilePic,
 	getUser,
 	getUserMemes,
@@ -288,4 +288,4 @@ export default compose(
 		getUserTemplates
 	}),
 	withTheme("dark")
-)(Artist)
+)(User)

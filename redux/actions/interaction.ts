@@ -2,10 +2,10 @@ import * as constants from "../constants"
 import axios from "axios"
 import Router from "next/router"
 
-export const createMeme = ({ bearer, caption, images }) => (dispatch) => {
+export const createInteraction = ({ bearer, caption, images }) => (dispatch) => {
 	axios
 		.post(
-			"/api/meme/create",
+			"/api/interaction/create",
 			{
 				caption,
 				images
@@ -19,7 +19,7 @@ export const createMeme = ({ bearer, caption, images }) => (dispatch) => {
 		.then(async (response) => {
 			const { data } = response
 			if (!data.error) {
-				Router.push(`/meme/${data.id}?download=1`)
+				Router.push(`/interaction/${data.id}`)
 			}
 		})
 		.catch((error) => {
@@ -27,40 +27,44 @@ export const createMeme = ({ bearer, caption, images }) => (dispatch) => {
 		})
 }
 
-export const getMeme = ({ callback = () => null, id }) => (dispatch) => {
+export const getInteraction = ({ callback = () => null, id }) => (dispatch) => {
 	axios
-		.get(`/api/meme/${id}`)
+		.get(`/api/interaction/${id}`)
 		.then(async (response) => {
 			const { data } = response
 			dispatch({
 				payload: data,
-				type: constants.GET_MEME
+				type: constants.GET_INTERACTION
 			})
-			callback(data.meme.templates)
+			callback()
 		})
 		.catch((error) => {
 			dispatch({
-				type: constants.SET_MEME_FETCH_ERROR
+				type: constants.SET_INTERACTION_FETCH_ERROR
 			})
 		})
 }
 
 export const resetToInitial = () => (dispatch) => {
 	dispatch({
-		type: constants.RESET_MEME_TO_INITIAL
+		type: constants.RESET_INTERACTION_TO_INITIAL
 	})
 }
 
-export const updateImg = ({ file, id }) => (dispatch) => {
+export const searchInteractions = ({ page = 0, q = null, templateId = null }) => (dispatch) => {
 	axios
-		.post(`/api/meme/${id}/updateImg`, {
-			file
+		.get("/api/interaction/search", {
+			params: {
+				page,
+				q,
+				templateId
+			}
 		})
 		.then((response) => {
 			const { data } = response
 			dispatch({
 				payload: data,
-				type: constants.UPDATE_MEME_IMG
+				type: constants.SEARCH_INTERACTIONS
 			})
 		})
 		.catch((error) => {
@@ -70,16 +74,16 @@ export const updateImg = ({ file, id }) => (dispatch) => {
 
 export const updateViews = ({ id }) => (dispatch) => {
 	axios
-		.post(`/api/meme/${id}/updateViews`)
+		.post(`/api/interaction/${id}/updateViews`)
 		.then(() => null)
 		.catch((error) => {
 			console.log(error)
 		})
 }
 
-export const updateMeme = ({ bearer, callback = () => null, data, id }) => (dispatch) => {
+export const updateInteraction = ({ bearer, callback = () => null, data, id }) => (dispatch) => {
 	axios
-		.post(`/api/meme/${id}/update`, data, {
+		.post(`/api/interaction/${id}/update`, data, {
 			headers: {
 				Authorization: bearer
 			}
@@ -88,7 +92,7 @@ export const updateMeme = ({ bearer, callback = () => null, data, id }) => (disp
 			const { data } = response
 			dispatch({
 				payload: data,
-				type: constants.UPDATE_MEME
+				type: constants.UPDATE_INTERACTION
 			})
 			callback()
 		})

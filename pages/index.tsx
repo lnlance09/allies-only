@@ -1,4 +1,3 @@
-import { searchMemes } from "@actions/search"
 import { Container, Divider } from "semantic-ui-react"
 import { Provider, connect } from "react-redux"
 import { withTheme } from "@redux/ThemeProvider"
@@ -9,17 +8,13 @@ import React, { useEffect } from "react"
 import SearchResults from "@components/searchResults"
 import store from "@store"
 
-const Home: React.FunctionComponent = (props) => {
-	//static contextType = MyContext;
-	console.log("props", props)
-	const { inverted, memes, searchMemes } = props
-
+const Home: React.FunctionComponent = ({ inverted }) => {
 	useEffect(() => {
-		searchMemes({ page: 0 })
+		// searchMemes({ page: 0 })
 	}, [])
 
 	const loadMore = (page) => {
-		return searchMemes({ page })
+		// return searchMemes({ page })
 	}
 
 	return (
@@ -40,18 +35,7 @@ const Home: React.FunctionComponent = (props) => {
 			>
 				<Divider hidden section />
 
-				<Container>
-					<SearchResults
-						hasMore={memes.hasMore}
-						inverted={inverted}
-						justImages={false}
-						loading={memes.loading}
-						loadMore={({ page }) => loadMore(page)}
-						page={memes.page}
-						results={memes.results}
-						type="memes"
-					/>
-				</Container>
+				<Container></Container>
 
 				<Divider hidden section />
 			</DefaultLayout>
@@ -83,16 +67,14 @@ Home.propTypes = {
 				})
 			])
 		)
-	}),
-	searchMemes: PropTypes.func
+	})
 }
 
 Home.defaultProps = {
 	memes: {
 		loading: true,
 		results: [false, false, false, false, false, false]
-	},
-	searchMemes
+	}
 }
 
 const mapStateToProps = (state: any, ownProps: any) => ({
@@ -100,4 +82,4 @@ const mapStateToProps = (state: any, ownProps: any) => ({
 	...ownProps
 })
 
-export default compose(connect(mapStateToProps, { searchMemes }), withTheme("dark"))(Home)
+export default compose(connect(mapStateToProps, {}), withTheme("dark"))(Home)
