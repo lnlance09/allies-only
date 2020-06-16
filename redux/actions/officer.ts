@@ -56,13 +56,13 @@ export const getOfficer = ({ callback = () => null, id }) => (dispatch) => {
 		})
 }
 
-export const searchOfficers = ({ page = 0, q = null, templateId = null }) => (dispatch) => {
+export const searchOfficers = ({ departmentId = null, page = 0, q = null }) => (dispatch) => {
 	axios
 		.get("/api/officer/search", {
 			params: {
+				departmentId,
 				page,
-				q,
-				templateId
+				q
 			}
 		})
 		.then((response) => {
@@ -83,10 +83,17 @@ export const resetToInitial = () => (dispatch) => {
 	})
 }
 
-export const updateImg = ({ file, id }) => (dispatch) => {
+export const updateImg = ({ bearer, file, id }) => (dispatch) => {
+	const formData = new FormData()
+	formData.set("file", file)
+
 	axios
-		.post(`/api/officer/${id}/updateImg`, {
-			file
+		.post(`/api/officer/${id}/updateImg`, formData, {
+			headers: {
+				Authorization: bearer,
+				"Content-Type": "multipart/form-data",
+				enctype: "multipart/form-data"
+			}
 		})
 		.then((response) => {
 			const { data } = response

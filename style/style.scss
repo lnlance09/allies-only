@@ -48,7 +48,7 @@ body {
 }
 
 .errorMsgContainer {
-	height: 250px;
+	height: 300px;
 	position: relative;
 	width: 100%;
 
@@ -71,6 +71,18 @@ body {
 	padding: 20px 3px;
 
 	&.inverted {
+		background: $invertedBackgroundColor;
+
+		a {
+			color: $lightGrey;
+
+			&:hover {
+				color: darken($lightGrey, 5%);
+			}
+		}
+	}
+
+	.dimmer.pageDimmer {
 		background: $invertedBackgroundColor;
 	}
 
@@ -109,7 +121,7 @@ body {
 }
 
 .signInPage {
-	margin-top: 0;
+	margin-top: 5.2em;
 	width: 100% !important;
 
 	@media only screen and (max-width: 767px) {

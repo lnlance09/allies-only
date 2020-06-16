@@ -5,7 +5,7 @@ import { useRouter } from "next/router"
 import { Provider, connect } from "react-redux"
 import DefaultPic from "@public/images/avatar/small/chris.jpg"
 import Link from "next/link"
-import Logo from "@public/images/logos/jackie-chan-light-blue.svg"
+import Logo from "@public/images/logos/logo_72x72.png"
 import PropTypes from "prop-types"
 import React, { Fragment, useEffect, useState } from "react"
 import Router from "next/router"
@@ -70,10 +70,11 @@ const Header: React.FunctionComponent = ({ basic, inverted, loading, logout }) =
 		return (
 			<Menu.Item className="headerMenuItem signInLink" direction="right" position="right">
 				<Button
-					color="blue"
+					color="yellow"
 					content="Become an ally"
 					inverted={inverted}
 					onClick={() => router.push("/signin?type=join")}
+					size="big"
 				/>
 			</Menu.Item>
 		)
@@ -90,39 +91,19 @@ const Header: React.FunctionComponent = ({ basic, inverted, loading, logout }) =
 					</Fragment>
 				)}
 
-				{basic ? (
-					<Container className="headerContainer basic" textAlign="center">
-						<Image
-							className="headerLogo basic"
-							inline
-							onClick={() => router.push("/")}
-							src={Logo}
-						/>
-					</Container>
-				) : (
-					<Fragment>
-						<Menu
-							borderless
-							className="globalHeader"
-							fitted="vertically"
-							fixed="top"
-							inverted={inverted}
-						>
-							<Container className="headerContainer">
-								<Menu.Item className="headerMenuItem home">
-									<div className="parallelogram">
-										<Link href="/">
-											<span className="alliesText">
-												<a>Allies</a>
-											</span>
-										</Link>
-										<Link href="/">
-											<span className="onlyText">
-												<a>Only</a>
-											</span>
-										</Link>
-									</div>
-								</Menu.Item>
+				<Menu
+					borderless
+					className="globalHeader"
+					fitted="vertically"
+					fixed="top"
+					inverted={inverted}
+				>
+					<Container className={`headerContainer ${basic ? "basic" : ""}`}>
+						<Menu.Item className="headerMenuItem home">
+							<Image className="logo" onClick={() => router.push("/")} src={Logo} />
+						</Menu.Item>
+						{!basic && (
+							<Fragment>
 								<Menu.Item className="headerMenuItem departments">
 									<Link href="/departments">
 										<a>Departments</a>
@@ -139,10 +120,10 @@ const Header: React.FunctionComponent = ({ basic, inverted, loading, logout }) =
 									</Link>
 								</Menu.Item>
 								{LoginButton()}
-							</Container>
-						</Menu>
-					</Fragment>
-				)}
+							</Fragment>
+						)}
+					</Container>
+				</Menu>
 			</div>
 		</Provider>
 	)

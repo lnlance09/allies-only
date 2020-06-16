@@ -1,341 +1,396 @@
-import { getMeme, updateImg, updateMeme, updateViews } from "@actions/meme"
+import { createInteraction, getInteraction } from "@actions/interaction"
 import {
 	Button,
 	Container,
 	Divider,
+	Dropdown,
 	Form,
 	Grid,
 	Header,
-	Image,
+	Icon,
 	Input,
+	List,
+	Message,
 	Placeholder,
+	Segment,
 	TextArea
 } from "semantic-ui-react"
-import { parseJwt } from "@utils/tokenFunctions"
-import { useRouter } from "next/router"
 import { Provider, connect } from "react-redux"
+import { fetchDepartments } from "@options/departments"
+import { fetchOfficers } from "@options/officers"
+import { useRouter } from "next/router"
 import { withTheme } from "@redux/ThemeProvider"
 import { compose } from "redux"
 import DefaultLayout from "@layouts/default"
-import html2canvas from "html2canvas"
-import LazyLoad from "react-lazyload"
-import Link from "next/link"
-import LinkedText from "@components/linkedText"
-import MemeImages from "@components/memeImages"
-import Moment from "react-moment"
+import MapBox from "@components/mapBox"
 import PropTypes from "prop-types"
-import React, { Fragment, useEffect, useRef, useState } from "react"
+import React, { useEffect, useState, Fragment } from "react"
+import SearchResults from "@components/searchResults"
 import store from "@store"
 
-const Meme: React.FunctionComponent = ({
-	getMeme,
-	inverted,
-	meme,
-	updateImg,
-	updateMeme,
-	updateViews
+const Interaction: React.FunctionComponent = ({
+	createInteraction,
+	interaction,
+	getInteraction,
+	inverted
 }) => {
-	const node = useRef(null)
 	const router = useRouter()
-	const { download, slug } = router.query
+	const { slug } = router.query
 
-	const { data, error, loading } = meme
-	const { createdAt, id, img, name, templates, user, views } = data
-
-	const [bearer, setBearer] = useState(null)
-	const [caption, setCaption] = useState(data.caption)
-	const [currentUser, setCurrentUser] = useState({})
-	const [editMode, setEditMode] = useState(false)
-	const [title, setTitle] = useState(name)
+	const [createMode, setCreateMode] = useState(false)
+	const [department, setDepartment] = useState("")
+	const [departmentOptions, setDepartmentOptions] = useState([])
+	const [description, setDescription] = useState("")
+	const [formLoading, setFormLoading] = useState(false)
+	const [officer, setOfficer] = useState([])
+	const [officerOptions, setOfficerOptions] = useState([])
+	const [title, setTitle] = useState("")
 
 	useEffect(() => {
-		const userData = parseJwt()
-		if (userData) {
-			setBearer(localStorage.getItem("jwtToken"))
-			setCurrentUser(userData)
+		const getInitialProps = async () => {
+			if (slug === "create") {
+				setCreateMode(true)
+
+				const officerOptions = await fetchOfficers(department, "")
+				setOfficerOptions(officerOptions)
+
+				const departmentOptions = await fetchDepartments("")
+				setDepartmentOptions(departmentOptions)
+			}
+
+			if (typeof slug !== "undefined" && slug !== "create") {
+				await getInteraction({ id: slug })
+				setCreateMode(false)
+			}
 		}
 
-		if (typeof slug !== "undefined") {
-			getMeme({ id: slug })
-			updateViews({ id: slug })
-		}
+		getInitialProps()
 	}, [slug])
 
-	useEffect(() => {
-		setCaption(data.caption)
-		setTitle(name)
-
-		if (editMode) {
-			document.addEventListener("mousedown", handleClick)
-		} else {
-			document.removeEventListener("mousedown", handleClick)
-		}
-
-		return () => {
-			document.removeEventListener("mousedown", handleClick)
-		}
-	}, [editMode])
-
-	const downloadMeme = () => {
-		const el = document.getElementById("memeContainer")
-		el.classList.add("downloading")
-
-		html2canvas(el, {
-			allowTaint: true,
-			scale: 1,
-			scrollX: -7,
-			scrollY: -window.scrollY,
-			useCORS: true
-		}).then((canvas) => {
-			const ctx = canvas.getContext("2d")
-			ctx.globalAlpha = 0.5
-			const img = canvas.toDataURL("image/png")
-			el.classList.remove("downloading")
-
-			updateImg({ file: img, id })
-
-			const link = document.createElement("a")
-			link.download = `meme.png`
-			link.href = img
-			link.click()
-		})
+	const addInteraction = () => {
+		setFormLoading(true)
+		createInteraction({ callback: () => setFormLoading(false), city, name })
 	}
 
-	const handleClick = (e) => {
-		if (node.current.contains(e.target)) {
-			return
-		}
-		setEditMode(false)
+	const changeDepartment = async (e) => {
+		const q = e.target.value
+		const departmentOptions = await fetchDepartments(q)
+		setDepartmentOptions(departmentOptions)
 	}
 
-	const onClickTemplate = (templateId) => {
-		router.push(`/template/${templateId}`)
+	const changeOfficer = async (e) => {
+		const q = e.target.value
+		const officerOptions = await fetchOfficers(q)
+		setOfficerOptions(officerOptions)
 	}
 
-	const RightColumn = (
-		<Fragment>
-			{!editMode && (
-				<Header as="h1" inverted={inverted}>
-					{name}
-					<Header.Subheader>
-						<Moment date={createdAt} fromNow /> •{" "}
-						<Link href={`/artists/${user.username}`}>
-							<a>{user.username}</a>
-						</Link>{" "}
-						• {views} views
-						{currentUser.id === user.id && (
-							<Fragment>
-								{" "}
-								•{" "}
-								<span className="editMeme" onClick={() => setEditMode(true)}>
-									Edit
-								</span>
-							</Fragment>
-						)}
-					</Header.Subheader>
-				</Header>
-			)}
+	const renderLabel = (option) => ({
+		color: option.color,
+		content: option.text
+	})
 
-			{editMode ? (
-				<div ref={node}>
-					<Form>
-						<Input
-							fluid
-							inverted={inverted}
-							onChange={(e, { value }) => setTitle(value)}
-							placeholder="Title"
-							value={title}
-						/>
-						<Divider />
-						<TextArea
-							inverted={inverted}
-							onChange={(e, { value }) => setCaption(value)}
-							onClick={() => setEditMode(true)}
-							placeholder="Caption"
-							rows={5}
-							value={caption}
-						/>
-						<Button
-							className="memeUpdateButton"
-							color="blue"
-							content="Update"
-							fluid
-							inverted={inverted}
-							onClick={() =>
-								updateMeme({
-									bearer,
-									callback: () => setEditMode(false),
-									data: { caption },
-									id
-								})
-							}
-						/>
-					</Form>
-				</div>
-			) : (
-				<Header as="p" className="memeCaption" inverted={inverted}>
-					<LinkedText text={data.caption} />
-				</Header>
-			)}
+	const selectDepartment = (e, { value }) => {
+		setDepartment(value)
+	}
 
-			<div style={{ margin: "24px 0 12px 0" }}>
-				<Image.Group className="templateImages" size="tiny">
-					{templates.map((template, i) => (
-						<Image
-							key={`templateImage${i}`}
-							onClick={() => onClickTemplate(template.templateId)}
-							src={template.img}
-							ui={false}
-						/>
-					))}
-				</Image.Group>
-			</div>
-
-			<Button
-				color="green"
-				content="Download"
-				fluid
-				icon="download"
-				inverted={inverted}
-				onClick={downloadMeme}
-			/>
-			<Button
-				color="blue"
-				content="Fork"
-				fluid
-				icon="fork"
-				inverted={inverted}
-				onClick={() => router.push(`/create?id=${slug}`)}
-				style={{ marginTop: "15px" }}
-			/>
-		</Fragment>
-	)
+	const selectOfficer = (e, { value }) => {
+		setOfficer(value)
+	}
 
 	return (
 		<Provider store={store}>
 			<DefaultLayout
-				containerClassName="memePage"
+				containerClassName="interactionsPage"
 				seo={{
-					description: caption,
+					description: `A `,
 					image: {
-						height: 512,
-						src: img,
-						width: 512
+						height: 200,
+						src: "",
+						width: 200
 					},
-					title: name,
-					url: `meme/${slug}`
+					title: createMode ? "Add an interaction" : interaction.data.name,
+					url: `interactions`
 				}}
 				showFooter={false}
 			>
-				<Fragment>
-					{error ? (
-						<Container className="errorMsgContainer" textAlign="center">
-							<Header as="h1" inverted={inverted}>
-								This meme does not exist
-								<div />
-								<Button
-									color="blue"
-									content="Go back"
-									inverted={inverted}
-									onClick={() => router.push(`/explore/memes`)}
-								/>
+				{createMode && (
+					<Container>
+						<Header as="h1" inverted={inverted} size="huge">
+							Add an interaction
+						</Header>
+
+						<Segment inverted={inverted} padded="very" placeholder>
+							<Header as="h2" icon size="huge">
+								<Icon color="yellow" inverted name="film" />
 							</Header>
-						</Container>
-					) : (
-						<Grid inverted stackable>
-							<Grid.Row>
-								<Grid.Column width={10}>
-									{loading ? (
-										<Placeholder fluid inverted={inverted}>
-											<Placeholder.Image square />
-										</Placeholder>
-									) : (
-										<LazyLoad height={200}>
-											<MemeImages
-												downloadMeme={downloadMeme}
-												downloadOnLoad={download === "1"}
-												editable={false}
-												images={templates}
-												isInitialRender={false}
-											/>
-										</LazyLoad>
-									)}
-								</Grid.Column>
-								<Grid.Column width={6}>{!loading && RightColumn}</Grid.Column>
-							</Grid.Row>
-						</Grid>
-					)}
-				</Fragment>
+							<Button color="yellow" content="Upload a video" inverted={inverted} />
+						</Segment>
+
+						<Divider inverted={inverted} />
+
+						<Form
+							error={interaction.error}
+							inverted={inverted}
+							size="big"
+							style={{ marginTop: "24px" }}
+						>
+							<Form.Field>
+								<label>Title</label>
+								<Input
+									onChange={(e, { value }) => setTitle(value)}
+									placeholder="Title"
+									value={title}
+								/>
+							</Form.Field>
+							<Form.Field>
+								<label>Description</label>
+								<TextArea
+									onChange={(e, { value }) => setDescription(value)}
+									placeholder="Describe this interaction"
+									value={description}
+								/>
+							</Form.Field>
+							<Form.Group widths="equal">
+								<Form.Field>
+									<label>Officers involved</label>
+									<Dropdown
+										fluid
+										multiple
+										onChange={selectOfficer}
+										onSearchChange={changeOfficer}
+										options={officerOptions}
+										placeholder="Officers involved"
+										renderLabel={renderLabel}
+										search
+										selection
+										value={officer}
+									/>
+								</Form.Field>
+								<Form.Field>
+									<label>Police Department</label>
+									<Dropdown
+										fluid
+										onChange={selectDepartment}
+										onSearchChange={changeDepartment}
+										options={departmentOptions}
+										placeholder="Police Department"
+										search
+										selection
+										value={department}
+									/>
+								</Form.Field>
+							</Form.Group>
+						</Form>
+
+						{interaction.error && (
+							<Message
+								content={interaction.errorMsg}
+								error
+								inverted={inverted}
+								size="big"
+							/>
+						)}
+
+						<Divider inverted={inverted} section />
+
+						<Button
+							color="blue"
+							content="Add"
+							fluid
+							inverted={inverted}
+							loading={formLoading}
+							onClick={addInteraction}
+							size="big"
+						/>
+					</Container>
+				)}
+
+				{!createMode && (
+					<Fragment>
+						{interaction.error ? (
+							<Container className="errorMsgContainer" textAlign="center">
+								<Header as="h1" inverted={inverted}>
+									This department does not exist
+									<div />
+									<Button
+										color="blue"
+										content="Search all departments"
+										inverted={inverted}
+										onClick={() => router.push(`/departments`)}
+									/>
+								</Header>
+							</Container>
+						) : (
+							<Fragment>
+								<Grid>
+									<Grid.Row>
+										<Grid.Column width={4}>
+											{interaction.loading ? (
+												<Placeholder inverted={inverted}>
+													<Placeholder.Image square />
+												</Placeholder>
+											) : (
+												<Fragment>
+													<MapBox
+														lat={parseFloat(interaction.data.lat, 10)}
+														lng={parseFloat(interaction.data.lon, 10)}
+														zoom={interaction.data.type === 1 ? 4 : 9}
+													/>
+												</Fragment>
+											)}
+										</Grid.Column>
+										<Grid.Column width={12}>
+											{!interaction.loading && (
+												<Fragment>
+													<Header as="h1" inverted={inverted}>
+														{interaction.data.name}
+														<Header.Subheader>
+															{interaction.data.type === 1 && (
+																<Fragment>
+																	{interaction.data.state}
+																</Fragment>
+															)}
+															{interaction.data.type === 2 && (
+																<Fragment>
+																	{interaction.data.city},{" "}
+																	{interaction.data.state}
+																</Fragment>
+															)}
+															{interaction.data.type === 3 && (
+																<Fragment>
+																	{interaction.data.county}{" "}
+																	County, {interaction.data.state}
+																</Fragment>
+															)}
+														</Header.Subheader>
+													</Header>
+
+													<div style={{ marginTop: "22px" }}>
+														<Button
+															color="yellow"
+															compact
+															content="Interaction"
+															icon="plus"
+															inverted={inverted}
+															onClick={() =>
+																router.push(
+																	`/interactions/create?deparmentId=${interaction.data.id}`
+																)
+															}
+														/>
+														<Button
+															color="orange"
+															compact
+															content="Officer"
+															icon="plus"
+															inverted={inverted}
+															onClick={() =>
+																router.push(
+																	`/officers/create?deparmentId=${interaction.data.id}`
+																)
+															}
+															style={{ marginLeft: "7px" }}
+														/>
+													</div>
+
+													<List
+														className="gridList"
+														horizontal
+														inverted={inverted}
+														size="big"
+													>
+														<List.Item
+															active={activeItem === "officers"}
+															onClick={() =>
+																setActiveItem("officers")
+															}
+														>
+															<b>{interaction.data.officerCount}</b>{" "}
+															officers
+														</List.Item>
+														<List.Item
+															active={activeItem === "interactions"}
+															onClick={() =>
+																setActiveItem("interactions")
+															}
+														>
+															<b>
+																{interaction.data.interactionCount}
+															</b>{" "}
+															interactions
+														</List.Item>
+													</List>
+												</Fragment>
+											)}
+										</Grid.Column>
+									</Grid.Row>
+								</Grid>
+
+								<Divider section />
+
+								{!interaction.error && !interaction.loading ? (
+									<SearchResults
+										hasMore={results.hasMore}
+										inverted={inverted}
+										loading={results.loading}
+										loadMore={({ page, userId }) => loadMore(page, userId)}
+										page={results.page}
+										results={results.results}
+										type={activeItem}
+									/>
+								) : null}
+							</Fragment>
+						)}
+					</Fragment>
+				)}
 			</DefaultLayout>
 		</Provider>
 	)
 }
 
-Meme.propTypes = {
-	getMeme: PropTypes.func,
-	inverted: PropTypes.bool,
-	meme: PropTypes.shape({
+Interaction.propTypes = {
+	createInteraction: PropTypes.func,
+	getInteraction: PropTypes.func,
+	interaction: PropTypes.shape({
 		data: PropTypes.shape({
-			caption: PropTypes.string,
-			createdAt: PropTypes.string,
-			id: PropTypes.bool,
-			img: PropTypes.string,
+			city: PropTypes.string,
+			county: PropTypes.string,
+			id: PropTypes.number,
+			interactionCount: PropTypes.number,
+			lat: PropTypes.string,
+			lon: PropTypes.string,
 			name: PropTypes.string,
-			s3Link: PropTypes.string,
-			templates: PropTypes.arrayOf(
-				PropTypes.shape({
-					img: PropTypes.string,
-					name: PropTypes.string,
-					templateId: PropTypes.number,
-					texts: PropTypes.arrayOf(
-						PropTypes.shape({
-							backgroundColor: PropTypes.string,
-							color: PropTypes.string,
-							font: PropTypes.string,
-							size: PropTypes.string,
-							text: PropTypes.string,
-							x: PropTypes.number,
-							y: PropTypes.number
-						})
-					)
-				})
-			),
-			user: PropTypes.shape({
-				id: PropTypes.number,
-				img: PropTypes.string,
-				name: PropTypes.string,
-				username: PropTypes.string
-			}),
-			views: PropTypes.number
+			officerCount: PropTypes.number,
+			state: PropTypes.string,
+			type: PropTypes.number
 		}),
 		error: PropTypes.bool,
 		errorMsg: PropTypes.string,
 		loading: PropTypes.bool
 	}),
-	updateImg: PropTypes.func,
-	updateMeme: PropTypes.func,
-	updateViews: PropTypes.func
+	inverted: PropTypes.bool
 }
 
-Meme.defaultProps = {
-	getMeme,
-	meme: {},
-	updateImg,
-	updateMeme,
-	updateViews
+Interaction.defaultProps = {
+	createInteraction,
+	getInteraction,
+	interaction: {
+		data: {},
+		error: false,
+		errorMsg: "",
+		loading: true
+	}
 }
 
 const mapStateToProps = (state: any, ownProps: any) => ({
-	...state.meme,
+	...state.department,
 	...ownProps
 })
 
 export default compose(
 	connect(mapStateToProps, {
-		getMeme,
-		updateImg,
-		updateMeme,
-		updateViews
+		createInteraction,
+		getInteraction
 	}),
 	withTheme("dark")
-)(Meme)
+)(Interaction)

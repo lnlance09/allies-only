@@ -33,6 +33,11 @@ export const getDepartment = ({ callback = () => null, id }) => (dispatch) => {
 				payload: data,
 				type: constants.GET_DEPARTMENT
 			})
+
+			if (!data.error) {
+				console.log("callback")
+				callback(data.department.id)
+			}
 		})
 		.catch(() => {
 			dispatch({

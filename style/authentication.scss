@@ -16,14 +16,26 @@
         .error.message {
             margin-bottom: 14px;
         }
+
+        .raceHeader {
+            cursor: pointer;
+            margin: 0;
+
+            &.active {
+                border-bottom: solid 2px $yellow;
+                display: inline;
+                padding-bottom: 6px;
+            }
+        }
     }
 
     .registerText {
         margin-top: 4px;
 
         .registerLink {
-            border-bottom: solid 1px $white;
+            border-bottom: solid 2px $invertedYellow;
             cursor: pointer;
+            padding-bottom: 3px;
         }
     }
 }

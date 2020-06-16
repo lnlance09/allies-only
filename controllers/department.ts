@@ -3,8 +3,6 @@ const Auth = require("../utils/authFunctions.ts")
 const Aws = require("../utils/awsFunctions.ts")
 const db = require("../models/index.ts")
 const axios = require("axios")
-const randomize = require("randomatic")
-const sha1 = require("sha1")
 const validator = require("validator")
 /* eslint-enable */
 const Department = db.department
@@ -75,7 +73,40 @@ exports.findAll = (req, res) => {
 		where.type = type
 	}
 
-	let attributes = ["city", "county", "id", "lat", "lon", "name", "state", "type", "zipCode"]
+	let attributes = [
+		"city",
+		"county",
+		"id",
+		"lat",
+		"lon",
+		"name",
+		"state",
+		"type",
+		"zipCode",
+		[
+			db.Sequelize.fn("COUNT", db.Sequelize.fn("DISTINCT", db.Sequelize.col("officers.id"))),
+			"officerCount"
+		],
+		[
+			db.Sequelize.fn(
+				"COUNT",
+				db.Sequelize.fn("DISTINCT", db.Sequelize.col("officers->interactions.id"))
+			),
+			"interactionCount"
+		]
+	]
+	let include = [
+		{
+			attributes: [],
+			include: [
+				{
+					attributes: [],
+					model: Interaction
+				}
+			],
+			model: Officer
+		}
+	]
 
 	if (forOptions === "1") {
 		attributes = [
@@ -86,14 +117,18 @@ exports.findAll = (req, res) => {
 			["name", "text"],
 			["id", "value"]
 		]
+		include = null
 	}
 
 	Department.findAll({
 		attributes,
+		group: ["id"],
+		include,
 		limit,
 		offset,
 		order,
 		raw: true,
+		subQuery: false,
 		where
 	})
 		.then((departments) => {
@@ -118,9 +153,46 @@ exports.findOne = (req, res) => {
 	const { id } = req.params
 
 	Department.findAll({
-		attributes: ["city", "county", "id", "name", "state", "type"],
+		attributes: [
+			"city",
+			"county",
+			"id",
+			"lat",
+			"lon",
+			"name",
+			"state",
+			"type",
+			"zipCode",
+			[
+				db.Sequelize.fn(
+					"COUNT",
+					db.Sequelize.fn("DISTINCT", db.Sequelize.col("officers.id"))
+				),
+				"officerCount"
+			],
+			[
+				db.Sequelize.fn(
+					"COUNT",
+					db.Sequelize.fn("DISTINCT", db.Sequelize.col("officers->interactions.id"))
+				),
+				"interactionCount"
+			]
+		],
+		include: [
+			{
+				attributes: [],
+				include: [
+					{
+						attributes: [],
+						model: Interaction
+					}
+				],
+				model: Officer
+			}
+		],
 		limit: 1,
 		raw: true,
+		subQuery: false,
 		where: {
 			id
 		}
@@ -134,29 +206,22 @@ exports.findOne = (req, res) => {
 			}
 
 			const department = data[0]
-			const departmentId = department.id
-
-			const officerCount = await Officer.count({
-				col: "officer.departmentId",
-				distinct: true,
+			const location = await Location.findAll({
+				attributes: ["lat", "lon"],
+				limit: 1,
+				raw: true,
 				where: {
-					departmentId
+					city: department.city,
+					state: department.state
 				}
-			}).then((count) => count)
-			department.officerCount = officerCount
+			})
+				.then((locations) => {
+					return locations[0]
+				})
+				.catch(() => {})
 
-			const interactionCount = await Interaction.count({
-				col: "interaction.id",
-				distinct: true,
-				where: {
-					officerId: {
-						[Op.in]: db.Sequelize.literal(
-							`(SELECT id FROM officers WHERE departmentId = "${departmentId}")`
-						)
-					}
-				}
-			}).then((count) => count)
-			department.interactionCount = interactionCount
+			department.lat = location.lat
+			department.lon = location.lon
 
 			return res.status(200).send({
 				department,

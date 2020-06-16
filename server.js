@@ -44,6 +44,7 @@ app.prepare().then(() => {
 	server.get("/api/officer/search", officers.findAll)
 	server.get("/api/officer/:id", officers.findOne)
 	server.post("/api/officer/:id/update", officers.update)
+	server.post("/api/officer/:id/updateImg", officers.updateImg)
 
 	// Users
 	server.post("/api/user/changeProfilePic", users.changeProfilePic)

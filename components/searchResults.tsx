@@ -61,8 +61,10 @@ const SearchResults: React.FunctionComponent = ({
 									<span>{meta}</span>
 								</Item.Meta>
 								<Item.Description>
-									<Label color="orange">52 interactions</Label>
-									<Label color="blue">52 officers</Label>
+									<Label color="orange">
+										{result.interactionCount} interactions
+									</Label>
+									<Label color="blue">{result.officerCount} officers</Label>
 								</Item.Description>
 							</Item.Content>
 						</Item>
@@ -83,7 +85,7 @@ const SearchResults: React.FunctionComponent = ({
 						>
 							<Item.Image
 								onError={(i) => (i.target.src = DefaultPic)}
-								src={result.img === null ? DefaultPic : result.img}
+								src={result.img === null ? DefaultPic : `${s3BaseUrl}${result.img}`}
 							/>
 							<Item.Content>
 								<Item.Header>

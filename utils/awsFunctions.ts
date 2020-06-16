@@ -16,7 +16,7 @@ module.exports = {
 		}
 
 		const params = {
-			Bucket: "brandywine22",
+			Bucket: "alliesonly",
 			Key: fileName,
 			Body: body,
 			ContentEncoding: "base64",

@@ -1,18 +1,25 @@
 import { parseJwt } from "@utils/tokenFunctions"
 import { withTheme } from "@redux/ThemeProvider"
+import { useRouter } from "next/router"
 import Authentication from "@components/authentication"
 import DefaultLayout from "@layouts/default"
-import PropTypes from "prop-types"
-import React, { useEffect } from "react"
+import React, { useEffect, useState } from "react"
 import Router from "next/router"
 
 const SignIn: React.FunctionComponent = ({ inverted }) => {
+	const router = useRouter()
+	const { type } = router.query
+
+	const [loaded, setLoaded] = useState(false)
+
 	useEffect(() => {
 		const userData = parseJwt()
 		if (userData ? userData.emailVerified : false) {
 			Router.push("/")
 		}
-	}, [])
+
+		setLoaded(true)
+	}, [loaded])
 
 	return (
 		<DefaultLayout
@@ -32,13 +39,9 @@ const SignIn: React.FunctionComponent = ({ inverted }) => {
 			showFooter={false}
 			textAlign="center"
 		>
-			<Authentication inverted={inverted} />
+			{loaded && <Authentication inverted={inverted} login={type !== "join"} />}
 		</DefaultLayout>
 	)
-}
-
-SignIn.propTypes = {
-	inverted: PropTypes.bool
 }
 
 export default withTheme("dark")(SignIn)

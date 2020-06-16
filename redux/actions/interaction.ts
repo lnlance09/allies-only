@@ -51,13 +51,13 @@ export const resetToInitial = () => (dispatch) => {
 	})
 }
 
-export const searchInteractions = ({ page = 0, q = null, templateId = null }) => (dispatch) => {
+export const searchInteractions = ({ departmentId, page = 0, q = nulll }) => (dispatch) => {
 	axios
 		.get("/api/interaction/search", {
 			params: {
+				departmentId,
 				page,
-				q,
-				templateId
+				q
 			}
 		})
 		.then((response) => {

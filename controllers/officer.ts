@@ -2,6 +2,7 @@
 const Auth = require("../utils/authFunctions.ts")
 const Aws = require("../utils/awsFunctions.ts")
 const db = require("../models/index.ts")
+const randomize = require("randomatic")
 const slugify = require("slugify")
 /* eslint-enable */
 const Department = db.department
@@ -89,13 +90,19 @@ exports.create = async (req, res) => {
 }
 
 exports.findAll = async (req, res) => {
-	const { departmentId, page, q } = req.query
+	const { departmentId, forOptions, page, q } = req.query
 
-	const limit = 10
+	const limit = 1
+	const offset = isNaN(page) ? 0 : page * limit
 	let where = {
 		[Op.or]: [
 			{
-				name: {
+				firstName: {
+					[Op.like]: `%${q}%`
+				}
+			},
+			{
+				lastName: {
 					[Op.like]: `%${q}%`
 				}
 			}
@@ -110,37 +117,69 @@ exports.findAll = async (req, res) => {
 		where.departmentId = departmentId
 	}
 
-	Officer.findAll({
-		attributes: [
-			// [db.Sequelize.col("officer.badgeNumber"), "badgeNumber"],
-			[db.Sequelize.col("officer.firstName"), "firstName"],
-			[db.Sequelize.col("officer.img"), "img"],
-			[db.Sequelize.col("officer.lastName"), "lastName"],
-			[db.Sequelize.col("officer.position"), "position"],
-			[db.Sequelize.col("officer.slug"), "slug"],
-			[db.Sequelize.col("department.name"), "departmentName"],
+	let attributes = [
+		// [db.Sequelize.col("officer.badgeNumber"), "badgeNumber"],
+		[db.Sequelize.col("officer.firstName"), "firstName"],
+		[db.Sequelize.col("officer.id"), "id"],
+		[db.Sequelize.col("officer.img"), "img"],
+		[db.Sequelize.col("officer.lastName"), "lastName"],
+		[db.Sequelize.col("officer.position"), "position"],
+		[db.Sequelize.col("officer.slug"), "slug"],
+		[db.Sequelize.col("department.name"), "departmentName"],
+		[
+			db.Sequelize.fn(
+				"COUNT",
+				db.Sequelize.fn("DISTINCT", db.Sequelize.col("interactions.id"))
+			),
+			"interactionCount"
+		]
+	]
+	let include = [
+		{
+			attributes: [],
+			model: Department,
+			required: true
+		},
+		{
+			attributes: [],
+			model: Interaction
+		}
+	]
+
+	if (forOptions === "1") {
+		attributes = [
+			[db.Sequelize.literal("'black'"), "color"],
 			[
 				db.Sequelize.fn(
-					"COUNT",
-					db.Sequelize.fn("DISTINCT", db.Sequelize.col("interactions.id"))
+					"concat",
+					db.Sequelize.col("firstName"),
+					"-",
+					db.Sequelize.col("lastName"),
+					"-",
+					db.Sequelize.col("id")
 				),
-				"interactionCount"
-			]
-		],
-		include: [
-			{
-				attributes: [],
-				model: Department,
-				required: true
-			},
-			{
-				attributes: [],
-				model: Interaction
-			}
-		],
+				"key"
+			],
+			[
+				db.Sequelize.fn(
+					"concat",
+					db.Sequelize.col("firstName"),
+					" ",
+					db.Sequelize.col("lastName")
+				),
+				"text"
+			],
+			["id", "value"]
+		]
+		include = null
+	}
+
+	Officer.findAll({
+		attributes,
+		include,
 		group: ["officer.id"],
 		limit,
-		offset: page * limit,
+		offset,
 		order: [["id", "DESC"]],
 		raw: true,
 		subQuery: false,
@@ -172,6 +211,7 @@ exports.findOne = async (req, res) => {
 		attributes: [
 			[db.Sequelize.col("officer.createdAt"), "createdAt"],
 			[db.Sequelize.col("officer.firstName"), "firstName"],
+			[db.Sequelize.col("officer.id"), "id"],
 			[db.Sequelize.col("officer.img"), "img"],
 			[db.Sequelize.col("officer.lastName"), "lastName"],
 			[db.Sequelize.col("officer.position"), "position"],
@@ -225,41 +265,6 @@ exports.findOne = async (req, res) => {
 		})
 }
 
-exports.updateImg = async (req, res) => {
-	const { id } = req.params
-	const { file } = req.body
-
-	if (typeof file === "undefined") {
-		return res.status(401).send({ error: true, msg: "You must include a picture" })
-	}
-
-	const timestamp = new Date().getTime()
-	const fileName = `memes/${randomize("aa", 24)}-${timestamp}.png`
-	await Aws.uploadToS3(file, fileName)
-
-	Meme.update(
-		{
-			s3Link: fileName
-		},
-		{
-			where: { id }
-		}
-	)
-		.then(() => {
-			return res.status(200).send({
-				error: false,
-				msg: "Success",
-				s3Link: fileName
-			})
-		})
-		.catch(() => {
-			return res.status(500).send({
-				error: true,
-				msg: "There was an error"
-			})
-		})
-}
-
 exports.update = async (req, res) => {
 	const { id } = req.params
 	const { caption, name } = req.body
@@ -269,7 +274,7 @@ exports.update = async (req, res) => {
 		return res.status(401).send({ error: true, msg: "You must be logged in" })
 	}
 
-	const count = await Meme.count({
+	const count = await Officer.count({
 		where: {
 			createdBy: user.data.id,
 			id
@@ -293,14 +298,55 @@ exports.update = async (req, res) => {
 		updateData.name = name
 	}
 
-	Meme.update(updateData, {
+	Officer.update(updateData, {
 		where: { id }
 	})
 		.then(async () => {
-			const meme = await Meme.findByPk(id, { raw: true })
+			const meme = await Officer.findByPk(id, { raw: true })
 			return res.status(200).send({
 				error: false,
 				meme,
+				msg: "Success"
+			})
+		})
+		.catch(() => {
+			return res.status(500).send({
+				error: true,
+				msg: "There was an error"
+			})
+		})
+}
+
+exports.updateImg = async (req, res) => {
+	const { id } = req.params
+	const { file } = req.files
+	const { authenticated } = Auth.parseAuthentication(req)
+
+	if (!authenticated) {
+		// return res.status(401).send({ error: true, msg: "You must be logged in" })
+	}
+
+	if (typeof file === "undefined") {
+		return res.status(401).send({ error: true, msg: "You must include a picture" })
+	}
+
+	const image = file.data
+	const timestamp = new Date().getTime()
+	const fileName = `officers/${randomize("aa", 24)}-${timestamp}.png`
+	await Aws.uploadToS3(image, fileName, false)
+
+	Officer.update(
+		{
+			img: fileName
+		},
+		{
+			where: { id }
+		}
+	)
+		.then(() => {
+			return res.status(200).send({
+				error: false,
+				img: fileName,
 				msg: "Success"
 			})
 		})

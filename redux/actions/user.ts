@@ -25,6 +25,26 @@ export const changeProfilePic = ({ bearer, file }) => (dispatch) => {
 		})
 }
 
+export const getInteractions = ({ page = 0, userId = null }) => (dispatch) => {
+	axios
+		.get("/api/interaction/search", {
+			params: {
+				page,
+				userId
+			}
+		})
+		.then((response) => {
+			const { data } = response
+			dispatch({
+				payload: data,
+				type: constants.GET_USER_INTERACTIONS
+			})
+		})
+		.catch((error) => {
+			console.log(error)
+		})
+}
+
 export const getUser = ({ username }) => (dispatch) => {
 	axios
 		.get(`/api/user/${username}`)
@@ -36,56 +56,11 @@ export const getUser = ({ username }) => (dispatch) => {
 			})
 
 			const id = data.user.id
-			dispatch(getUserMemes({ id }))
-			dispatch(getUserTemplates({ id }))
+			dispatch(getInteractions({ userId: id }))
 		})
 		.catch((error) => {
 			dispatch({
 				type: constants.SET_USER_FETCH_ERROR
-			})
-		})
-}
-
-export const getUserMemes = ({ id, page = 0 }) => (dispatch) => {
-	axios
-		.get("/api/meme/search", {
-			params: {
-				page,
-				userId: id
-			}
-		})
-		.then((response) => {
-			const { data } = response
-			dispatch({
-				payload: data,
-				type: constants.GET_USER_MEMES
-			})
-		})
-		.catch((error) => {
-			dispatch({
-				type: constants.SET_USER_MEMES_FETCH_ERROR
-			})
-		})
-}
-
-export const getUserTemplates = ({ id, page = 0 }) => (dispatch) => {
-	axios
-		.get("/api/template/search", {
-			params: {
-				page,
-				userId: id
-			}
-		})
-		.then((response) => {
-			const { data } = response
-			dispatch({
-				payload: data,
-				type: constants.GET_USER_TEMPLATES
-			})
-		})
-		.catch((error) => {
-			dispatch({
-				type: constants.SET_USER_TEMPLATES_FETCH_ERROR
 			})
 		})
 }

@@ -1,6 +1,6 @@
 /* eslint-disable */
-const withImages = require("next-images")
 const withFonts = require("next-fonts")
+const withImages = require("next-images")
 /* eslint-enable */
 
 module.exports = withFonts(

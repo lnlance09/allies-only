@@ -4,15 +4,18 @@ import { searchOfficers } from "@actions/officer"
 import {
 	Button,
 	Container,
+	Dimmer,
 	Divider,
 	Dropdown,
 	Form,
 	Grid,
 	Header,
+	Image,
 	Input,
 	List,
+	Loader,
 	Message,
-	Placeholder
+	Segment
 } from "semantic-ui-react"
 import { Provider, connect } from "react-redux"
 import { fetchCities } from "@options/cities"
@@ -20,6 +23,8 @@ import { useRouter } from "next/router"
 import { withTheme } from "@redux/ThemeProvider"
 import { compose } from "redux"
 import DefaultLayout from "@layouts/default"
+import MapBox from "@components/mapBox"
+import ParagraphPic from "@public/images/paragraphs/paragraph.png"
 import PropTypes from "prop-types"
 import React, { useEffect, useState, Fragment } from "react"
 import SearchResults from "@components/searchResults"
@@ -28,7 +33,6 @@ import store from "@store"
 const Department: React.FunctionComponent = ({
 	createDepartment,
 	department,
-	departments,
 	getDepartment,
 	inverted,
 	searchInteractions,
@@ -53,9 +57,13 @@ const Department: React.FunctionComponent = ({
 			}
 
 			if (typeof slug !== "undefined" && slug !== "create") {
-				await getDepartment({ id: slug })
-				await searchOfficers({})
-				await searchInteractions({})
+				await getDepartment({
+					callback: (departmentId) => {
+						searchOfficers({ departmentId })
+						searchInteractions({ departmentId })
+					},
+					id: slug
+				})
 				setCreateMode(false)
 			}
 		}
@@ -72,6 +80,9 @@ const Department: React.FunctionComponent = ({
 		const q = e.target.value
 		const locationOptions = await fetchCities(q)
 		setLocationOptions(locationOptions)
+	}
+	const loadMore = (page, departmentId) => {
+		return searchOfficers({ departmentId, page })
 	}
 
 	const selectCity = (e, { value }) => {
@@ -103,7 +114,6 @@ const Department: React.FunctionComponent = ({
 					<Container>
 						<Header as="h1" inverted={inverted} size="huge">
 							Add a new department
-							<Header.Subheader>Municipal police department</Header.Subheader>
 						</Header>
 
 						<Form
@@ -174,20 +184,26 @@ const Department: React.FunctionComponent = ({
 							</Container>
 						) : (
 							<Fragment>
-								<Grid>
-									<Grid.Row>
-										<Grid.Column width={4}>
-											{department.loading ? (
-												<Placeholder inverted={inverted}>
-													<Placeholder.Image square />
-												</Placeholder>
-											) : (
-												<Fragment></Fragment>
-											)}
-										</Grid.Column>
-										<Grid.Column width={12}>
-											{!department.loading && (
-												<Fragment>
+								{department.loading ? (
+									<Container textAlign="center">
+										<Dimmer active className="pageDimmer">
+											<Loader active size="huge">
+												Loading
+											</Loader>
+										</Dimmer>
+									</Container>
+								) : (
+									<Fragment>
+										<Grid>
+											<Grid.Row>
+												<Grid.Column width={4}>
+													<MapBox
+														lat={parseFloat(department.data.lat, 10)}
+														lng={parseFloat(department.data.lon, 10)}
+														zoom={department.data.type === 1 ? 4 : 9}
+													/>
+												</Grid.Column>
+												<Grid.Column width={12}>
 													<Header as="h1" inverted={inverted}>
 														{department.data.name}
 														<Header.Subheader>
@@ -266,25 +282,26 @@ const Department: React.FunctionComponent = ({
 															interactions
 														</List.Item>
 													</List>
-												</Fragment>
-											)}
-										</Grid.Column>
-									</Grid.Row>
-								</Grid>
+												</Grid.Column>
+											</Grid.Row>
+										</Grid>
+										<Divider section />
 
-								<Divider section />
-
-								{!department.error && !department.loading ? (
-									<SearchResults
-										hasMore={results.hasMore}
-										inverted={inverted}
-										loading={results.loading}
-										loadMore={({ page, userId }) => loadMore(page, userId)}
-										page={results.page}
-										results={results.results}
-										type={activeItem}
-									/>
-								) : null}
+										{!department.error && !department.loading ? (
+											<SearchResults
+												hasMore={results.hasMore}
+												inverted={inverted}
+												loading={results.loading}
+												loadMore={({ page, departmentId }) =>
+													loadMore(page, departmentId)
+												}
+												page={results.page}
+												results={results.results}
+												type={activeItem}
+											/>
+										) : null}
+									</Fragment>
+								)}
 							</Fragment>
 						)}
 					</Fragment>
@@ -302,6 +319,8 @@ Department.propTypes = {
 			county: PropTypes.string,
 			id: PropTypes.number,
 			interactionCount: PropTypes.number,
+			lat: PropTypes.string,
+			lon: PropTypes.string,
 			name: PropTypes.string,
 			officerCount: PropTypes.number,
 			state: PropTypes.string,

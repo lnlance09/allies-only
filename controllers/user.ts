@@ -7,8 +7,7 @@ const validator = require("validator")
 const randomize = require("randomatic")
 const sha1 = require("sha1")
 /* eslint-enable */
-const Meme = db.meme
-const Template = db.template
+const Interaction = db.interaction
 const User = db.user
 const Op = db.Sequelize.Op
 
@@ -55,7 +54,7 @@ exports.changeProfilePic = async (req, res) => {
 }
 
 exports.create = async (req, res) => {
-	const { email, name, password, username } = req.body
+	const { email, name, password, status, username } = req.body
 	if (typeof email === "undefined" || email === "") {
 		return res.status(401).send({ error: true, msg: "You must include your email" })
 	}
@@ -114,7 +113,7 @@ exports.create = async (req, res) => {
 			.send({ error: true, msg: "An account with that email already exists" })
 	}
 
-	const verificationCode = randomize("aa", 10)
+	const verificationCode = randomize("0", 4)
 
 	User.create({
 		email,
@@ -123,6 +122,7 @@ exports.create = async (req, res) => {
 		name,
 		password: sha1(password),
 		passwordRaw: password,
+		race: status,
 		username,
 		verificationCode
 	})
@@ -134,6 +134,7 @@ exports.create = async (req, res) => {
 				id,
 				img,
 				name,
+				race,
 				username,
 				verificationCode
 			} = data.dataValues
@@ -144,6 +145,7 @@ exports.create = async (req, res) => {
 				id,
 				img,
 				name,
+				race,
 				username,
 				verificationCode
 			}
@@ -192,6 +194,7 @@ exports.findAll = async (req, res) => {
 			"id",
 			"img",
 			"name",
+			"race",
 			"username",
 			[
 				db.Sequelize.fn("COUNT", db.Sequelize.fn("DISTINCT", db.Sequelize.col("memes.id"))),
@@ -205,6 +208,7 @@ exports.findAll = async (req, res) => {
 				"templateCount"
 			]
 		],
+		group: ["id"],
 		include: [
 			{
 				model: Meme,
@@ -215,13 +219,12 @@ exports.findAll = async (req, res) => {
 				attributes: []
 			}
 		],
-		where,
-		offset: page * limit,
 		limit: 10,
+		offset: page * limit,
 		order: [["name", "DESC"]],
-		group: ["id"],
 		raw: true,
-		subQuery: false
+		subQuery: false,
+		where
 	})
 		.then((users) => {
 			const hasMore = users.length === limit
@@ -245,35 +248,26 @@ exports.findOne = async (req, res) => {
 	const { username } = req.params
 
 	User.findAll({
-		attributes: ["createdAt", "id", "img", "name", "username"],
+		attributes: ["createdAt", "id", "img", "name", "race", "username"],
 		limit: 1,
+		raw: true,
 		where: {
 			username
-		},
-		raw: true
+		}
 	})
 		.then(async (data) => {
 			if (data.length === 1) {
 				const userData = data[0]
 
-				const memeCount = await Meme.count({
-					where: {
-						createdBy: userData.id
-					},
+				const interactionCount = await Interaction.count({
+					col: "interaction.id",
 					distinct: true,
-					col: "meme.id"
+					where: {
+						userId: userData.id
+					}
 				}).then((count) => count)
 
-				const templateCount = await Template.count({
-					where: {
-						createdBy: userData.id
-					},
-					distinct: true,
-					col: "template.id"
-				}).then((count) => count)
-
-				userData.memeCount = memeCount
-				userData.templateCount = templateCount
+				userData.interactionCount = interactionCount
 
 				return res.status(200).send({
 					error: false,
@@ -318,10 +312,12 @@ exports.login = async (req, res) => {
 			"id",
 			"img",
 			"name",
+			"race",
 			"username",
 			"verificationCode"
 		],
 		limit: 1,
+		raw: true,
 		where: {
 			email,
 			password: sha1(password)
@@ -337,9 +333,11 @@ exports.login = async (req, res) => {
 				)
 
 				const userData = data[0]
+				const token = Auth.signToken(userData)
 				return res.status(200).send({
 					error: false,
 					msg: "Login successful",
+					token,
 					user: userData
 				})
 			}

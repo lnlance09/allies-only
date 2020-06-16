@@ -1,4 +1,5 @@
 import * as constants from "../constants"
+import { s3BaseUrl } from "@options/config"
 
 const initial = () => ({
 	officer: {
@@ -28,19 +29,20 @@ const officer = (state = initial(), action) => {
 
 	switch (action.type) {
 		case constants.GET_OFFICER:
+			const { officer } = payload
 			return {
 				...state,
 				officer: {
 					...state.officer,
 					data: {
-						createdAt: payload.officer.createdAt,
-						departmentId: payload.officer.departmentId,
-						departmentName: payload.officer.departmentName,
-						firstName: payload.officer.firstName,
-						id: payload.officer.templateId,
-						img: payload.officer.img,
-						interactionCount: payload.officer.memeCount,
-						lastName: payload.officer.lastName
+						createdAt: officer.createdAt,
+						departmentId: officer.departmentId,
+						departmentName: officer.departmentName,
+						firstName: officer.firstName,
+						id: officer.id,
+						img: officer.img === null ? null : `${s3BaseUrl}${officer.img}`,
+						interactionCount: officer.interactionCount,
+						lastName: officer.lastName
 					},
 					error: false,
 					errorMsg: "",

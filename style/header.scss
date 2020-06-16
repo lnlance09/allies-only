@@ -123,21 +123,6 @@
         animation: decrease 2s 0.5s infinite;
     }
 
-    .headerLogo {
-        cursor: pointer;
-        height: 50px;
-        line-height: 4;
-        margin-right: 12px;
-        width: 50px;
-
-        &.basic {
-            height: 64px;
-            line-height: 64px;
-            margin-right: 0;
-            width: 64px;
-        }
-    }
-
     .menu.globalHeader {
         background: $white;
         // border-bottom: dotted 1px $grey;
@@ -153,11 +138,6 @@
     }
 
     .headerContainer {
-        &.basic {
-            padding-bottom: 10px;
-            padding-top: 16px;
-        }
-
         .responsive {
             display: flex;
             width: 100%;
@@ -188,19 +168,25 @@
                 margin-left: 18px;
             }
 
+            .logo {
+                cursor: pointer;
+                height: 48px;
+                width: 48px;
+            }
+
             div.parallelogram {
                 align-items: center;
-                border: solid 1px $white;
+                border: solid 2px $white;
                 cursor: pointer;
                 display: flex;
                 justify-content: center;
 
                 span.alliesText {
-                    background: $yellow !important;
+                    background: $invertedYellow !important;
                     padding: 4px 7px;
 
                     a {
-                        font-family: OswaldLightItalic;
+                        font-family: OswaldLight;
                         font-size: 36px !important;
                         margin-left: 0;
                         transform: skewX(20deg);
@@ -223,6 +209,15 @@
             }
         }
 
+        &.basic {
+            .headerMenuItem.home {
+                display: flex;
+                justify-content: center;
+                text-align: center;
+                width: 100%;
+            }
+        }
+
         .loginItem {
             // padding-right: 0;
         }
@@ -230,10 +225,10 @@
         .dropDownMenu {
             &.inverted {
                 .menu {
-                    background: lighten($invertedBackgroundColor, 4%);
+                    background: lighten($invertedBackgroundColor, 6%);
 
                     &:before, &:after {
-                        background: lighten($invertedBackgroundColor, 4%);
+                        background: lighten($invertedBackgroundColor, 6%);
                     }
 
                     .item {

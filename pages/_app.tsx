@@ -1,4 +1,5 @@
 import "semantic-ui-css/semantic.min.css"
+import "react-toastify/dist/ReactToastify.css"
 import "@style/style.scss"
 import { AppProps } from "next/app"
 import { Provider } from "react-redux"

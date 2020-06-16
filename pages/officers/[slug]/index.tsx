@@ -1,5 +1,5 @@
 import { searchInteractions } from "@actions/interaction"
-import { createOfficer, getOfficer } from "@actions/officer"
+import { createOfficer, getOfficer, updateImg } from "@actions/officer"
 import {
 	Button,
 	Container,
@@ -21,6 +21,8 @@ import { withTheme } from "@redux/ThemeProvider"
 import { compose } from "redux"
 import DefaultLayout from "@layouts/default"
 import DefaultPic from "@public/images/placeholders/placeholder-dark.jpg"
+import ImageUpload from "@components/imageUpload"
+import Link from "next/link"
 import PropTypes from "prop-types"
 import React, { useEffect, useState, Fragment } from "react"
 import SearchResults from "@components/searchResults"
@@ -31,10 +33,13 @@ const Officer: React.FunctionComponent = ({
 	officer,
 	getOfficer,
 	inverted,
-	searchInteractions
+	searchInteractions,
+	updateImg
 }) => {
 	const router = useRouter()
 	const { slug } = router.query
+
+	const { departmentId, departmentName, id, img } = officer.data
 
 	const [bearer, setBearer] = useState(null)
 	const [createMode, setCreateMode] = useState(null)
@@ -195,14 +200,20 @@ const Officer: React.FunctionComponent = ({
 								<Grid>
 									<Grid.Row>
 										<Grid.Column width={4}>
-											{officer.loading ? (
-												<Placeholder inverted={inverted}>
-													<Placeholder.Image square />
-												</Placeholder>
+											{bearer !== null ? (
+												<ImageUpload
+													bearer={bearer}
+													callback={(bearer, file, id) =>
+														updateImg({ bearer, file, id })
+													}
+													id={officer.data.id}
+													img={officer.data.img}
+													inverted={inverted}
+												/>
 											) : (
 												<Image
 													onError={(i) => (i.target.src = DefaultPic)}
-													src={officer.data.img}
+													src={img === null ? DefaultPic : img}
 												/>
 											)}
 										</Grid.Column>
@@ -213,7 +224,11 @@ const Officer: React.FunctionComponent = ({
 														{officer.data.firstName}{" "}
 														{officer.data.lastName}
 														<Header.Subheader>
-															{officer.data.departmentName}
+															<Link
+																href={`/departments/${departmentId}`}
+															>
+																<a>{departmentName}</a>
+															</Link>
 														</Header.Subheader>
 													</Header>
 
@@ -226,7 +241,7 @@ const Officer: React.FunctionComponent = ({
 															inverted={inverted}
 															onClick={() =>
 																router.push(
-																	`/interactions/create?deparmentId=${department.data.id}`
+																	`/interactions/create?deparmentId=${id}`
 																)
 															}
 														/>
@@ -294,7 +309,8 @@ Officer.propTypes = {
 		}),
 		loading: PropTypes.bool
 	}),
-	searchInteractions: PropTypes.func
+	searchInteractions: PropTypes.func,
+	updateImg: PropTypes.func
 }
 
 Officer.defaultProps = {
@@ -313,7 +329,8 @@ Officer.defaultProps = {
 		loading: true
 	},
 	getOfficer,
-	searchInteractions
+	searchInteractions,
+	updateImg
 }
 
 const mapStateToProps = (state: any, ownProps: any) => ({
@@ -325,7 +342,8 @@ export default compose(
 	connect(mapStateToProps, {
 		createOfficer,
 		getOfficer,
-		searchInteractions
+		searchInteractions,
+		updateImg
 	}),
 	withTheme("dark")
 )(Officer)
