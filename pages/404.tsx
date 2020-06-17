@@ -41,7 +41,6 @@ const User: React.FunctionComponent = ({
 	const { createdAt, id, img, interactionCount, interactions, name } = user
 
 	const [active, setActive] = useState(true)
-	const [activeItem, setActiveItem] = useState("memes")
 	const [bearer, setBearer] = useState(null)
 	const [currentUser, setCurrentUser] = useState({})
 
@@ -111,6 +110,7 @@ const User: React.FunctionComponent = ({
 	return (
 		<Provider store={store}>
 			<DefaultLayout
+				activeItem={currentUser.id === id ? "profile" : "allies"}
 				containerClassName="allyPage"
 				seo={{
 					description: `${name}'s interactions with the police on AlliesOnly`,

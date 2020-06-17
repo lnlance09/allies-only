@@ -12,7 +12,7 @@ import store from "@store"
 const Authentication: React.FunctionComponent = (props) => {
 	const [buttonText, setButtonText] = useState(props.login ? "Create an account" : "Sign in")
 	const [email, setEmail] = useState("")
-	const [headerText, setHeaderText] = useState(props.login ? "Sign In" : "Create an account")
+	const [headerText, setHeaderText] = useState(props.login ? "Sign In" : "Become an ally")
 	const [loadingLogin, setLoadingLogin] = useState(false)
 	const [loadingRegistration, setLoadingRegistration] = useState(false)
 	const [login, setLogin] = useState(props.login)
@@ -20,7 +20,7 @@ const Authentication: React.FunctionComponent = (props) => {
 	const [password, setPassword] = useState("")
 	const [regEmail, setRegEmail] = useState("")
 	const [registerText, setRegisterText] = useState(
-		props.login ? "New to AlliesOnly?" : "Already have an account?"
+		props.login ? "New to Allies Only?" : "Already have an account?"
 	)
 	const [regPassword, setRegPassword] = useState("")
 	const [status, setStatus] = useState(1)
@@ -30,8 +30,8 @@ const Authentication: React.FunctionComponent = (props) => {
 
 	const toggleLogin = useCallback(() => {
 		const buttonText = login ? "Sign in" : "Create an account"
-		const headerText = login ? "Create an account" : "Sign In"
-		const registerText = login ? "Already have an account?" : "New to AlliesOnly?"
+		const headerText = login ? "Become an ally" : "Sign In"
+		const registerText = login ? "Already have an account?" : "New to Allies Only?"
 		setButtonText(buttonText)
 		setHeaderText(headerText)
 		setRegisterText(registerText)
@@ -86,25 +86,26 @@ const Authentication: React.FunctionComponent = (props) => {
 	}
 
 	const RaceBox = () => (
-		<Form inverted={props.inverted} size="big">
-			<Header
-				className={`raceHeader ${status === 1 ? "active" : ""}`}
-				content="I am a person of color"
-				inverted={props.inverted}
-				onClick={() => setStatus(1)}
-				size="large"
-			/>
-			<Divider horizontal inverted={props.inverted} section>
-				Or
-			</Divider>
-			<Header
-				className={`raceHeader ${status === 2 ? "active" : ""}`}
-				content="I am an ally"
-				inverted={props.inverted}
-				onClick={() => setStatus(2)}
-				size="large"
-			/>
-			<Divider inverted={props.inverted} section />
+		<Fragment>
+			<Form as={Segment} inverted={props.inverted} size="big">
+				<Header
+					className={`raceHeader ${status === 1 ? "active" : ""}`}
+					content="I am a person of color"
+					inverted={props.inverted}
+					onClick={() => setStatus(1)}
+					size="large"
+				/>
+				<Divider horizontal inverted={props.inverted} section>
+					Or
+				</Divider>
+				<Header
+					className={`raceHeader ${status === 2 ? "active" : ""}`}
+					content="I am an ally"
+					inverted={props.inverted}
+					onClick={() => setStatus(2)}
+					size="large"
+				/>
+			</Form>
 			<Button
 				color="yellow"
 				content="Next"
@@ -114,8 +115,9 @@ const Authentication: React.FunctionComponent = (props) => {
 					setStatusSelected(true)
 				}}
 				size="big"
+				style={{ marginTop: "20px" }}
 			/>
-		</Form>
+		</Fragment>
 	)
 
 	const MainForm = () => {

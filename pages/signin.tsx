@@ -23,7 +23,6 @@ const SignIn: React.FunctionComponent = ({ inverted }) => {
 
 	return (
 		<DefaultLayout
-			basicHeader
 			containerClassName="signInPage"
 			isText
 			seo={{
@@ -38,6 +37,7 @@ const SignIn: React.FunctionComponent = ({ inverted }) => {
 			}}
 			showFooter={false}
 			textAlign="center"
+			useGrid={false}
 		>
 			{loaded && <Authentication inverted={inverted} login={type !== "join"} />}
 		</DefaultLayout>

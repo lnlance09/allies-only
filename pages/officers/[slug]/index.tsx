@@ -3,6 +3,7 @@ import { createOfficer, getOfficer, updateImg } from "@actions/officer"
 import {
 	Button,
 	Container,
+	Dimmer,
 	Divider,
 	Dropdown,
 	Form,
@@ -10,8 +11,8 @@ import {
 	Header,
 	Image,
 	Input,
-	Message,
-	Placeholder
+	Loader,
+	Message
 } from "semantic-ui-react"
 import { parseJwt } from "@utils/tokenFunctions"
 import { Provider, connect } from "react-redux"
@@ -98,6 +99,7 @@ const Officer: React.FunctionComponent = ({
 	return (
 		<Provider store={store}>
 			<DefaultLayout
+				activeItem="officers"
 				containerClassName="officersPage"
 				seo={{
 					description: `A `,
@@ -197,74 +199,88 @@ const Officer: React.FunctionComponent = ({
 							</Container>
 						) : (
 							<Fragment>
-								<Grid>
-									<Grid.Row>
-										<Grid.Column width={4}>
-											{bearer !== null ? (
-												<ImageUpload
-													bearer={bearer}
-													callback={(bearer, file, id) =>
-														updateImg({ bearer, file, id })
-													}
-													id={officer.data.id}
-													img={officer.data.img}
-													inverted={inverted}
-												/>
-											) : (
-												<Image
-													onError={(i) => (i.target.src = DefaultPic)}
-													src={img === null ? DefaultPic : img}
-												/>
-											)}
-										</Grid.Column>
-										<Grid.Column width={12}>
-											{!officer.loading && (
-												<Fragment>
-													<Header as="h1" inverted={inverted}>
-														{officer.data.firstName}{" "}
-														{officer.data.lastName}
-														<Header.Subheader>
-															<Link
-																href={`/departments/${departmentId}`}
-															>
-																<a>{departmentName}</a>
-															</Link>
-														</Header.Subheader>
-													</Header>
-
-													<div style={{ marginTop: "22px" }}>
-														<Button
-															color="yellow"
-															compact
-															content="Interaction"
-															icon="plus"
-															inverted={inverted}
-															onClick={() =>
-																router.push(
-																	`/interactions/create?deparmentId=${id}`
-																)
+								{officer.loading ? (
+									<Container textAlign="center">
+										<Dimmer active className="pageDimmer">
+											<Loader active size="huge">
+												Loading
+											</Loader>
+										</Dimmer>
+									</Container>
+								) : (
+									<Fragment>
+										<Grid>
+											<Grid.Row>
+												<Grid.Column width={4}>
+													{bearer !== null ? (
+														<ImageUpload
+															bearer={bearer}
+															callback={(bearer, file, id) =>
+																updateImg({ bearer, file, id })
 															}
+															id={officer.data.id}
+															img={officer.data.img}
+															inverted={inverted}
 														/>
-													</div>
-												</Fragment>
-											)}
-										</Grid.Column>
-									</Grid.Row>
-								</Grid>
+													) : (
+														<Image
+															onError={(i) =>
+																(i.target.src = DefaultPic)
+															}
+															src={img === null ? DefaultPic : img}
+														/>
+													)}
+												</Grid.Column>
+												<Grid.Column width={12}>
+													{!officer.loading && (
+														<Fragment>
+															<Header as="h1" inverted={inverted}>
+																{officer.data.firstName}{" "}
+																{officer.data.lastName}
+																<Header.Subheader>
+																	<Link
+																		href={`/departments/${departmentId}`}
+																	>
+																		<a>{departmentName}</a>
+																	</Link>
+																</Header.Subheader>
+															</Header>
 
-								<Divider section />
-
-								{!officer.error && !officer.loading ? (
-									<SearchResults
-										hasMore={officer.interactions.hasMore}
-										inverted={inverted}
-										loading={officer.interactions.loading}
-										loadMore={({ page, userId }) => loadMore(page, userId)}
-										page={officer.interactions.page}
-										results={officer.interactions.results}
-										type="interactions"
-									/>
-								) : null}
+															<div style={{ marginTop: "22px" }}>
+																<Button
+																	color="yellow"
+																	compact
+																	content="Interaction"
+																	icon="plus"
+																	inverted={inverted}
+																	onClick={() =>
+																		router.push(
+																			`/interactions/create?deparmentId=${id}`
+																		)
+																	}
+																/>
+															</div>
+														</Fragment>
+													)}
+												</Grid.Column>
+											</Grid.Row>
+										</Grid>
+										<Divider section />
+										{!officer.error && !officer.loading ? (
+											<SearchResults
+												hasMore={officer.interactions.hasMore}
+												inverted={inverted}
+												loading={officer.interactions.loading}
+												loadMore={({ page, userId }) =>
+													loadMore(page, userId)
+												}
+												page={officer.interactions.page}
+												results={officer.interactions.results}
+												type="interactions"
+											/>
+										) : null}
+									</Fragment>
+								)}
 							</Fragment>
 						)}
 					</Fragment>

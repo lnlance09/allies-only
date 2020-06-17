@@ -216,12 +216,16 @@ exports.findOne = (req, res) => {
 				}
 			})
 				.then((locations) => {
-					return locations[0]
+					if (locations.length === 1) {
+						return locations[0]
+					}
+
+					return false
 				})
 				.catch(() => {})
 
-			department.lat = location.lat
-			department.lon = location.lon
+			department.lat = location ? location.lat : null
+			department.lon = location ? location.lon : null
 
 			return res.status(200).send({
 				department,

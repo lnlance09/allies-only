@@ -35,6 +35,7 @@ const Departments: React.FunctionComponent = ({ departments, inverted, searchDep
 	return (
 		<Provider store={store}>
 			<DefaultLayout
+				activeItem="departments"
 				containerClassName="departmentsPage"
 				seo={{
 					description: "",

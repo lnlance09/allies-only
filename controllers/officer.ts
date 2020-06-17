@@ -92,7 +92,7 @@ exports.create = async (req, res) => {
 exports.findAll = async (req, res) => {
 	const { departmentId, forOptions, page, q } = req.query
 
-	const limit = 1
+	const limit = 20
 	const offset = isNaN(page) ? 0 : page * limit
 	let where = {
 		[Op.or]: [

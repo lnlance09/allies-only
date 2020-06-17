@@ -1,5 +1,5 @@
 import { searchInteractions } from "@actions/interaction"
-import { Button, Divider, Header, Input } from "semantic-ui-react"
+import { Button, Divider, Header } from "semantic-ui-react"
 import { DebounceInput } from "react-debounce-input"
 import { Provider, connect } from "react-redux"
 import { useRouter } from "next/router"
@@ -11,7 +11,7 @@ import React, { useState } from "react"
 import SearchResults from "@components/searchResults"
 import store from "@store"
 
-const Interactions: React.FunctionComponent = ({ interactions, inverted, searchInteractions }) => {
+const Allies: React.FunctionComponent = ({ interactions, inverted, searchInteractions }) => {
 	const router = useRouter()
 	const { q } = router.query
 
@@ -30,8 +30,8 @@ const Interactions: React.FunctionComponent = ({ interactions, inverted, searchI
 	return (
 		<Provider store={store}>
 			<DefaultLayout
-				activeItem="interactions"
-				containerClassName="interactionsPage"
+				activeItem="allies"
+				containerClassName="alliesPage"
 				seo={{
 					description: "",
 					image: {
@@ -39,21 +39,21 @@ const Interactions: React.FunctionComponent = ({ interactions, inverted, searchI
 						src: "",
 						width: 200
 					},
-					title: "Interactions with police",
-					url: `interactions`
+					title: "Allies",
+					url: `allies`
 				}}
 				showFooter={false}
 			>
 				<Header as="h1" inverted={inverted} size="huge">
-					Interactions
+					Allies
 					<Button
 						className="addButton"
 						color="yellow"
-						content="Add an interaction"
+						content="Invite an ally"
 						icon="plus"
 						inverted={inverted}
 						onClick={() => {
-							router.push("/interactions/create")
+							// router.push("/interactions/create")
 						}}
 					/>
 				</Header>
@@ -86,7 +86,7 @@ const Interactions: React.FunctionComponent = ({ interactions, inverted, searchI
 	)
 }
 
-Interactions.propTypes = {
+Allies.propTypes = {
 	interactions: PropTypes.shape({
 		hasMore: PropTypes.bool,
 		loading: PropTypes.bool,
@@ -105,7 +105,7 @@ Interactions.propTypes = {
 	inverted: PropTypes.bool
 }
 
-Interactions.defaultProps = {
+Allies.defaultProps = {
 	interactions: {
 		hasMore: false,
 		loading: true,
@@ -116,7 +116,7 @@ Interactions.defaultProps = {
 }
 
 const mapStateToProps = (state: any, ownProps: any) => ({
-	...state.interaction,
+	...state.user,
 	...ownProps
 })
 
@@ -125,4 +125,4 @@ export default compose(
 		searchInteractions
 	}),
 	withTheme("dark")
-)(Interactions)
+)(Allies)

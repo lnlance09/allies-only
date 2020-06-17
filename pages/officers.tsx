@@ -35,6 +35,7 @@ const Officers: React.FunctionComponent = ({ inverted, officers, searchOfficers 
 	return (
 		<Provider store={store}>
 			<DefaultLayout
+				activeItem="officers"
 				containerClassName="officersPage"
 				seo={{
 					description: "",
@@ -52,7 +53,7 @@ const Officers: React.FunctionComponent = ({ inverted, officers, searchOfficers 
 					Officers
 					<Button
 						className="addButton"
-						color="orange"
+						color="yellow"
 						content="Add an officer"
 						icon="plus"
 						inverted={inverted}

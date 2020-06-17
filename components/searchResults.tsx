@@ -110,7 +110,7 @@ const SearchResults: React.FunctionComponent = ({
 			{results.length === 0 && !loading ? (
 				<Container textAlign="center">
 					<Segment inverted={inverted} placeholder>
-						<Header icon size="huge">
+						<Header icon size="large">
 							No {type} yet...
 						</Header>
 					</Segment>

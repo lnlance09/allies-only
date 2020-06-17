@@ -13,7 +13,7 @@ const initial = () => ({
 			loading: false,
 			results: []
 		},
-		loading: false
+		loading: true
 	},
 	officers: {
 		error: false,

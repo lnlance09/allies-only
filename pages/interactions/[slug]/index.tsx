@@ -100,6 +100,7 @@ const Interaction: React.FunctionComponent = ({
 	return (
 		<Provider store={store}>
 			<DefaultLayout
+				activeItem="interactions"
 				containerClassName="interactionsPage"
 				seo={{
 					description: `A `,
@@ -125,8 +126,6 @@ const Interaction: React.FunctionComponent = ({
 							</Header>
 							<Button color="yellow" content="Upload a video" inverted={inverted} />
 						</Segment>
-
-						<Divider inverted={inverted} />
 
 						<Form
 							error={interaction.error}
@@ -154,6 +153,7 @@ const Interaction: React.FunctionComponent = ({
 								<Form.Field>
 									<label>Officers involved</label>
 									<Dropdown
+										closeOnChange
 										fluid
 										multiple
 										onChange={selectOfficer}
@@ -194,7 +194,7 @@ const Interaction: React.FunctionComponent = ({
 						<Divider inverted={inverted} section />
 
 						<Button
-							color="blue"
+							color="yellow"
 							content="Add"
 							fluid
 							inverted={inverted}

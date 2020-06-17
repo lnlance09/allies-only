@@ -39,7 +39,8 @@ export const getDepartment = ({ callback = () => null, id }) => (dispatch) => {
 				callback(data.department.id)
 			}
 		})
-		.catch(() => {
+		.catch((error) => {
+			console.log("error", error)
 			dispatch({
 				type: constants.SET_DEPARTMENT_FETCH_ERROR
 			})

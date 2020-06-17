@@ -32,53 +32,17 @@ const Home: React.FunctionComponent = ({ inverted }) => {
 					url: ""
 				}}
 				showFooter={false}
-			>
-				<Divider hidden section />
-
-				<Container></Container>
-
-				<Divider hidden section />
-			</DefaultLayout>
+			></DefaultLayout>
 		</Provider>
 	)
 }
 
-Home.propTypes = {
-	inverted: PropTypes.bool,
-	memes: PropTypes.shape({
-		hasMore: PropTypes.bool,
-		loading: PropTypes.bool,
-		page: PropTypes.number,
-		results: PropTypes.arrayOf(
-			PropTypes.oneOfType([
-				PropTypes.bool,
-				PropTypes.shape({
-					caption: PropTypes.string,
-					createdAt: PropTypes.string,
-					createdBy: PropTypes.number,
-					id: PropTypes.number,
-					likes: PropTypes.number,
-					name: PropTypes.string,
-					s3Link: PropTypes.string,
-					userImg: PropTypes.string,
-					userName: PropTypes.string,
-					username: PropTypes.string,
-					views: PropTypes.number
-				})
-			])
-		)
-	})
-}
+Home.propTypes = {}
 
-Home.defaultProps = {
-	memes: {
-		loading: true,
-		results: [false, false, false, false, false, false]
-	}
-}
+Home.defaultProps = {}
 
 const mapStateToProps = (state: any, ownProps: any) => ({
-	...state.search,
+	...state.home,
 	...ownProps
 })
 

@@ -51,7 +51,7 @@ export const resetToInitial = () => (dispatch) => {
 	})
 }
 
-export const searchInteractions = ({ departmentId, page = 0, q = nulll }) => (dispatch) => {
+export const searchInteractions = ({ departmentId, page = 0, q = null }) => (dispatch) => {
 	axios
 		.get("/api/interaction/search", {
 			params: {

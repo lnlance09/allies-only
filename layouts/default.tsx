@@ -1,22 +1,27 @@
-import { Container } from "semantic-ui-react"
+import { Container, Divider, Grid, Image, Menu } from "semantic-ui-react"
 import { baseUrl } from "@options/config"
+import { useRouter } from "next/router"
 import { withTheme } from "@redux/ThemeProvider"
 import Footer from "@components/footer"
 import Head from "next/head"
-import Header from "@components/header"
+import Logo from "@public/images/logos/logo_72x72.png"
 import PropTypes from "prop-types"
-import React from "react"
+import React, { Fragment } from "react"
+import Sidebar from "@components/sidebar"
 
 const DefaultLayout: React.FunctionComponent = ({
-	basicHeader,
+	activeItem,
 	children,
 	containerClassName,
 	inverted,
 	isText,
+	loading,
 	seo,
 	showFooter,
-	textAlign
+	textAlign,
+	useGrid
 }) => {
+	const router = useRouter()
 	const { description, image, title, url } = seo
 	const fullUrl = `${baseUrl}${url}`
 
@@ -57,26 +62,54 @@ const DefaultLayout: React.FunctionComponent = ({
 
 				<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDArCL_59nenZmhsD8v2NsbpuJzi9VRucg&libraries=places"></script>
 
-				<title>{title} - Brandy</title>
+				<title>{title} - Allies Only</title>
 			</Head>
 
-			<Header basic={basicHeader} inverted={inverted} />
+			<div className="rainbow" />
+			{loading && (
+				<Fragment>
+					<div className="subline inc" />
+					<div className="subline dec" />
+				</Fragment>
+			)}
+
+			<Menu
+				className="topHeader"
+				borderless
+				fitted="vertically"
+				fixed="top"
+				inverted={inverted}
+			>
+				<Container>
+					<Menu.Item>
+						<Image className="logo" onClick={() => router.push("/")} src={Logo} />
+					</Menu.Item>
+				</Container>
+			</Menu>
 
 			<Container
 				className={`mainContainer ${containerClassName} ${inverted ? "inverted" : ""}`}
 				text={isText}
 				textAlign={textAlign}
 			>
-				{children}
+				{useGrid ? (
+					<Grid stackable>
+						<Grid.Column width={4}>
+							<Sidebar activeItem={activeItem} inverted={inverted} />
+						</Grid.Column>
+						<Grid.Column width={12}>{children}</Grid.Column>
+					</Grid>
+				) : (
+					<Fragment>{children}</Fragment>
+				)}
 			</Container>
-
 			{showFooter && <Footer />}
 		</div>
 	)
 }
 
 DefaultLayout.propTypes = {
-	basicHeader: PropTypes.bool,
+	activeItem: PropTypes.string,
 	children: PropTypes.node,
 	containerClassName: PropTypes.string,
 	inverted: PropTypes.bool,
@@ -92,10 +125,12 @@ DefaultLayout.propTypes = {
 		url: PropTypes.string
 	}),
 	showFooter: PropTypes.bool,
-	textAlign: PropTypes.string
+	textAlign: PropTypes.string,
+	useGrid: PropTypes.bool
 }
 
 DefaultLayout.defaultProps = {
+	activeItem: "departments",
 	basicHeader: false,
 	containerClassName: "",
 	inverted: true,
@@ -104,7 +139,8 @@ DefaultLayout.defaultProps = {
 		image: {}
 	},
 	showFooter: true,
-	textAlign: "left"
+	textAlign: "left",
+	useGrid: true
 }
 
 export default withTheme("dark")(DefaultLayout)
