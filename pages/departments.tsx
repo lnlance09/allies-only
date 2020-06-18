@@ -1,5 +1,5 @@
 import { searchDepartments } from "@actions/department"
-import { Button, Divider, Dropdown, Form, Header, Input, Select } from "semantic-ui-react"
+import { Button, Divider, Form, Header } from "semantic-ui-react"
 import { DebounceInput } from "react-debounce-input"
 import { Provider, connect } from "react-redux"
 import { useRouter } from "next/router"
@@ -117,7 +117,8 @@ Departments.propTypes = {
 			])
 		)
 	}),
-	inverted: PropTypes.bool
+	inverted: PropTypes.bool,
+	searchDepartments: PropTypes.func
 }
 
 Departments.defaultProps = {

@@ -1,15 +1,14 @@
 import { logout } from "@actions/authentication"
 import { parseJwt } from "@utils/tokenFunctions"
-import { Button, Divider, Image, Label, Menu } from "semantic-ui-react"
+import { Button, Divider, Label, Menu } from "semantic-ui-react"
 import { useRouter } from "next/router"
 import { Provider, connect } from "react-redux"
-import DefaultPic from "@public/images/avatar/small/chris.jpg"
 import PropTypes from "prop-types"
 import React, { Fragment, useEffect, useState } from "react"
 import Router from "next/router"
 import store from "@store"
 
-const Sidebar: React.FunctionComponent = ({ activeItem, basic, inverted, loading, logout }) => {
+const Sidebar: React.FunctionComponent = ({ activeItem, basic, inverted, logout }) => {
 	const router = useRouter()
 
 	const [authenticated, setAuthenticated] = useState(null)

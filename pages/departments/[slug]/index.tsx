@@ -10,12 +10,10 @@ import {
 	Form,
 	Grid,
 	Header,
-	Image,
 	Input,
 	List,
 	Loader,
-	Message,
-	Segment
+	Message
 } from "semantic-ui-react"
 import { Provider, connect } from "react-redux"
 import { fetchCities } from "@options/cities"
@@ -24,7 +22,6 @@ import { withTheme } from "@redux/ThemeProvider"
 import { compose } from "redux"
 import DefaultLayout from "@layouts/default"
 import MapBox from "@components/mapBox"
-import ParagraphPic from "@public/images/paragraphs/paragraph.png"
 import PropTypes from "prop-types"
 import React, { useEffect, useState, Fragment } from "react"
 import SearchResults from "@components/searchResults"

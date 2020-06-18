@@ -39,7 +39,5 @@ module.exports = (sequelize, Sequelize) => {
 		}
 	})
 
-	User.associate = (models) => {}
-
 	return User
 }

@@ -1,4 +1,4 @@
-export const fetchCities = async (q) => {
+export const fetchCities = async (q: string) => {
 	const response = await fetch(`/api/location/search?q=${q}`, {
 		headers: {
 			"Content-Type": "application/json"

@@ -8,7 +8,6 @@ const slugify = require("slugify")
 const Department = db.department
 const Interaction = db.interaction
 const Officer = db.officer
-const User = db.user
 const Op = db.Sequelize.Op
 
 exports.create = async (req, res) => {

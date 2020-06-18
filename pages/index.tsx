@@ -1,11 +1,8 @@
-import { Container, Divider } from "semantic-ui-react"
 import { Provider, connect } from "react-redux"
 import { withTheme } from "@redux/ThemeProvider"
 import { compose } from "redux"
 import DefaultLayout from "@layouts/default"
-import PropTypes from "prop-types"
 import React, { useEffect } from "react"
-import SearchResults from "@components/searchResults"
 import store from "@store"
 
 const Home: React.FunctionComponent = ({ inverted }) => {

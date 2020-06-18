@@ -6,7 +6,7 @@ import React, { Fragment, useEffect, useState } from "react"
 import Router from "next/router"
 import useDebounce from "@utils/debounce"
 
-const resultRenderer = ({ departmentName, img, name, type }) => {
+const resultRenderer = ({ departmentName, name, type }) => {
 	return (
 		<div className="searchItem">
 			<Header inverted size="tiny">
@@ -24,8 +24,8 @@ const resultRenderer = ({ departmentName, img, name, type }) => {
 }
 
 resultRenderer.propTypes = {
-	image: PropTypes.string,
-	text: PropTypes.string,
+	departmentName: PropTypes.string,
+	name: PropTypes.string,
 	type: PropTypes.string
 }
 
@@ -67,7 +67,7 @@ const Autocomplete: React.FunctionComponent = ({ category, disabled, placeholder
 			forAutocomplete: 1,
 			forOptions: 0
 		})
-		let results = {}
+		const results = {}
 		if (departments.length > 0) {
 			results.departments = { name: "Departments", results: departments }
 		}
@@ -79,7 +79,7 @@ const Autocomplete: React.FunctionComponent = ({ category, disabled, placeholder
 	}
 
 	const onClick = (e, data) => {
-		let link = `/pages/youtube/${data.result.social_media_id}`
+		const link = `/pages/youtube/${data.result.social_media_id}`
 		Router.push(link)
 	}
 
@@ -100,7 +100,7 @@ const Autocomplete: React.FunctionComponent = ({ category, disabled, placeholder
 						size="big"
 					/>
 				}
-				// loading={loading}
+				loading={loading}
 				minCharacters={3}
 				onSearchChange={(e, { value }) => setQ(value)}
 				onResultSelect={onClick}

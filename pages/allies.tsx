@@ -82,6 +82,8 @@ const Allies: React.FunctionComponent = ({ inverted, searchUsers, users }) => {
 }
 
 Allies.propTypes = {
+	inverted: PropTypes.bool,
+	searchUsers: PropTypes.func,
 	users: PropTypes.shape({
 		hasMore: PropTypes.bool,
 		loading: PropTypes.bool,
@@ -100,13 +102,13 @@ Allies.propTypes = {
 }
 
 Allies.defaultProps = {
+	searchUsers,
 	users: {
 		hasMore: false,
 		loading: true,
 		page: 0,
 		results: [false, false, false, false, false, false]
-	},
-	searchUsers
+	}
 }
 
 const mapStateToProps = (state: any, ownProps: any) => ({

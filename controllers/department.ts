@@ -228,15 +228,13 @@ exports.findOne = (req, res) => {
 					city: department.city,
 					state: department.state
 				}
-			})
-				.then((locations) => {
-					if (locations.length === 1) {
-						return locations[0]
-					}
+			}).then((locations) => {
+				if (locations.length === 1) {
+					return locations[0]
+				}
 
-					return false
-				})
-				.catch(() => {})
+				return false
+			})
 
 			department.lat = location ? location.lat : null
 			department.lon = location ? location.lon : null
@@ -257,7 +255,7 @@ exports.findOne = (req, res) => {
 
 exports.update = async (req, res) => {
 	const { id } = req.params
-	const { city, county, name, state, type } = req.body
+	const { name } = req.body
 	const { authenticated, user } = Auth.parseAuthentication(req)
 
 	if (!authenticated) {

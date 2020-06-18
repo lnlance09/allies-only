@@ -16,10 +16,8 @@ const ImageUpload: React.FunctionComponent = ({
 	msg
 }) => {
 	const [active, setActive] = useState(false)
-	const [files, setFiles] = useState([])
 
 	const onDrop = async (files) => {
-		await setFiles(files)
 		if (files.length > 0) {
 			callback(bearer, files[0], id)
 		}

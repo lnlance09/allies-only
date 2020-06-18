@@ -1,12 +1,9 @@
-import { Container, Grid, Image, Input } from "semantic-ui-react"
+import { Container, Grid } from "semantic-ui-react"
 import { baseUrl } from "@options/config"
-import { useRouter } from "next/router"
 import { withTheme } from "@redux/ThemeProvider"
-import Autocomplete from "@components/autocomplete"
 import Footer from "@components/footer"
 import Head from "next/head"
 import Header from "@components/header"
-import Logo from "@public/images/logos/logo_72x72.png"
 import PropTypes from "prop-types"
 import React, { Fragment } from "react"
 import Sidebar from "@components/sidebar"
@@ -24,7 +21,6 @@ const DefaultLayout: React.FunctionComponent = ({
 	textAlign,
 	useGrid
 }) => {
-	const router = useRouter()
 	const { description, image, title, url } = seo
 	const fullUrl = `${baseUrl}${url}`
 

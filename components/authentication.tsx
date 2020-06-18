@@ -3,7 +3,7 @@ import {
 	submitRegistrationForm,
 	submitVerificationForm
 } from "@actions/authentication"
-import { Button, Divider, Form, Header, Input, Message, Segment } from "semantic-ui-react"
+import { Button, Divider, Form, Header, Input, Segment } from "semantic-ui-react"
 import { Provider, connect } from "react-redux"
 import PropTypes from "prop-types"
 import React, { Fragment, useCallback, useState } from "react"

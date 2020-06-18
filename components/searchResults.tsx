@@ -2,10 +2,8 @@ import { Container, Header, Item, Label, Placeholder, Segment, Visibility } from
 import { s3BaseUrl } from "@options/config"
 import AllyPic from "@public/images/avatar/large/joe.jpg"
 import DefaultPic from "@public/images/placeholders/placeholder-dark.jpg"
-import LinkedText from "@components/linkedText"
-import Moment from "react-moment"
 import PropTypes from "prop-types"
-import React, { Fragment, useState } from "react"
+import React, { useState } from "react"
 import Router from "next/router"
 
 const SearchResults: React.FunctionComponent = ({
@@ -20,16 +18,11 @@ const SearchResults: React.FunctionComponent = ({
 }) => {
 	const [fetching, setFetching] = useState(false)
 
-	const getCardImage = (s3Link) => {
-		return s3Link === null ? DefaultPic : `${s3BaseUrl}${s3Link}`
-	}
-
 	const renderDepartmentsList = () => {
 		return (
 			<Item.Group className={`resultsList ${inverted ? "inverted" : ""}`}>
 				{results.map((result) => {
 					if (loading) {
-						console.log("loading")
 						return (
 							<Item key={`resultsListItem${result.id}`}>
 								<Item.Content>

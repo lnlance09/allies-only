@@ -72,10 +72,6 @@ const User: React.FunctionComponent = ({
 
 	const { getRootProps, getInputProps } = useDropzone({ onDrop })
 
-	const loadMoreInteractions = (page, userId) => {
-		return getInteractions({ page, id: userId })
-	}
-
 	const imgSrc = img === null || img === "" ? DefaultPic : `${s3BaseUrl}${img}`
 
 	const ProfilePic = () => {
