@@ -90,10 +90,9 @@ exports.create = async (req, res) => {
 }
 
 exports.findAll = async (req, res) => {
-	const { departmentId, forOptions, page, q } = req.query
+	const { departmentId, forAutocomplete, forOptions, page, q } = req.query
 
-	const limit = 20
-	const offset = isNaN(page) ? 0 : page * limit
+	let limit = 20
 	let where = {
 		[Op.or]: [
 			{
@@ -173,6 +172,34 @@ exports.findAll = async (req, res) => {
 		]
 		include = null
 	}
+
+	if (forAutocomplete === "1") {
+		attributes = [
+			[
+				db.Sequelize.fn(
+					"concat",
+					db.Sequelize.col("officer.firstName"),
+					" ",
+					db.Sequelize.col("officer.lastName")
+				),
+				"name"
+			],
+			[db.Sequelize.col("officer.img"), "img"],
+			[db.Sequelize.col("department.name"), "departmentName"],
+			[db.Sequelize.col("officer.slug"), "slug"],
+			[db.Sequelize.literal("'officer'"), "type"]
+		]
+		include = [
+			{
+				attributes: [],
+				model: Department,
+				required: true
+			}
+		]
+		limit = 4
+	}
+
+	const offset = isNaN(page) ? 0 : page * limit
 
 	Officer.findAll({
 		attributes,

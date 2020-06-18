@@ -22,7 +22,6 @@ export const changePassword = ({ bearer, confirmPassword, newPassword, password 
 			newPassword
 		})
 		.then((response) => {
-			console.log(response)
 			dispatch({
 				payload: response,
 				type: constants.CHANGE_PASSWORD

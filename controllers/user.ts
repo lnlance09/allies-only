@@ -168,20 +168,13 @@ exports.create = async (req, res) => {
 exports.findAll = async (req, res) => {
 	const { page, q } = req.query
 
-	const limit = 10
+	const limit = 20
+	const offset = isNaN(page) ? 0 : page * limit
+	const order = [["name", "ASC"]]
 	let where = {
-		[Op.or]: [
-			{
-				username: {
-					[Op.like]: `%${q}%`
-				}
-			},
-			{
-				name: {
-					[Op.like]: `%${q}%`
-				}
-			}
-		]
+		name: {
+			[Op.like]: `%${q}%`
+		}
 	}
 
 	if (typeof q === "undefined" || q === "") {
@@ -189,41 +182,11 @@ exports.findAll = async (req, res) => {
 	}
 
 	User.findAll({
-		attributes: [
-			"createdAt",
-			"id",
-			"img",
-			"name",
-			"race",
-			"username",
-			[
-				db.Sequelize.fn("COUNT", db.Sequelize.fn("DISTINCT", db.Sequelize.col("memes.id"))),
-				"memeCount"
-			],
-			[
-				db.Sequelize.fn(
-					"COUNT",
-					db.Sequelize.fn("DISTINCT", db.Sequelize.col("templates.id"))
-				),
-				"templateCount"
-			]
-		],
-		group: ["id"],
-		include: [
-			{
-				model: Meme,
-				attributes: []
-			},
-			{
-				model: Template,
-				attributes: []
-			}
-		],
-		limit: 10,
-		offset: page * limit,
-		order: [["name", "DESC"]],
+		attributes: ["createdAt", "id", "img", "name", "race", "username"],
+		limit,
+		offset,
+		order,
 		raw: true,
-		subQuery: false,
 		where
 	})
 		.then((users) => {
@@ -239,7 +202,7 @@ exports.findAll = async (req, res) => {
 		.catch((err) => {
 			return res.status(500).send({
 				error: true,
-				msg: err.message || "An error occurred"
+				msg: err.message || "Some error occurred"
 			})
 		})
 }

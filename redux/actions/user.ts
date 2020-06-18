@@ -58,7 +58,29 @@ export const getUser = ({ username }) => (dispatch) => {
 			const id = data.user.id
 			dispatch(getInteractions({ userId: id }))
 		})
-		.catch((error) => {
+		.catch(() => {
+			dispatch({
+				type: constants.SET_USER_FETCH_ERROR
+			})
+		})
+}
+
+export const searchUsers = ({ page = 0, q = null }) => (dispatch) => {
+	axios
+		.get("/api/user/search", {
+			params: {
+				page,
+				q
+			}
+		})
+		.then((response) => {
+			const { data } = response
+			dispatch({
+				payload: data,
+				type: constants.SEARCH_USERS
+			})
+		})
+		.catch(() => {
 			dispatch({
 				type: constants.SET_USER_FETCH_ERROR
 			})

@@ -1,12 +1,14 @@
-export const fetchOfficers = async (departmentId, q) => {
-	const response = await fetch(
-		`/api/officer/search?q=${q}&department=${departmentId}&forOptions=1&page=0`,
-		{
-			headers: {
-				"Content-Type": "application/json"
-			}
+import axios from "axios"
+
+export const fetchOfficers = async ({ departmentId, forAutocomplete = 0, forOptions = 1, q }) => {
+	const data = await axios.get("/api/officer/search", {
+		params: {
+			departmentId,
+			forAutocomplete,
+			forOptions,
+			page: 0,
+			q
 		}
-	)
-	const data = await response.json()
-	return data.officers
+	})
+	return data.data.officers
 }

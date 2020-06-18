@@ -1,5 +1,5 @@
-import { searchInteractions } from "@actions/interaction"
-import { Button, Divider, Header } from "semantic-ui-react"
+import { searchUsers } from "@actions/user"
+import { Divider, Header } from "semantic-ui-react"
 import { DebounceInput } from "react-debounce-input"
 import { Provider, connect } from "react-redux"
 import { useRouter } from "next/router"
@@ -7,24 +7,29 @@ import { withTheme } from "@redux/ThemeProvider"
 import { compose } from "redux"
 import DefaultLayout from "@layouts/default"
 import PropTypes from "prop-types"
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import SearchResults from "@components/searchResults"
 import store from "@store"
 
-const Allies: React.FunctionComponent = ({ interactions, inverted, searchInteractions }) => {
+const Allies: React.FunctionComponent = ({ inverted, searchUsers, users }) => {
 	const router = useRouter()
 	const { q } = router.query
 
 	const [searchVal, setSearchVal] = useState(q)
 
+	useEffect(() => {
+		searchUsers({ q })
+		setSearchVal(q)
+	}, [q])
+
 	const loadMore = (page, q) => {
-		return searchInteractions({ page, q: searchVal })
+		return searchUsers({ page, q: searchVal })
 	}
 
 	const searchForResults = (e) => {
 		const q = e.target.value
 		setSearchVal(q)
-		searchInteractions({ q })
+		searchUsers({ page: 0, q })
 	}
 
 	return (
@@ -46,16 +51,6 @@ const Allies: React.FunctionComponent = ({ interactions, inverted, searchInterac
 			>
 				<Header as="h1" inverted={inverted} size="huge">
 					Allies
-					<Button
-						className="addButton"
-						color="yellow"
-						content="Invite an ally"
-						icon="plus"
-						inverted={inverted}
-						onClick={() => {
-							// router.push("/interactions/create")
-						}}
-					/>
 				</Header>
 
 				<div className={`ui icon input fluid big ${inverted ? "inverted" : ""}`}>
@@ -72,14 +67,14 @@ const Allies: React.FunctionComponent = ({ interactions, inverted, searchInterac
 				<Divider inverted={inverted} section />
 
 				<SearchResults
-					hasMore={interactions.hasMore}
+					hasMore={users.hasMore}
 					inverted={inverted}
-					loading={interactions.loading}
+					loading={users.loading}
 					loadMore={({ page, q }) => loadMore(page, q)}
-					page={interactions.page}
+					page={users.page}
 					q={searchVal}
-					results={interactions.results}
-					type="interactions"
+					results={users.results}
+					type="users"
 				/>
 			</DefaultLayout>
 		</Provider>
@@ -87,7 +82,7 @@ const Allies: React.FunctionComponent = ({ interactions, inverted, searchInterac
 }
 
 Allies.propTypes = {
-	interactions: PropTypes.shape({
+	users: PropTypes.shape({
 		hasMore: PropTypes.bool,
 		loading: PropTypes.bool,
 		page: PropTypes.number,
@@ -101,18 +96,17 @@ Allies.propTypes = {
 				})
 			])
 		)
-	}),
-	inverted: PropTypes.bool
+	})
 }
 
 Allies.defaultProps = {
-	interactions: {
+	users: {
 		hasMore: false,
 		loading: true,
 		page: 0,
 		results: [false, false, false, false, false, false]
 	},
-	searchInteractions
+	searchUsers
 }
 
 const mapStateToProps = (state: any, ownProps: any) => ({
@@ -122,7 +116,7 @@ const mapStateToProps = (state: any, ownProps: any) => ({
 
 export default compose(
 	connect(mapStateToProps, {
-		searchInteractions
+		searchUsers
 	}),
 	withTheme("dark")
 )(Allies)

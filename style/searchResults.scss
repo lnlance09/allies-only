@@ -1,5 +1,9 @@
 .searchResults {
 	.resultsList {
+		@media only screen and (max-width: 767px) {
+			padding: 0 7px !important;
+		}
+
 		&.inverted {
 			.item {
 				background: lighten($invertedBackgroundColor, 2%);
@@ -12,12 +16,30 @@
 					transition: 0.3s;
 				}
 
-				.header {
-					color: $offWhite !important;
+				@media only screen and (max-width: 767px) {
+					.image {
+						display: none !important;
+					}
+
+					margin: 7px auto !important;
+
+					&:first-of-type {
+						margin-top: 0 !important;
+					}
 				}
 
-				.meta {
-					color: $offWhite !important;
+				.content {
+					@media only screen and (max-width: 767px) {
+						padding-top: 0 !important;
+					}
+
+					.header {
+						color: $offWhite !important;
+					}
+
+					.meta {
+						color: $offWhite !important;
+					}
 				}
 			}
 		}

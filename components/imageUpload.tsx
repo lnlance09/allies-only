@@ -21,7 +21,6 @@ const ImageUpload: React.FunctionComponent = ({
 	const onDrop = async (files) => {
 		await setFiles(files)
 		if (files.length > 0) {
-			console.log("id", id)
 			callback(bearer, files[0], id)
 		}
 	}

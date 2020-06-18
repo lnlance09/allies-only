@@ -1,14 +1,22 @@
 import * as constants from "../constants"
+import { s3BaseUrl } from "@options/config"
 
 const initial = () => ({
-	meme: {
+	interaction: {
 		data: {
-			templates: [],
-			user: {}
+			user: {},
+			video: null
 		},
 		error: false,
 		errorMsg: "",
 		loading: true
+	},
+	interactions: {
+		error: false,
+		errorMsg: "",
+		hasMore: false,
+		loading: true,
+		results: []
 	}
 })
 
@@ -43,8 +51,20 @@ const interaction = (state = initial(), action) => {
 						user: {}
 					},
 					error: true,
-					errorMsg: "This meme does not exist",
+					errorMsg: "This interaction does not exist",
 					loading: false
+				}
+			}
+
+		case constants.UPLOAD_VIDEO:
+			return {
+				...state,
+				interaction: {
+					...state.interaction,
+					data: {
+						...state.interaction.data,
+						video: `${s3BaseUrl}${payload.video}`
+					}
 				}
 			}
 

@@ -8,10 +8,13 @@ module.exports = (sequelize, Sequelize) => {
 			unique: true
 		},
 		description: {
-			type: Sequelize.STRING
+			type: Sequelize.TEXT
 		},
 		officerId: {
 			type: Sequelize.INTEGER
+		},
+		title: {
+			type: Sequelize.STRING
 		},
 		userId: {
 			type: Sequelize.INTEGER

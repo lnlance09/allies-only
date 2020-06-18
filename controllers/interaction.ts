@@ -3,8 +3,8 @@ const Auth = require("../utils/authFunctions.ts")
 const Aws = require("../utils/awsFunctions.ts")
 const db = require("../models/index.ts")
 const axios = require("axios")
+const path = require("path")
 const randomize = require("randomatic")
-const sha1 = require("sha1")
 const validator = require("validator")
 /* eslint-enable */
 const Department = db.department
@@ -13,26 +13,33 @@ const Officer = db.officer
 const Op = db.Sequelize.Op
 
 exports.create = async (req, res) => {
-	const { file } = req.files
-	const { description, officerId } = req.body
-	const { authenticated, user } = Auth.parseAuthentication(req)
-
-	if (typeof officerId === "undefined" || officerId === "") {
-		return res
-			.status(422)
-			.send({ error: true, msg: "You must link this interaction to an officer" })
+	if (typeof req.files === "undefined") {
+		return res.status(422).send({ error: true, msg: "You must include a video" })
 	}
+
+	const { file } = req.files
+	const { department, description, officer, title } = req.body
+	const { authenticated, user } = Auth.parseAuthentication(req)
 
 	const image = file.data
 	const timestamp = new Date().getTime()
 	const fileName = `interactions/${randomize("aa", 24)}-${timestamp}.png`
 	await Aws.uploadToS3(image, fileName, false)
 
+	if (typeof officer === "undefined" || officer === "") {
+		return res
+			.status(422)
+			.send({ error: true, msg: "You must link this interaction to an officer" })
+	}
+
+	/*
 	Interaction.create({
+		department,
 		description,
-		officerId,
+		officer,
+		title,
 		userId: authenticated ? user.data.id : 1,
-		video: ""
+		video: fileName
 	})
 		.then((data) => {
 			const { id } = data.dataValues
@@ -48,6 +55,7 @@ exports.create = async (req, res) => {
 				msg: err.message || "An error occurred"
 			})
 		})
+	*/
 }
 
 exports.findAll = (req, res) => {
@@ -160,12 +168,12 @@ exports.update = async (req, res) => {
 	}
 
 	const count = await Interaction.count({
+		col: "interaction.id",
+		distinct: true,
 		where: {
 			createdBy: user.data.id,
 			id
-		},
-		distinct: true,
-		col: "interaction.id"
+		}
 	}).then((count) => count)
 
 	if (count === 0) {
@@ -207,4 +215,30 @@ exports.updateViews = async (req, res) => {
 		error: false,
 		msg: "Views updated"
 	})
+}
+
+exports.uploadVideo = async (req, res) => {
+	if (typeof req.files === "undefined") {
+		return res.status(422).send({ error: true, msg: "You must include a video" })
+	}
+
+	const { file } = req.files
+	const ext = path.extname(file.name)
+	const extensions = [".avi", ".flv", ".m4v", ".mp4", ".mkv", ".webm"]
+
+	if (!extensions.includes(ext)) {
+		return res.status(401).send({ error: true, msg: "That video format is not allowed" })
+	}
+
+	const video = file.data
+	const timestamp = new Date().getTime()
+	const fileName = `interactions/${randomize("aa", 24)}-${timestamp}${ext}`
+	await Aws.uploadToS3(video, fileName, false, "video/mp4")
+
+	setTimeout(() => {
+		return res.status(200).send({
+			error: false,
+			video: fileName
+		})
+	}, 25000)
 }

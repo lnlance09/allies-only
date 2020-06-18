@@ -24,7 +24,7 @@ const Interactions: React.FunctionComponent = ({ interactions, inverted, searchI
 	const searchForResults = (e) => {
 		const q = e.target.value
 		setSearchVal(q)
-		searchInteractions({ q })
+		searchInteractions({ page: 0, q })
 	}
 
 	return (

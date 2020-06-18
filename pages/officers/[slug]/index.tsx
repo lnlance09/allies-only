@@ -61,7 +61,7 @@ const Officer: React.FunctionComponent = ({
 
 			if (slug === "create") {
 				setCreateMode(true)
-				const departmentOptions = await fetchDepartments("")
+				const departmentOptions = await fetchDepartments({ q: "" })
 				setDepartmentOptions(departmentOptions)
 			}
 
@@ -88,7 +88,7 @@ const Officer: React.FunctionComponent = ({
 
 	const changeDepartment = async (e) => {
 		const q = e.target.value
-		const departmentOptions = await fetchDepartments(q)
+		const departmentOptions = await fetchDepartments({ q })
 		setDepartmentOptions(departmentOptions)
 	}
 

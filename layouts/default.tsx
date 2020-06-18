@@ -1,9 +1,11 @@
-import { Container, Divider, Grid, Image, Menu } from "semantic-ui-react"
+import { Container, Grid, Image, Input } from "semantic-ui-react"
 import { baseUrl } from "@options/config"
 import { useRouter } from "next/router"
 import { withTheme } from "@redux/ThemeProvider"
+import Autocomplete from "@components/autocomplete"
 import Footer from "@components/footer"
 import Head from "next/head"
+import Header from "@components/header"
 import Logo from "@public/images/logos/logo_72x72.png"
 import PropTypes from "prop-types"
 import React, { Fragment } from "react"
@@ -11,6 +13,7 @@ import Sidebar from "@components/sidebar"
 
 const DefaultLayout: React.FunctionComponent = ({
 	activeItem,
+	basicHeader,
 	children,
 	containerClassName,
 	inverted,
@@ -65,27 +68,7 @@ const DefaultLayout: React.FunctionComponent = ({
 				<title>{title} - Allies Only</title>
 			</Head>
 
-			<div className="rainbow" />
-			{loading && (
-				<Fragment>
-					<div className="subline inc" />
-					<div className="subline dec" />
-				</Fragment>
-			)}
-
-			<Menu
-				className="topHeader"
-				borderless
-				fitted="vertically"
-				fixed="top"
-				inverted={inverted}
-			>
-				<Container>
-					<Menu.Item>
-						<Image className="logo" onClick={() => router.push("/")} src={Logo} />
-					</Menu.Item>
-				</Container>
-			</Menu>
+			<Header basicHeader={basicHeader} loading={loading} />
 
 			<Container
 				className={`mainContainer ${containerClassName} ${inverted ? "inverted" : ""}`}
@@ -93,8 +76,8 @@ const DefaultLayout: React.FunctionComponent = ({
 				textAlign={textAlign}
 			>
 				{useGrid ? (
-					<Grid stackable>
-						<Grid.Column width={4}>
+					<Grid className="mainGrid" stackable>
+						<Grid.Column className="leftColumn" width={4}>
 							<Sidebar activeItem={activeItem} inverted={inverted} />
 						</Grid.Column>
 						<Grid.Column width={12}>{children}</Grid.Column>
@@ -110,10 +93,12 @@ const DefaultLayout: React.FunctionComponent = ({
 
 DefaultLayout.propTypes = {
 	activeItem: PropTypes.string,
+	basicHeader: PropTypes.bool,
 	children: PropTypes.node,
 	containerClassName: PropTypes.string,
 	inverted: PropTypes.bool,
 	isText: PropTypes.bool,
+	loading: PropTypes.bool,
 	seo: PropTypes.shape({
 		description: PropTypes.string,
 		image: PropTypes.shape({

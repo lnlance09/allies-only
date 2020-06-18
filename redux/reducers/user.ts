@@ -12,6 +12,13 @@ const initial = () => ({
 			page: 0,
 			results: [false, false, false, false, false, false]
 		}
+	},
+	users: {
+		error: false,
+		errorMsg: "",
+		hasMore: false,
+		loading: true,
+		results: []
 	}
 })
 
@@ -61,6 +68,22 @@ const user = (state = initial(), action) => {
 						page: payload.page,
 						results: userInteractions
 					}
+				}
+			}
+
+		case constants.SEARCH_USERS:
+			let userResults = payload.users
+			if (payload.page > 1) {
+				userResults = [...state.users.results, ...payload.users]
+			}
+
+			return {
+				...state,
+				users: {
+					hasMore: payload.hasMore,
+					loading: false,
+					page: payload.page,
+					results: userResults
 				}
 			}
 

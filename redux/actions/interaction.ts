@@ -1,21 +1,40 @@
 import * as constants from "../constants"
+import { toast } from "react-toastify"
 import axios from "axios"
 import Router from "next/router"
 
-export const createInteraction = ({ bearer, caption, images }) => (dispatch) => {
+toast.configure({
+	autoClose: 2000,
+	closeOnClick: true,
+	draggable: true,
+	hideProgressBar: true,
+	newestOnTop: true
+})
+
+export const createInteraction = ({
+	bearer,
+	callback = () => null,
+	department,
+	description,
+	file,
+	officer,
+	title
+}) => (dispatch) => {
+	const formData = new FormData()
+	formData.set("department", department)
+	formData.set("description", description)
+	formData.set("file", file)
+	formData.set("officer", officer)
+	formData.set("title", title)
+
 	axios
-		.post(
-			"/api/interaction/create",
-			{
-				caption,
-				images
-			},
-			{
-				headers: {
-					Authorization: bearer
-				}
+		.post("/api/interaction/create", formData, {
+			headers: {
+				Authorization: bearer,
+				"Content-Type": "multipart/form-data",
+				enctype: "multipart/form-data"
 			}
-		)
+		})
 		.then(async (response) => {
 			const { data } = response
 			if (!data.error) {
@@ -23,7 +42,8 @@ export const createInteraction = ({ bearer, caption, images }) => (dispatch) => 
 			}
 		})
 		.catch((error) => {
-			console.log(error)
+			callback()
+			toast.error(error.response.data.msg)
 		})
 }
 
@@ -72,15 +92,6 @@ export const searchInteractions = ({ departmentId, page = 0, q = null }) => (dis
 		})
 }
 
-export const updateViews = ({ id }) => (dispatch) => {
-	axios
-		.post(`/api/interaction/${id}/updateViews`)
-		.then(() => null)
-		.catch((error) => {
-			console.log(error)
-		})
-}
-
 export const updateInteraction = ({ bearer, callback = () => null, data, id }) => (dispatch) => {
 	axios
 		.post(`/api/interaction/${id}/update`, data, {
@@ -98,5 +109,43 @@ export const updateInteraction = ({ bearer, callback = () => null, data, id }) =
 		})
 		.catch((error) => {
 			console.log(error)
+		})
+}
+
+export const updateViews = ({ id }) => (dispatch) => {
+	axios
+		.post(`/api/interaction/${id}/updateViews`)
+		.then(() => null)
+		.catch((error) => {
+			console.log(error)
+		})
+}
+
+export const uploadVideo = ({ callback = () => null, file }) => (dispatch) => {
+	const formData = new FormData()
+	formData.set("file", file)
+
+	axios
+		.post("/api/interaction/uploadVideo", formData, {
+			headers: {
+				"Content-Type": "multipart/form-data",
+				enctype: "multipart/form-data"
+			}
+		})
+		.then(async (response) => {
+			const { data } = response
+
+			if (!data.error) {
+				callback()
+			}
+
+			dispatch({
+				payload: data,
+				type: constants.UPLOAD_VIDEO
+			})
+		})
+		.catch((error) => {
+			callback()
+			toast.error(error.response.data.msg)
 		})
 }

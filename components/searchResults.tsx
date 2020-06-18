@@ -1,5 +1,6 @@
 import { Container, Header, Item, Label, Placeholder, Segment, Visibility } from "semantic-ui-react"
 import { s3BaseUrl } from "@options/config"
+import AllyPic from "@public/images/avatar/large/joe.jpg"
 import DefaultPic from "@public/images/placeholders/placeholder-dark.jpg"
 import LinkedText from "@components/linkedText"
 import Moment from "react-moment"
@@ -61,10 +62,10 @@ const SearchResults: React.FunctionComponent = ({
 									<span>{meta}</span>
 								</Item.Meta>
 								<Item.Description>
-									<Label color="orange">
+									<Label color="yellow">
 										{result.interactionCount} interactions
 									</Label>
-									<Label color="blue">{result.officerCount} officers</Label>
+									<Label color="orange">{result.officerCount} officers</Label>
 								</Item.Description>
 							</Item.Content>
 						</Item>
@@ -105,6 +106,30 @@ const SearchResults: React.FunctionComponent = ({
 		)
 	}
 
+	const renderUsersList = () => {
+		return (
+			<Item.Group className={`resultsList ${inverted ? "inverted" : ""}`}>
+				{results.map((result) => {
+					return (
+						<Item
+							key={`resultsListItem${result.id}`}
+							onClick={() => Router.push(`/${result.username}`)}
+						>
+							<Item.Image
+								onError={(i) => (i.target.src = AllyPic)}
+								src={result.img === null ? AllyPic : `${s3BaseUrl}${result.img}`}
+							/>
+							<Item.Content>
+								<Item.Header>{result.name}</Item.Header>
+								<Item.Meta>@{result.username}</Item.Meta>
+							</Item.Content>
+						</Item>
+					)
+				})}
+			</Item.Group>
+		)
+	}
+
 	return (
 		<div className={`searchResults ${type}`}>
 			{results.length === 0 && !loading ? (
@@ -128,6 +153,7 @@ const SearchResults: React.FunctionComponent = ({
 				>
 					{type === "departments" && renderDepartmentsList()}
 					{type === "officers" && renderOfficersList()}
+					{type === "users" && renderUsersList()}
 				</Visibility>
 			)}
 		</div>

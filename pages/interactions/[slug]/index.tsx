@@ -1,17 +1,16 @@
-import { createInteraction, getInteraction } from "@actions/interaction"
+import { createInteraction, getInteraction, uploadVideo } from "@actions/interaction"
 import {
 	Button,
 	Container,
+	Dimmer,
 	Divider,
 	Dropdown,
 	Form,
-	Grid,
 	Header,
 	Icon,
 	Input,
-	List,
+	Loader,
 	Message,
-	Placeholder,
 	Segment,
 	TextArea
 } from "semantic-ui-react"
@@ -19,29 +18,33 @@ import { Provider, connect } from "react-redux"
 import { fetchDepartments } from "@options/departments"
 import { fetchOfficers } from "@options/officers"
 import { useRouter } from "next/router"
+import { parseJwt } from "@utils/tokenFunctions"
 import { withTheme } from "@redux/ThemeProvider"
 import { compose } from "redux"
 import DefaultLayout from "@layouts/default"
-import MapBox from "@components/mapBox"
+import Dropzone from "react-dropzone"
 import PropTypes from "prop-types"
 import React, { useEffect, useState, Fragment } from "react"
-import SearchResults from "@components/searchResults"
+import ReactPlayer from "react-player"
 import store from "@store"
 
 const Interaction: React.FunctionComponent = ({
 	createInteraction,
 	interaction,
 	getInteraction,
-	inverted
+	inverted,
+	uploadVideo
 }) => {
 	const router = useRouter()
 	const { slug } = router.query
 
+	const [bearer, setBearer] = useState(null)
 	const [createMode, setCreateMode] = useState(false)
 	const [department, setDepartment] = useState("")
 	const [departmentOptions, setDepartmentOptions] = useState([])
 	const [description, setDescription] = useState("")
 	const [formLoading, setFormLoading] = useState(false)
+	const [loading, setLoading] = useState(false)
 	const [officer, setOfficer] = useState([])
 	const [officerOptions, setOfficerOptions] = useState([])
 	const [title, setTitle] = useState("")
@@ -51,10 +54,10 @@ const Interaction: React.FunctionComponent = ({
 			if (slug === "create") {
 				setCreateMode(true)
 
-				const officerOptions = await fetchOfficers(department, "")
+				const officerOptions = await fetchOfficers({ departentId: department, q: "" })
 				setOfficerOptions(officerOptions)
 
-				const departmentOptions = await fetchDepartments("")
+				const departmentOptions = await fetchDepartments({ q: "" })
 				setDepartmentOptions(departmentOptions)
 			}
 
@@ -67,21 +70,43 @@ const Interaction: React.FunctionComponent = ({
 		getInitialProps()
 	}, [slug])
 
+	useEffect(() => {
+		const userData = parseJwt()
+		if (userData) {
+			setBearer(localStorage.getItem("jwtToken"))
+		}
+	}, [bearer])
+
 	const addInteraction = () => {
 		setFormLoading(true)
-		createInteraction({ callback: () => setFormLoading(false), city, name })
+		createInteraction({
+			bearer,
+			callback: () => setFormLoading(false),
+			department,
+			description,
+			file: files[0],
+			officer,
+			title
+		})
 	}
 
 	const changeDepartment = async (e) => {
 		const q = e.target.value
-		const departmentOptions = await fetchDepartments(q)
+		const departmentOptions = await fetchDepartments({ q })
 		setDepartmentOptions(departmentOptions)
 	}
 
 	const changeOfficer = async (e) => {
 		const q = e.target.value
-		const officerOptions = await fetchOfficers(q)
+		const officerOptions = await fetchOfficers({ q })
 		setOfficerOptions(officerOptions)
+	}
+
+	const onDrop = (files) => {
+		if (files.length > 0) {
+			setLoading(true)
+			uploadVideo({ callback: () => setLoading(false), file: files[0] })
+		}
 	}
 
 	const renderLabel = (option) => ({
@@ -102,6 +127,7 @@ const Interaction: React.FunctionComponent = ({
 			<DefaultLayout
 				activeItem="interactions"
 				containerClassName="interactionsPage"
+				loading={loading}
 				seo={{
 					description: `A `,
 					image: {
@@ -120,12 +146,37 @@ const Interaction: React.FunctionComponent = ({
 							Add an interaction
 						</Header>
 
-						<Segment inverted={inverted} padded="very" placeholder>
-							<Header as="h2" icon size="huge">
-								<Icon color="yellow" inverted name="film" />
-							</Header>
-							<Button color="yellow" content="Upload a video" inverted={inverted} />
-						</Segment>
+						{interaction.data.video === null ? (
+							<Segment inverted={inverted} padded="very" placeholder>
+								<Header as="h1" icon size="huge">
+									<Icon color="yellow" inverted name="film" />
+								</Header>
+								<Dropzone onDrop={onDrop}>
+									{({ getRootProps, getInputProps }) => (
+										<div {...getRootProps()}>
+											<input {...getInputProps()} />
+											<Button
+												color="yellow"
+												content="Upload a video"
+												inverted={inverted}
+											/>
+										</div>
+									)}
+								</Dropzone>
+							</Segment>
+						) : (
+							<div className="videoPlayer">
+								<ReactPlayer
+									controls
+									height="100%"
+									muted
+									onReady={(e) => console.log("e", e)}
+									playing
+									url={interaction.data.video}
+									width="100%"
+								/>
+							</div>
+						)}
 
 						<Form
 							error={interaction.error}
@@ -136,6 +187,7 @@ const Interaction: React.FunctionComponent = ({
 							<Form.Field>
 								<label>Title</label>
 								<Input
+									inverted={inverted}
 									onChange={(e, { value }) => setTitle(value)}
 									placeholder="Title"
 									value={title}
@@ -146,6 +198,7 @@ const Interaction: React.FunctionComponent = ({
 								<TextArea
 									onChange={(e, { value }) => setDescription(value)}
 									placeholder="Describe this interaction"
+									rows={7}
 									value={description}
 								/>
 							</Form.Field>
@@ -222,123 +275,17 @@ const Interaction: React.FunctionComponent = ({
 							</Container>
 						) : (
 							<Fragment>
-								<Grid>
-									<Grid.Row>
-										<Grid.Column width={4}>
-											{interaction.loading ? (
-												<Placeholder inverted={inverted}>
-													<Placeholder.Image square />
-												</Placeholder>
-											) : (
-												<Fragment>
-													<MapBox
-														lat={parseFloat(interaction.data.lat, 10)}
-														lng={parseFloat(interaction.data.lon, 10)}
-														zoom={interaction.data.type === 1 ? 4 : 9}
-													/>
-												</Fragment>
-											)}
-										</Grid.Column>
-										<Grid.Column width={12}>
-											{!interaction.loading && (
-												<Fragment>
-													<Header as="h1" inverted={inverted}>
-														{interaction.data.name}
-														<Header.Subheader>
-															{interaction.data.type === 1 && (
-																<Fragment>
-																	{interaction.data.state}
-																</Fragment>
-															)}
-															{interaction.data.type === 2 && (
-																<Fragment>
-																	{interaction.data.city},{" "}
-																	{interaction.data.state}
-																</Fragment>
-															)}
-															{interaction.data.type === 3 && (
-																<Fragment>
-																	{interaction.data.county}{" "}
-																	County, {interaction.data.state}
-																</Fragment>
-															)}
-														</Header.Subheader>
-													</Header>
-
-													<div style={{ marginTop: "22px" }}>
-														<Button
-															color="yellow"
-															compact
-															content="Interaction"
-															icon="plus"
-															inverted={inverted}
-															onClick={() =>
-																router.push(
-																	`/interactions/create?deparmentId=${interaction.data.id}`
-																)
-															}
-														/>
-														<Button
-															color="orange"
-															compact
-															content="Officer"
-															icon="plus"
-															inverted={inverted}
-															onClick={() =>
-																router.push(
-																	`/officers/create?deparmentId=${interaction.data.id}`
-																)
-															}
-															style={{ marginLeft: "7px" }}
-														/>
-													</div>
-
-													<List
-														className="gridList"
-														horizontal
-														inverted={inverted}
-														size="big"
-													>
-														<List.Item
-															active={activeItem === "officers"}
-															onClick={() =>
-																setActiveItem("officers")
-															}
-														>
-															<b>{interaction.data.officerCount}</b>{" "}
-															officers
-														</List.Item>
-														<List.Item
-															active={activeItem === "interactions"}
-															onClick={() =>
-																setActiveItem("interactions")
-															}
-														>
-															<b>
-																{interaction.data.interactionCount}
-															</b>{" "}
-															interactions
-														</List.Item>
-													</List>
-												</Fragment>
-											)}
-										</Grid.Column>
-									</Grid.Row>
-								</Grid>
-
-								<Divider section />
-
-								{!interaction.error && !interaction.loading ? (
-									<SearchResults
-										hasMore={results.hasMore}
-										inverted={inverted}
-										loading={results.loading}
-										loadMore={({ page, userId }) => loadMore(page, userId)}
-										page={results.page}
-										results={results.results}
-										type={activeItem}
-									/>
-								) : null}
+								{interaction.loading ? (
+									<Container textAlign="center">
+										<Dimmer active className="pageDimmer">
+											<Loader active size="huge">
+												Loading
+											</Loader>
+										</Dimmer>
+									</Container>
+								) : (
+									<div></div>
+								)}
 							</Fragment>
 						)}
 					</Fragment>
@@ -353,44 +300,51 @@ Interaction.propTypes = {
 	getInteraction: PropTypes.func,
 	interaction: PropTypes.shape({
 		data: PropTypes.shape({
-			city: PropTypes.string,
-			county: PropTypes.string,
-			id: PropTypes.number,
-			interactionCount: PropTypes.number,
-			lat: PropTypes.string,
-			lon: PropTypes.string,
-			name: PropTypes.string,
-			officerCount: PropTypes.number,
-			state: PropTypes.string,
-			type: PropTypes.number
+			createdAt: PropTypes.string,
+			department: PropTypes.string,
+			description: PropTypes.string,
+			officer: PropTypes.string,
+			title: PropTypes.string,
+			user: PropTypes.shape({
+				name: PropTypes.string,
+				username: PropTypes.string
+			}),
+			video: PropTypes.string,
+			views: PropTypes.number
 		}),
 		error: PropTypes.bool,
 		errorMsg: PropTypes.string,
 		loading: PropTypes.bool
 	}),
-	inverted: PropTypes.bool
+	inverted: PropTypes.bool,
+	uploadVideo: PropTypes.func
 }
 
 Interaction.defaultProps = {
 	createInteraction,
 	getInteraction,
 	interaction: {
-		data: {},
+		data: {
+			user: {},
+			video: null
+		},
 		error: false,
 		errorMsg: "",
 		loading: true
-	}
+	},
+	uploadVideo
 }
 
 const mapStateToProps = (state: any, ownProps: any) => ({
-	...state.department,
+	...state.interaction,
 	...ownProps
 })
 
 export default compose(
 	connect(mapStateToProps, {
 		createInteraction,
-		getInteraction
+		getInteraction,
+		uploadVideo
 	}),
 	withTheme("dark")
 )(Interaction)

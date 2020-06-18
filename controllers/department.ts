@@ -50,10 +50,9 @@ exports.create = async (req, res) => {
 }
 
 exports.findAll = (req, res) => {
-	const { forOptions, page, q, state, type } = req.query
+	const { forAutocomplete, forOptions, page, q, state, type } = req.query
 
-	const limit = 20
-	const offset = isNaN(page) ? 0 : page * limit
+	let limit = 20
 	const order = [["name", "ASC"]]
 	let where = {
 		name: {
@@ -119,6 +118,21 @@ exports.findAll = (req, res) => {
 		]
 		include = null
 	}
+
+	if (forAutocomplete === "1") {
+		attributes = [
+			"city",
+			"id",
+			"name",
+			"state",
+			["type", "departmentType"],
+			[db.Sequelize.literal("'department'"), "type"]
+		]
+		include = null
+		limit = 4
+	}
+
+	const offset = isNaN(page) ? 0 : page * limit
 
 	Department.findAll({
 		attributes,

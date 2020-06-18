@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Ubuntu+Condensed&display=swap');
 
-.pageHeader {
-    .menu.globalHeader {
+.pageSidebar {
+    .menu.globalSidebar {
         background: $white;
         box-shadow: none;
         margin-top: 0;
@@ -34,36 +34,10 @@
 
     &.basic {
         .headerMenuItem.home {
-            display: flex;
-            justify-content: center;
-            text-align: center;
-            width: 100%;
-        }
-    }
-
-    .dropDownMenu {
-        &.inverted {
-            .menu {
-                background: lighten($invertedBackgroundColor, 6%);
-
-                &:before, &:after {
-                    background: lighten($invertedBackgroundColor, 6%);
-                }
-
-                .item {
-                    color: $white !important;
-
-                    &:hover {
-                        background: lighten($invertedBackgroundColor, 8%);
-                        color: $offWhite !important;
-                    }
-                }
-            }
-        }
-
-        .menu.visible {
-            min-width: 150px;
-            z-index: 1001;
+            // display: flex;
+            // justify-content: center;
+            // text-align: center;
+            // width: 100%;
         }
     }
 }

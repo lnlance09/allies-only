@@ -29,7 +29,7 @@ const Officers: React.FunctionComponent = ({ inverted, officers, searchOfficers 
 	const searchForResults = (e) => {
 		const q = e.target.value
 		setSearchVal(q)
-		searchOfficers({ q })
+		searchOfficers({ page: 0, q })
 	}
 
 	return (

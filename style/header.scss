@@ -1,0 +1,87 @@
+@keyframes increase {
+	from {
+		left: -5%;
+		width: 5%;
+	}
+	 
+	to {
+	    left: 130%;
+		width: 100%;
+	}
+ }
+ 
+ @keyframes decrease {
+	from { 
+		left: -80%;
+		width: 80%;
+	}
+ 
+	to {
+		left: 110%;
+		width: 10%;
+	}
+}
+
+.pageHeader {
+    .rainbow {
+        background: $invertedYellow;
+        color: transparent;
+        height: 4px !important;
+        position: fixed;
+        top: 0;
+        width: 100%;
+        z-index: 99999;
+    }
+
+    .subline {
+        background: $yellow;
+        height: 4px;
+        position: fixed;
+        top: 0;
+        z-index: 999999;
+    }
+
+    .inc {
+        animation: increase 2s infinite;
+    }
+
+    .dec {
+        animation: decrease 2s 0.5s infinite;
+    }
+
+    .topHeader {
+        align-items: center;
+        background: lighten($invertedBackgroundColor, 4%) !important;
+        display: flex;
+        justify-content: center;
+        max-width: none !important;
+        padding: 10px 13px 6px 13px;
+        position: fixed;
+        top: 0;
+        width: 100% !important;
+        z-index: 9999;
+
+        img {
+            cursor: pointer;
+            height: 48px;
+            width: 48px;
+        }
+
+        .container.basic {
+            display: flex;
+            justify-content: center;
+            padding: 8px 0;
+        }
+
+        .grid .column {
+            &.logoColumn {
+                align-items: center;
+                display: flex;
+            }
+
+            input {
+                line-height: 25px;
+            }
+        }
+    }
+}

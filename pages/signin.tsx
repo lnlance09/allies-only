@@ -23,6 +23,7 @@ const SignIn: React.FunctionComponent = ({ inverted }) => {
 
 	return (
 		<DefaultLayout
+			basicHeader
 			containerClassName="signInPage"
 			isText
 			seo={{

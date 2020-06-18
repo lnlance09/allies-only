@@ -1,9 +1,13 @@
-export const fetchDepartments = async (q) => {
-	const response = await fetch(`/api/department/search?q=${q}&forOptions=1&page=0`, {
-		headers: {
-			"Content-Type": "application/json"
+import axios from "axios"
+
+export const fetchDepartments = async ({ forAutocomplete = 0, forOptions = 1, q }) => {
+	const data = await axios.get("/api/department/search", {
+		params: {
+			forAutocomplete,
+			forOptions,
+			page: 0,
+			q
 		}
 	})
-	const data = await response.json()
-	return data.departments
+	return data.data.departments
 }

@@ -29,7 +29,7 @@ const Departments: React.FunctionComponent = ({ departments, inverted, searchDep
 	const searchForResults = (e) => {
 		const q = e.target.value
 		setSearchVal(q)
-		searchDepartments({ q })
+		searchDepartments({ page: 0, q })
 	}
 
 	return (

@@ -1,0 +1,52 @@
+.autocompleteComponent {
+    .ui.input {
+        input {
+            background-color: transparent !important;
+            border: none !important;
+            caret-color: $white;
+            color: $white;
+            outline: none !important;
+        }
+
+        width: 100%;
+
+        .icon {
+            color: $white;
+        }
+    }
+
+    .results.transition {
+        background: $invertedBackgroundColor !important;
+        border: none !important;
+        top: 53px;
+        width: 100% !important;
+
+        .category {
+            width: 100% !important;
+
+            .name {
+                background: darken($invertedBackgroundColor, 5%) !important;
+                padding: 0 !important;
+            }
+
+            .results {
+                border: none !important;
+                width: 100% !important;
+
+                .result {
+                    background: darken($invertedBackgroundColor, 3%);
+                    padding: 11px;
+                    width: 100% !important;
+
+                    .header {
+                        margin-top: 0 !important;
+                    }
+
+                    &:hover {
+                        background: darken($invertedBackgroundColor, 1%);
+                    }
+                }
+            }
+        }
+    }
+}

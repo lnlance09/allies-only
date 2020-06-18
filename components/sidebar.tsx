@@ -87,13 +87,13 @@ const Sidebar: React.FunctionComponent = ({ activeItem, basic, inverted, loading
 
 	return (
 		<Provider store={store}>
-			<div className="pageHeader">
+			<div className="pageSidebar">
 				<Menu
 					borderless
-					className="globalHeader"
+					className="globalSidebar"
 					fluid
 					inverted={inverted}
-					size="huge"
+					size="massive"
 					vertical
 				>
 					{!basic && (

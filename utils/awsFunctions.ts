@@ -8,7 +8,7 @@ const s3 = new AWS.S3({
 })
 
 module.exports = {
-	uploadToS3: async function (file, fileName, useBuffer = true) {
+	uploadToS3: async function (file, fileName, useBuffer = true, contentType = "image/jpeg") {
 		let body = file
 		if (useBuffer) {
 			const base64 = file.replace(/^data:image\/\w+;base64,/, "")
@@ -20,7 +20,7 @@ module.exports = {
 			Key: fileName,
 			Body: body,
 			ContentEncoding: "base64",
-			ContentType: "image/jpeg"
+			ContentType: contentType
 		}
 
 		s3.upload(params, function (err, data) {
