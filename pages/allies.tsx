@@ -74,7 +74,7 @@ const Allies: React.FunctionComponent = ({ inverted, searchUsers, users }) => {
 					page={users.page}
 					q={searchVal}
 					results={users.results}
-					type="users"
+					type="allies"
 				/>
 			</DefaultLayout>
 		</Provider>

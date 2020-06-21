@@ -38,11 +38,11 @@ const Officers: React.FunctionComponent = ({ inverted, officers, searchOfficers 
 				activeItem="officers"
 				containerClassName="officersPage"
 				seo={{
-					description: "",
+					description: "Browse officers and view their interactions with citizens",
 					image: {
-						height: 200,
-						src: "",
-						width: 200
+						height: 500,
+						src: "/public/images/logos/logo.png",
+						width: 500
 					},
 					title: "Police Officers",
 					url: `officers`

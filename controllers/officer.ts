@@ -4,10 +4,12 @@ const Aws = require("../utils/awsFunctions.ts")
 const db = require("../models/index.ts")
 const randomize = require("randomatic")
 const slugify = require("slugify")
+const validator = require("validator")
 /* eslint-enable */
 const Department = db.department
 const Interaction = db.interaction
 const Officer = db.officer
+const OfficerInteraction = db.officerInteraction
 const Op = db.Sequelize.Op
 
 exports.create = async (req, res) => {
@@ -15,15 +17,19 @@ exports.create = async (req, res) => {
 	const { authenticated, user } = Auth.parseAuthentication(req)
 
 	if (typeof firstName === "undefined" || firstName === "") {
-		return res
-			.status(422)
-			.send({ error: true, msg: "You must provide the first name of the officer" })
+		return res.status(422).send({ error: true, msg: "You must provide a first name" })
 	}
 
 	if (typeof lastName === "undefined" || lastName === "") {
-		return res
-			.status(422)
-			.send({ error: true, msg: "You must provide the last name of the officer" })
+		return res.status(422).send({ error: true, msg: "You must provide a last name" })
+	}
+
+	if (typeof department === "undefined" || department === "") {
+		return res.status(422).send({ error: true, msg: "You must provide the department" })
+	}
+
+	if (!validator.isAlpha(firstName) || !validator.isAlpha(lastName)) {
+		return res.status(422).send({ error: true, msg: "Names can only contain letters" })
 	}
 
 	const departmentCount = await Department.count({
@@ -52,14 +58,34 @@ exports.create = async (req, res) => {
 		return res.status(422).send({ error: true, msg: "That officer already exists" })
 	}
 
-	const officer = await Officer.create({
+	Officer.create({
 		createdBy: authenticated ? user.data.id : 1,
 		departmentId: department,
 		firstName,
 		lastName
 	})
-		.then((data) => {
-			return data.dataValues
+		.then(async (data) => {
+			const officer = data.dataValues
+			const slug = slugify(`${firstName} ${lastName} ${officer.id}`, {
+				lower: true,
+				replacement: "-",
+				strict: true
+			})
+
+			Officer.update(
+				{
+					slug
+				},
+				{
+					where: { id: officer.id }
+				}
+			).then(() => {
+				officer.slug = slug
+				return res.status(200).send({
+					error: false,
+					officer
+				})
+			})
 		})
 		.catch((err) => {
 			return res.status(500).send({
@@ -67,31 +93,13 @@ exports.create = async (req, res) => {
 				msg: err.message || "An error occurred"
 			})
 		})
-
-	const slug = slugify(`${firstName} ${lastName} ${officer.id}`, {
-		replacement: "-",
-		lower: true
-	})
-
-	await Officer.update(
-		{
-			slug
-		},
-		{
-			where: { id: officer.id }
-		}
-	).then(() => {
-		return res.status(200).send({
-			error: false,
-			officer
-		})
-	})
 }
 
 exports.findAll = async (req, res) => {
 	const { departmentId, forAutocomplete, forOptions, page, q } = req.query
 
 	let limit = 20
+	let order = [[db.Sequelize.col("interactionCount"), "DESC"]]
 	let where = {
 		[Op.or]: [
 			{
@@ -116,7 +124,6 @@ exports.findAll = async (req, res) => {
 	}
 
 	let attributes = [
-		// [db.Sequelize.col("officer.badgeNumber"), "badgeNumber"],
 		[db.Sequelize.col("officer.firstName"), "firstName"],
 		[db.Sequelize.col("officer.id"), "id"],
 		[db.Sequelize.col("officer.img"), "img"],
@@ -127,7 +134,7 @@ exports.findAll = async (req, res) => {
 		[
 			db.Sequelize.fn(
 				"COUNT",
-				db.Sequelize.fn("DISTINCT", db.Sequelize.col("interactions.id"))
+				db.Sequelize.fn("DISTINCT", db.Sequelize.col("officerInteractions.id"))
 			),
 			"interactionCount"
 		]
@@ -140,13 +147,16 @@ exports.findAll = async (req, res) => {
 		},
 		{
 			attributes: [],
-			model: Interaction
+			model: OfficerInteraction,
+			required: false
 		}
 	]
 
 	if (forOptions === "1") {
 		attributes = [
-			[db.Sequelize.literal("'black'"), "color"],
+			[db.Sequelize.literal("'yellow'"), "color"],
+			[db.Sequelize.col("department.id"), "departmentId"],
+			[db.Sequelize.col("department.name"), "departmentName"],
 			[
 				db.Sequelize.fn(
 					"concat",
@@ -154,7 +164,7 @@ exports.findAll = async (req, res) => {
 					"-",
 					db.Sequelize.col("lastName"),
 					"-",
-					db.Sequelize.col("id")
+					db.Sequelize.col("officer.id")
 				),
 				"key"
 			],
@@ -163,13 +173,22 @@ exports.findAll = async (req, res) => {
 					"concat",
 					db.Sequelize.col("firstName"),
 					" ",
-					db.Sequelize.col("lastName")
+					db.Sequelize.col("lastName"),
+					" - ",
+					db.Sequelize.col("department.name")
 				),
 				"text"
 			],
-			["id", "value"]
+			[db.Sequelize.col("officer.id"), "value"]
 		]
-		include = null
+		include = [
+			{
+				attributes: ["id"],
+				model: Department,
+				required: true
+			}
+		]
+		order = [["id", "DESC"]]
 	}
 
 	if (forAutocomplete === "1") {
@@ -196,17 +215,18 @@ exports.findAll = async (req, res) => {
 			}
 		]
 		limit = 4
+		order = [["id", "DESC"]]
 	}
 
 	const offset = isNaN(page) ? 0 : page * limit
 
 	Officer.findAll({
 		attributes,
-		include,
 		group: ["officer.id"],
+		include,
 		limit,
 		offset,
-		order: [["id", "DESC"]],
+		order,
 		raw: true,
 		subQuery: false,
 		where
@@ -222,7 +242,6 @@ exports.findAll = async (req, res) => {
 			})
 		})
 		.catch((err) => {
-			console.log(err)
 			return res.status(500).send({
 				error: true,
 				msg: err.message || "An error occurred"
@@ -243,11 +262,11 @@ exports.findOne = async (req, res) => {
 			[db.Sequelize.col("officer.position"), "position"],
 			[db.Sequelize.col("officer.slug"), "slug"],
 			[db.Sequelize.col("department.name"), "departmentName"],
-			[db.Sequelize.col("department.id"), "departmentId"],
+			[db.Sequelize.col("department.slug"), "departmentSlug"],
 			[
 				db.Sequelize.fn(
 					"COUNT",
-					db.Sequelize.fn("DISTINCT", db.Sequelize.col("interactions.id"))
+					db.Sequelize.fn("DISTINCT", db.Sequelize.col("officerInteractions.id"))
 				),
 				"interactionCount"
 			]
@@ -260,7 +279,7 @@ exports.findOne = async (req, res) => {
 			},
 			{
 				attributes: [],
-				model: Interaction
+				model: OfficerInteraction
 			}
 		],
 		order: [["id", "ASC"]],
@@ -278,6 +297,14 @@ exports.findOne = async (req, res) => {
 			}
 
 			const officer = officers[0]
+
+			if (officer.id === null) {
+				return res.status(404).send({
+					error: true,
+					msg: "That officer does not exist"
+				})
+			}
+
 			return res.status(200).send({
 				error: false,
 				officer
@@ -361,25 +388,27 @@ exports.updateImg = async (req, res) => {
 	const fileName = `officers/${randomize("aa", 24)}-${timestamp}.png`
 	await Aws.uploadToS3(image, fileName, false)
 
-	Officer.update(
-		{
-			img: fileName
-		},
-		{
-			where: { id }
-		}
-	)
-		.then(() => {
-			return res.status(200).send({
-				error: false,
-				img: fileName,
-				msg: "Success"
+	setTimeout(() => {
+		Officer.update(
+			{
+				img: fileName
+			},
+			{
+				where: { id }
+			}
+		)
+			.then(() => {
+				return res.status(200).send({
+					error: false,
+					img: fileName,
+					msg: "Success"
+				})
 			})
-		})
-		.catch(() => {
-			return res.status(500).send({
-				error: true,
-				msg: "There was an error"
+			.catch(() => {
+				return res.status(500).send({
+					error: true,
+					msg: "There was an error"
+				})
 			})
-		})
+	}, 5000)
 }

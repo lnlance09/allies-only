@@ -1,21 +1,30 @@
 import * as constants from "../constants"
-import { s3BaseUrl } from "@options/config"
+import { toast } from "react-toastify"
 import axios from "axios"
 import Router from "next/router"
+
+toast.configure({
+	autoClose: 2000,
+	closeOnClick: true,
+	draggable: true,
+	hideProgressBar: true,
+	newestOnTop: true
+})
 
 export const createDepartment = ({ callback = () => null, city, name }) => (dispatch) => {
 	axios
 		.post("/api/department/create", {
 			city,
-			name
+			name: name.trim()
 		})
 		.then((response) => {
 			const { data } = response
 			if (!data.error) {
-				Router.push(`/departments/${data.id}`)
+				Router.push(`/departments/${data.department.slug}`)
 			}
 		})
 		.catch((error) => {
+			toast.error(error.response.data.msg)
 			callback()
 			dispatch({
 				payload: error.response.data.msg,
@@ -35,12 +44,10 @@ export const getDepartment = ({ callback = () => null, id }) => (dispatch) => {
 			})
 
 			if (!data.error) {
-				console.log("callback")
 				callback(data.department.id)
 			}
 		})
 		.catch((error) => {
-			console.log("error", error)
 			dispatch({
 				type: constants.SET_DEPARTMENT_FETCH_ERROR
 			})

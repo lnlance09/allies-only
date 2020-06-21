@@ -25,38 +25,19 @@ export const changeProfilePic = ({ bearer, file }) => (dispatch) => {
 		})
 }
 
-export const getInteractions = ({ page = 0, userId = null }) => (dispatch) => {
-	axios
-		.get("/api/interaction/search", {
-			params: {
-				page,
-				userId
-			}
-		})
-		.then((response) => {
-			const { data } = response
-			dispatch({
-				payload: data,
-				type: constants.GET_USER_INTERACTIONS
-			})
-		})
-		.catch((error) => {
-			console.log(error)
-		})
-}
-
-export const getUser = ({ username }) => (dispatch) => {
+export const getUser = ({ callback = () => null, username }) => (dispatch) => {
 	axios
 		.get(`/api/user/${username}`)
-		.then((response) => {
+		.then(async (response) => {
 			const { data } = response
 			dispatch({
 				payload: data,
 				type: constants.GET_USER
 			})
 
-			const id = data.user.id
-			dispatch(getInteractions({ userId: id }))
+			if (!data.error) {
+				callback(data.user.id)
+			}
 		})
 		.catch(() => {
 			dispatch({

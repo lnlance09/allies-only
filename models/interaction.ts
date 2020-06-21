@@ -7,11 +7,11 @@ module.exports = (sequelize, Sequelize) => {
 			type: Sequelize.INTEGER,
 			unique: true
 		},
+		departmentId: {
+			type: Sequelize.INTEGER
+		},
 		description: {
 			type: Sequelize.TEXT
-		},
-		officerId: {
-			type: Sequelize.INTEGER
 		},
 		title: {
 			type: Sequelize.STRING
@@ -28,7 +28,8 @@ module.exports = (sequelize, Sequelize) => {
 	})
 
 	Interaction.associate = (models) => {
-		Interaction.belongsTo(models.officer, { foreignKey: "officerId" })
+		Interaction.belongsTo(models.department, { foreignKey: "departmentId" })
+		Interaction.hasMany(models.officerInteraction, { foreignKey: "interactionId" })
 		Interaction.belongsTo(models.user, { foreignKey: "userId" })
 	}
 

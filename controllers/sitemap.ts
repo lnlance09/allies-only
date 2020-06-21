@@ -3,8 +3,9 @@ const db = require("../models/index.ts")
 const { SitemapStream, streamToPromise } = require("sitemap")
 const { createGzip } = require("zlib")
 /* eslint-enable */
-const Meme = db.meme
-const Template = db.template
+const Department = db.department
+const Interaction = db.interaction
+const Officer = db.officer
 const User = db.user
 
 exports.sitemap = async (req, res) => {
@@ -12,25 +13,31 @@ exports.sitemap = async (req, res) => {
 	res.header("Content-Encoding", "gzip")
 
 	try {
-		const smStream = new SitemapStream({ hostname: "https://brandy.io/" })
+		const smStream = new SitemapStream({ hostname: "https://alliesonly.com/" })
 		const pipeline = smStream.pipe(createGzip())
 
-		const memes = await Meme.findAll({
-			model: Meme,
-			attributes: ["id"],
+		// Execute all of the queries
+		const departments = await Department.findAll({
+			model: Department,
+			attributes: ["slug"],
 			raw: true
 		})
-			.then((memes) => memes)
+			.then((departments) => departments)
 			.catch(() => [])
-
-		const templates = await Template.findAll({
-			model: Template,
-			attributes: ["id"],
+		const interactions = await Interaction.findAll({
+			model: Interaction,
+			attributes: ["id", "slug"],
 			raw: true
 		})
-			.then((templates) => templates)
+			.then((interactions) => interactions)
 			.catch(() => [])
-
+		const officers = await Officer.findAll({
+			model: Interaction,
+			attributes: ["slug"],
+			raw: true
+		})
+			.then((officers) => officers)
+			.catch(() => [])
 		const users = await User.findAll({
 			model: User,
 			attributes: ["username"],
@@ -39,24 +46,40 @@ exports.sitemap = async (req, res) => {
 			.then((users) => users)
 			.catch(() => [])
 
-		smStream.write({ url: "/create", changefreq: "monthly", priority: 1.0 })
-
-		memes.map((meme) => {
-			smStream.write({ url: `/meme/${meme.id}`, changefreq: "daily", priority: 0.9 })
+		// Write all of the links
+		interactions.map((interaction) => {
+			smStream.write({
+				url: `/interactions/${interaction.id}`,
+				changefreq: "daily",
+				priority: 0.9
+			})
 		})
+		smStream.write({ url: "/interactions", changefreq: "monthly", priority: 0.9 })
+		smStream.write({ url: "/interactions/create", changefreq: "monthly", priority: 0.9 })
 
-		templates.map((template) => {
-			smStream.write({ url: `/template/${template.id}`, changefreq: "daily", priority: 0.8 })
+		officers.map((officer) => {
+			smStream.write({ url: `/officers/${officer.slug}`, changefreq: "daily", priority: 0.8 })
 		})
+		smStream.write({ url: "/officers", changefreq: "monthly", priority: 0.8 })
+		smStream.write({ url: "/officers/create", changefreq: "monthly", priority: 0.8 })
 
-		smStream.write({ url: "/explore/memes", changefreq: "monthly", priority: 0.7 })
-		smStream.write({ url: "/explore/templates", changefreq: "monthly", priority: 0.7 })
-		smStream.write({ url: "/explore/artists", changefreq: "monthly", priority: 0.7 })
-		smStream.write({ url: "/", changefreq: "monthly", priority: 0.5 })
+		departments.map((department) => {
+			smStream.write({
+				url: `/departments/${department.slug}`,
+				changefreq: "daily",
+				priority: 0.6
+			})
+		})
+		smStream.write({ url: "/departments", changefreq: "monthly", priority: 0.6 })
+		smStream.write({ url: "/departments/create", changefreq: "monthly", priority: 0.6 })
 
 		users.map((user) => {
-			smStream.write({ url: `/artist/${user.username}`, changefreq: "daily", priority: 0.4 })
+			smStream.write({ url: `/${user.username}`, changefreq: "daily", priority: 0.5 })
 		})
+		smStream.write({ url: "/allies", changefreq: "monthly", priority: 0.5 })
+
+		smStream.write({ url: "/signin", changefreq: "monthly", priority: 0.4 })
+		smStream.write({ url: "/signin?type=join", changefreq: "monthly", priority: 0.4 })
 
 		smStream.end()
 

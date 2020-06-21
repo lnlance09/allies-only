@@ -1,5 +1,5 @@
 import { searchInteractions } from "@actions/interaction"
-import { Button, Divider, Header, Input } from "semantic-ui-react"
+import { Button, Divider, Header } from "semantic-ui-react"
 import { DebounceInput } from "react-debounce-input"
 import { Provider, connect } from "react-redux"
 import { useRouter } from "next/router"
@@ -7,7 +7,7 @@ import { withTheme } from "@redux/ThemeProvider"
 import { compose } from "redux"
 import DefaultLayout from "@layouts/default"
 import PropTypes from "prop-types"
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import SearchResults from "@components/searchResults"
 import store from "@store"
 
@@ -17,8 +17,13 @@ const Interactions: React.FunctionComponent = ({ interactions, inverted, searchI
 
 	const [searchVal, setSearchVal] = useState(q)
 
+	useEffect(() => {
+		searchInteractions({ page: 0, q })
+		setSearchVal(q)
+	}, [q])
+
 	const loadMore = (page, q) => {
-		return searchInteractions({ page, q: searchVal })
+		return searchInteractions({ page, q })
 	}
 
 	const searchForResults = (e) => {
@@ -33,13 +38,13 @@ const Interactions: React.FunctionComponent = ({ interactions, inverted, searchI
 				activeItem="interactions"
 				containerClassName="interactionsPage"
 				seo={{
-					description: "",
+					description: "View interactions between the police and citizens",
 					image: {
-						height: 200,
-						src: "",
-						width: 200
+						height: 500,
+						src: "/public/images/logos/logo.png",
+						width: 500
 					},
-					title: "Interactions with police",
+					title: "Police Interactions",
 					url: `interactions`
 				}}
 				showFooter={false}
@@ -102,7 +107,8 @@ Interactions.propTypes = {
 			])
 		)
 	}),
-	inverted: PropTypes.bool
+	inverted: PropTypes.bool,
+	searchInteractions: PropTypes.func
 }
 
 Interactions.defaultProps = {

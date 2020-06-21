@@ -79,7 +79,11 @@ const Autocomplete: React.FunctionComponent = ({ category, disabled, placeholder
 	}
 
 	const onClick = (e, data) => {
-		const link = `/pages/youtube/${data.result.social_media_id}`
+		const { slug, type } = data.result
+		let link = `/departments/${slug}`
+		if (type === "officer") {
+			link = `/officers/${slug}`
+		}
 		Router.push(link)
 	}
 

@@ -42,6 +42,26 @@
 					}
 				}
 			}
+
+			.interactionCard {
+				background: $invertedBackgroundColor;
+				cursor: pointer;				
+
+				video {
+					background-color: $invertedBackgroundColor;
+					line-height: 0.8 !important;
+				}
+
+				.interactionContent {
+					background-color: lighten($invertedBackgroundColor, 7%);
+					color: $white;
+					padding: 13px 17px;
+
+					p {
+						font-size: 16px;
+					}
+				}
+			}
 		}
 	}
 }

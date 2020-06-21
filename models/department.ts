@@ -47,6 +47,7 @@ module.exports = (sequelize, Sequelize) => {
 	)
 
 	Department.associate = (models) => {
+		Department.hasMany(models.interaction, { foreignKey: "departmentId" })
 		Department.hasMany(models.officer, { foreignKey: "departmentId" })
 	}
 

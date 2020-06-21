@@ -1,9 +1,10 @@
+import axios from "axios"
+
 export const fetchCities = async (q: string) => {
-	const response = await fetch(`/api/location/search?q=${q}`, {
-		headers: {
-			"Content-Type": "application/json"
+	const data = await axios.get("/api/location/search", {
+		params: {
+			q
 		}
 	})
-	const data = await response.json()
-	return data.locations
+	return data.data.locations
 }

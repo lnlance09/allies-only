@@ -10,7 +10,7 @@ const initial = () => ({
 			hasMore: true,
 			loading: true,
 			page: 0,
-			results: [false, false, false, false, false, false]
+			results: []
 		}
 	},
 	users: {
@@ -52,7 +52,7 @@ const user = (state = initial(), action) => {
 				}
 			}
 
-		case constants.GET_USER_INTERACTIONS:
+		case constants.SEARCH_INTERACTIONS:
 			let userInteractions = payload.interactions
 			if (payload.page > 1) {
 				userInteractions = [...state.user.interactions.results, ...payload.interactions]

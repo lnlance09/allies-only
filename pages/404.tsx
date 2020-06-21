@@ -1,4 +1,5 @@
-import { changeProfilePic, getInteractions, getUser } from "@actions/user"
+import { searchInteractions } from "@actions/interaction"
+import { changeProfilePic, getUser } from "@actions/user"
 import {
 	Button,
 	Container,
@@ -14,25 +15,25 @@ import {
 import { s3BaseUrl } from "@options/config"
 import { parseJwt } from "@utils/tokenFunctions"
 import { useRouter } from "next/router"
-import { useDropzone } from "react-dropzone"
 import { Provider, connect } from "react-redux"
 import { withTheme } from "@redux/ThemeProvider"
 import { compose } from "redux"
 import DefaultLayout from "@layouts/default"
-import DefaultPic from "@public/images/logos/logo.png"
+import DefaultPic from "@public/images/avatar/large/joe.jpg"
+import ImageUpload from "@components/imageUpload"
 import Moment from "react-moment"
 import PropTypes from "prop-types"
-import React, { Fragment, useCallback, useEffect, useState } from "react"
+import React, { Fragment, useEffect, useState } from "react"
 import SearchResults from "@components/searchResults"
 import store from "@store"
 
 const User: React.FunctionComponent = ({
 	changeProfilePic,
 	error,
-	getInteractions,
 	getUser,
 	inverted,
 	loading,
+	searchInteractions,
 	user
 }) => {
 	const router = useRouter()
@@ -46,7 +47,7 @@ const User: React.FunctionComponent = ({
 
 	useEffect(() => {
 		if (typeof username !== "undefined") {
-			getUser({ username })
+			getUser({ callback: (userId) => searchInteractions({ userId }), username })
 		}
 	}, [getUser, username])
 
@@ -58,44 +59,22 @@ const User: React.FunctionComponent = ({
 		}
 	}, [bearer])
 
-	const onDrop = useCallback(
-		(files) => {
-			if (files.length > 0) {
-				changeProfilePic({
-					bearer,
-					file: files[0]
-				})
-			}
-		},
-		[bearer, changeProfilePic]
-	)
-
-	const { getRootProps, getInputProps } = useDropzone({ onDrop })
+	const loadMore = (page, userId) => {
+		return searchInteractions({ userId, page })
+	}
 
 	const imgSrc = img === null || img === "" ? DefaultPic : `${s3BaseUrl}${img}`
 
 	const ProfilePic = () => {
-		const content = (
-			<div {...getRootProps()}>
-				<input {...getInputProps()} />
-				<Header inverted={inverted}>Change your pic</Header>
-				<Button className="changePicBtn" color="blue" icon inverted={inverted}>
-					<Icon name="image" />
-				</Button>
-			</div>
-		)
-
 		if (currentUser.id === id) {
 			return (
-				<Dimmer.Dimmable
-					as={Image}
-					className="profilePic"
-					dimmed={active}
-					dimmer={{ active, content, inverted: !inverted }}
-					onError={(i) => (i.target.src = DefaultPic)}
-					onMouseEnter={() => setActive(true)}
-					onMouseLeave={() => setActive(false)}
-					src={imgSrc}
+				<ImageUpload
+					bearer={bearer}
+					callback={(bearer, file, id) => changeProfilePic({ bearer, file })}
+					fluid
+					id={id}
+					img={imgSrc === null ? DefaultPic : imgSrc}
+					inverted={inverted}
 				/>
 			)
 		}
@@ -106,7 +85,7 @@ const User: React.FunctionComponent = ({
 	return (
 		<Provider store={store}>
 			<DefaultLayout
-				activeItem={currentUser.id === id ? "profile" : "allies"}
+				activeItem={currentUser.id === id && bearer !== null ? "profile" : "allies"}
 				containerClassName="allyPage"
 				seo={{
 					description: `${name}'s interactions with the police on AlliesOnly`,
@@ -124,6 +103,13 @@ const User: React.FunctionComponent = ({
 					<Container className="errorMsgContainer" textAlign="center">
 						<Header as="h1" inverted={inverted}>
 							This user does not exist
+							<div />
+							<Button
+								color="yellow"
+								content="Search all allies"
+								inverted={inverted}
+								onClick={() => router.push(`/allies`)}
+							/>
 						</Header>
 					</Container>
 				) : (
@@ -169,7 +155,7 @@ const User: React.FunctionComponent = ({
 								page={interactions.page}
 								results={interactions.results}
 								type="interactions"
-								userId={user.id}
+								userId={id}
 							/>
 						) : null}
 					</Fragment>
@@ -183,10 +169,10 @@ User.propTypes = {
 	changeProfilePic: PropTypes.func,
 	error: PropTypes.bool,
 	errorMsg: PropTypes.string,
-	getInteractions: PropTypes.func,
 	getUser: PropTypes.func,
 	inverted: PropTypes.bool,
 	loading: PropTypes.bool,
+	searchInteractions: PropTypes.func,
 	user: PropTypes.shape({
 		createdAt: PropTypes.string,
 		id: PropTypes.number,
@@ -216,8 +202,8 @@ User.propTypes = {
 
 User.defaultProps = {
 	changeProfilePic,
-	getInteractions,
-	getUser
+	getUser,
+	searchInteractions
 }
 
 const mapStateToProps = (state: any, ownProps: any) => ({
@@ -228,8 +214,8 @@ const mapStateToProps = (state: any, ownProps: any) => ({
 export default compose(
 	connect(mapStateToProps, {
 		changeProfilePic,
-		getInteractions,
-		getUser
+		getUser,
+		searchInteractions
 	}),
 	withTheme("dark")
 )(User)

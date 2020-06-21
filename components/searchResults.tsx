@@ -1,20 +1,28 @@
-import { Container, Header, Item, Label, Placeholder, Segment, Visibility } from "semantic-ui-react"
+import { Container, Divider, Header, Item, Label, Segment, Visibility } from "semantic-ui-react"
+import { formatPlural } from "@utils/textFunctions"
 import { s3BaseUrl } from "@options/config"
 import AllyPic from "@public/images/avatar/large/joe.jpg"
 import DefaultPic from "@public/images/placeholders/placeholder-dark.jpg"
+import Link from "next/link"
+import Moment from "react-moment"
+import OfficerPic from "@public/images/avatar/officer.png"
 import PropTypes from "prop-types"
-import React, { useState } from "react"
+import React, { Fragment, useState } from "react"
+import ReactPlayer from "react-player"
 import Router from "next/router"
 
 const SearchResults: React.FunctionComponent = ({
+	departmentId,
 	hasMore,
 	inverted,
 	loading,
 	loadMore,
+	officerId,
 	page,
 	q,
 	results,
-	type
+	type,
+	userId
 }) => {
 	const [fetching, setFetching] = useState(false)
 
@@ -22,49 +30,85 @@ const SearchResults: React.FunctionComponent = ({
 		return (
 			<Item.Group className={`resultsList ${inverted ? "inverted" : ""}`}>
 				{results.map((result) => {
-					if (loading) {
-						return (
-							<Item key={`resultsListItem${result.id}`}>
-								<Item.Content>
-									<Placeholder inverted={inverted}>
-										<Placeholder.Header>
-											<Placeholder.Line length="very long" />
-											<Placeholder.Line length="long" />
-										</Placeholder.Header>
-										<Placeholder.Paragraph>
-											<Placeholder.Line length="medium" />
-										</Placeholder.Paragraph>
-									</Placeholder>
-								</Item.Content>
-							</Item>
-						)
+					const {
+						city,
+						id,
+						interactionCount,
+						name,
+						officerCount,
+						slug,
+						state,
+						type
+					} = result
+
+					let meta = state
+					if (type === 2) {
+						meta = `${city}, ${state}`
 					}
 
-					let meta = result.state
-					if (result.type === 2) {
-						meta = `${result.city}, ${result.state}`
-					}
 					return (
 						<Item
-							key={`resultsListItem${result.id}`}
-							onClick={() => Router.push(`/departments/${result.id}`)}
+							key={`resultsListItem${id}`}
+							onClick={() => Router.push(`/departments/${slug}`)}
 						>
 							<Item.Content>
-								<Item.Header>{result.name}</Item.Header>
+								<Item.Header>{name}</Item.Header>
 								<Item.Meta>
 									<span>{meta}</span>
 								</Item.Meta>
 								<Item.Description>
 									<Label color="yellow">
-										{result.interactionCount} interactions
+										{interactionCount}{" "}
+										{formatPlural(interactionCount, "interaction")}
 									</Label>
-									<Label color="orange">{result.officerCount} officers</Label>
+									<Label color="orange">
+										{officerCount} {formatPlural(officerCount, "officer")}
+									</Label>
 								</Item.Description>
 							</Item.Content>
 						</Item>
 					)
 				})}
 			</Item.Group>
+		)
+	}
+
+	const renderInteractionsList = () => {
+		return (
+			<div className={`resultsList ${inverted ? "inverted" : ""}`}>
+				{results.map((result, i) => {
+					return (
+						<Fragment key={`resultsListItem${result.id}`}>
+							{i !== 0 && <Divider inverted={inverted} section />}
+							<div
+								className="interactionCard"
+								onClick={() => Router.push(`/interactions/${result.id}`)}
+							>
+								<ReactPlayer
+									height="100%"
+									muted
+									playing={false}
+									style={{ lineHeight: 0.8 }}
+									url={result.video}
+									width="100%"
+								/>
+								<div className="interactionContent">
+									<Header as="h2" inverted size="large">
+										{result.title}
+										<Header.Subheader>
+											<Moment date={result.createdAt} fromNow /> •{" "}
+											<Link href={`/departments/${result.departmentId}`}>
+												<a>{result.departmentName}</a>
+											</Link>
+										</Header.Subheader>
+									</Header>
+									<p className="interactionDescription">{result.description}</p>
+								</div>
+							</div>
+						</Fragment>
+					)
+				})}
+			</div>
 		)
 	}
 
@@ -79,7 +123,7 @@ const SearchResults: React.FunctionComponent = ({
 						>
 							<Item.Image
 								onError={(i) => (i.target.src = DefaultPic)}
-								src={result.img === null ? DefaultPic : `${s3BaseUrl}${result.img}`}
+								src={result.img === null ? OfficerPic : `${s3BaseUrl}${result.img}`}
 							/>
 							<Item.Content>
 								<Item.Header>
@@ -88,7 +132,8 @@ const SearchResults: React.FunctionComponent = ({
 								<Item.Meta>{result.departmentName}</Item.Meta>
 								<Item.Description>
 									<Label color="orange">
-										{result.interactionCount} interactions
+										{result.interactionCount}{" "}
+										{formatPlural(result.interactionCount, "interaction")}
 									</Label>
 								</Item.Description>
 							</Item.Content>
@@ -115,6 +160,12 @@ const SearchResults: React.FunctionComponent = ({
 							<Item.Content>
 								<Item.Header>{result.name}</Item.Header>
 								<Item.Meta>@{result.username}</Item.Meta>
+								<Item.Description>
+									<Label color="orange">
+										{result.interactionCount}{" "}
+										{formatPlural(result.interactionCount, "interaction")}
+									</Label>
+								</Item.Description>
 							</Item.Content>
 						</Item>
 					)
@@ -129,7 +180,7 @@ const SearchResults: React.FunctionComponent = ({
 				<Container textAlign="center">
 					<Segment inverted={inverted} placeholder>
 						<Header icon size="large">
-							No {type} yet...
+							No {type}
 						</Header>
 					</Segment>
 				</Container>
@@ -139,14 +190,15 @@ const SearchResults: React.FunctionComponent = ({
 					onBottomVisible={async () => {
 						if (hasMore && !fetching) {
 							setFetching(true)
-							await loadMore({ page, q })
+							await loadMore({ departmentId, officerId, page, q, userId })
 							setFetching(false)
 						}
 					}}
 				>
+					{type === "allies" && renderUsersList()}
 					{type === "departments" && renderDepartmentsList()}
+					{type === "interactions" && renderInteractionsList()}
 					{type === "officers" && renderOfficersList()}
-					{type === "users" && renderUsersList()}
 				</Visibility>
 			)}
 		</div>
@@ -154,10 +206,12 @@ const SearchResults: React.FunctionComponent = ({
 }
 
 SearchResults.propTypes = {
+	departmentId: PropTypes.number,
 	hasMore: PropTypes.bool,
 	inverted: PropTypes.bool,
 	loading: PropTypes.bool,
 	loadMore: PropTypes.func,
+	officerId: PropTypes.number,
 	page: PropTypes.number,
 	q: PropTypes.string,
 	results: PropTypes.arrayOf(
@@ -184,7 +238,8 @@ SearchResults.propTypes = {
 			})
 		])
 	),
-	type: PropTypes.oneOf(["departments", "interactions", "officers"])
+	type: PropTypes.oneOf(["allies", "departments", "interactions", "officers"]),
+	userId: PropTypes.number
 }
 
 export default SearchResults

@@ -49,6 +49,7 @@ app.prepare().then(() => {
 
 	// Users
 	server.post("/api/user/changeProfilePic", users.changeProfilePic)
+	server.get("/api/user/count", users.count)
 	server.post("/api/user/create", users.create)
 	server.post("/api/user/login", users.login)
 	server.get("/api/user/search", users.findAll)

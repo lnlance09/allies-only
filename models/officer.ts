@@ -42,7 +42,7 @@ module.exports = (sequelize, Sequelize) => {
 	Officer.associate = (models) => {
 		Officer.belongsTo(models.department, { foreignKey: "departmentId" })
 		Officer.belongsTo(models.user, { foreignKey: "createdBy" })
-		Officer.hasMany(models.interaction, { foreignKey: "officerId" })
+		Officer.hasMany(models.officerInteraction, { foreignKey: "officerId" })
 	}
 
 	return Officer

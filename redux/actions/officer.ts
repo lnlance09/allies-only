@@ -1,6 +1,15 @@
 import * as constants from "../constants"
+import { toast } from "react-toastify"
 import axios from "axios"
 import Router from "next/router"
+
+toast.configure({
+	autoClose: 2000,
+	closeOnClick: true,
+	draggable: true,
+	hideProgressBar: true,
+	newestOnTop: true
+})
 
 export const createOfficer = ({
 	bearer,
@@ -23,14 +32,16 @@ export const createOfficer = ({
 				}
 			}
 		)
-		.then(async (response) => {
+		.then((response) => {
 			const { data } = response
-			if (!data.error) {
-				Router.push(`/officer/${data.officer.slug}`)
+			if (!data.error && data.officer) {
+				Router.push(`/officers/${data.officer.slug}`)
 			}
 		})
 		.catch((error) => {
 			callback()
+			toast.error(error.response.data.msg)
+
 			dispatch({
 				payload: error.response.data.msg,
 				type: constants.SET_OFFICER_CREATE_ERROR
@@ -47,7 +58,10 @@ export const getOfficer = ({ callback = () => null, id }) => (dispatch) => {
 				payload: data,
 				type: constants.GET_OFFICER
 			})
-			callback()
+
+			if (!data.error) {
+				callback(data.officer.id)
+			}
 		})
 		.catch(() => {
 			dispatch({

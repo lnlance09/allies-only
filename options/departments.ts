@@ -1,10 +1,11 @@
 import axios from "axios"
 
-export const fetchDepartments = async ({ forAutocomplete = 0, forOptions = 1, q }) => {
+export const fetchDepartments = async ({ forAutocomplete = 0, forOptions = 1, id, q }) => {
 	const data = await axios.get("/api/department/search", {
 		params: {
 			forAutocomplete,
 			forOptions,
+			id,
 			page: 0,
 			q
 		}

@@ -9,11 +9,11 @@ import {
 	Form,
 	Grid,
 	Header,
-	Image,
 	Input,
-	Loader,
-	Message
+	List,
+	Loader
 } from "semantic-ui-react"
+import { formatPlural } from "@utils/textFunctions"
 import { parseJwt } from "@utils/tokenFunctions"
 import { Provider, connect } from "react-redux"
 import { fetchDepartments } from "@options/departments"
@@ -21,7 +21,7 @@ import { useRouter } from "next/router"
 import { withTheme } from "@redux/ThemeProvider"
 import { compose } from "redux"
 import DefaultLayout from "@layouts/default"
-import DefaultPic from "@public/images/placeholders/placeholder-dark.jpg"
+import DefaultPic from "@public/images/avatar/officer.png"
 import ImageUpload from "@components/imageUpload"
 import Link from "next/link"
 import PropTypes from "prop-types"
@@ -38,9 +38,9 @@ const Officer: React.FunctionComponent = ({
 	updateImg
 }) => {
 	const router = useRouter()
-	const { slug } = router.query
+	const { departmentId, slug } = router.query
 
-	const { departmentId, departmentName, id, img } = officer.data
+	const { departmentName, departmentSlug, id, img } = officer.data
 
 	const [bearer, setBearer] = useState(null)
 	const [createMode, setCreateMode] = useState(null)
@@ -61,14 +61,26 @@ const Officer: React.FunctionComponent = ({
 
 			if (slug === "create") {
 				setCreateMode(true)
-				const departmentOptions = await fetchDepartments({ q: "" })
-				setDepartmentOptions(departmentOptions)
+
+				let departmentOptions = []
+				if (typeof departmentId !== "undefined") {
+					departmentOptions = await fetchDepartments({ id: departmentId })
+					setDepartmentOptions(departmentOptions)
+					setDepartment(parseInt(departmentId, 10))
+				} else {
+					departmentOptions = await fetchDepartments({ q: "" })
+					setDepartmentOptions(departmentOptions)
+				}
 			}
 
 			if (typeof slug !== "undefined" && slug !== "create") {
-				await getOfficer({ id: slug })
-				await searchInteractions({})
 				setCreateMode(false)
+				await getOfficer({
+					callback: (officerId) => {
+						searchInteractions({ officerId })
+					},
+					id: slug
+				})
 			}
 		}
 
@@ -92,6 +104,10 @@ const Officer: React.FunctionComponent = ({
 		setDepartmentOptions(departmentOptions)
 	}
 
+	const loadMore = (page, officerId) => {
+		return searchInteractions({ officerId, page })
+	}
+
 	const selectDepartment = (e, { value }) => {
 		setDepartment(value)
 	}
@@ -102,11 +118,12 @@ const Officer: React.FunctionComponent = ({
 				activeItem="officers"
 				containerClassName="officersPage"
 				seo={{
-					description: `A `,
+					description:
+						"Keep tabs on police officers and their interactions with citizens in their jurisdiction",
 					image: {
-						height: 200,
-						src: "",
-						width: 200
+						height: 500,
+						src: "/public/images/logos/logo.png",
+						width: 500
 					},
 					title: createMode
 						? "Add an officer"
@@ -129,7 +146,6 @@ const Officer: React.FunctionComponent = ({
 						>
 							<Form.Group widths="equal">
 								<Form.Field>
-									<label>First name</label>
 									<Input
 										onChange={(e, { value }) => setFirstName(value)}
 										placeholder="First name"
@@ -137,7 +153,6 @@ const Officer: React.FunctionComponent = ({
 									/>
 								</Form.Field>
 								<Form.Field>
-									<label>Last name</label>
 									<Input
 										onChange={(e, { value }) => setLastName(value)}
 										placeholder="Last name"
@@ -146,27 +161,17 @@ const Officer: React.FunctionComponent = ({
 								</Form.Field>
 							</Form.Group>
 							<Form.Field>
-								<label>Department</label>
 								<Dropdown
 									onChange={selectDepartment}
 									onSearchChange={changeDepartment}
 									options={departmentOptions}
-									placeholder="Name of department"
+									placeholder="Department"
 									search
 									selection
 									value={department}
 								/>
 							</Form.Field>
 						</Form>
-
-						{officer.error && (
-							<Message
-								content={officer.errorMsg}
-								error
-								inverted={inverted}
-								size="big"
-							/>
-						)}
 
 						<Divider inverted={inverted} section />
 
@@ -190,7 +195,7 @@ const Officer: React.FunctionComponent = ({
 									This officer does not exist
 									<div />
 									<Button
-										color="blue"
+										color="yellow"
 										content="Search all officers"
 										inverted={inverted}
 										onClick={() => router.push(`/officers`)}
@@ -212,24 +217,16 @@ const Officer: React.FunctionComponent = ({
 										<Grid>
 											<Grid.Row>
 												<Grid.Column width={4}>
-													{bearer !== null ? (
-														<ImageUpload
-															bearer={bearer}
-															callback={(bearer, file, id) =>
-																updateImg({ bearer, file, id })
-															}
-															id={officer.data.id}
-															img={officer.data.img}
-															inverted={inverted}
-														/>
-													) : (
-														<Image
-															onError={(i) =>
-																(i.target.src = DefaultPic)
-															}
-															src={img === null ? DefaultPic : img}
-														/>
-													)}
+													<ImageUpload
+														bearer={bearer}
+														callback={(bearer, file, id) =>
+															updateImg({ bearer, file, id })
+														}
+														fluid
+														id={officer.data.id}
+														img={img === null ? DefaultPic : img}
+														inverted={inverted}
+													/>
 												</Grid.Column>
 												<Grid.Column width={12}>
 													{!officer.loading && (
@@ -239,7 +236,7 @@ const Officer: React.FunctionComponent = ({
 																{officer.data.lastName}
 																<Header.Subheader>
 																	<Link
-																		href={`/departments/${departmentId}`}
+																		href={`/departments/${departmentSlug}`}
 																	>
 																		<a>{departmentName}</a>
 																	</Link>
@@ -260,6 +257,26 @@ const Officer: React.FunctionComponent = ({
 																	}
 																/>
 															</div>
+															<List
+																className="gridList"
+																horizontal
+																inverted={inverted}
+																size="big"
+															>
+																<List.Item active>
+																	<b>
+																		{
+																			officer.data
+																				.interactionCount
+																		}
+																	</b>{" "}
+																	{formatPlural(
+																		officer.data
+																			.interactionCount,
+																		"interaction"
+																	)}
+																</List.Item>
+															</List>
 														</Fragment>
 													)}
 												</Grid.Column>
@@ -271,9 +288,10 @@ const Officer: React.FunctionComponent = ({
 												hasMore={officer.interactions.hasMore}
 												inverted={inverted}
 												loading={officer.interactions.loading}
-												loadMore={({ page, userId }) =>
-													loadMore(page, userId)
+												loadMore={({ page, officerId }) =>
+													loadMore(page, officerId)
 												}
+												officerId={officer.data.id}
 												page={officer.interactions.page}
 												results={officer.interactions.results}
 												type="interactions"
@@ -297,8 +315,8 @@ Officer.propTypes = {
 	officer: PropTypes.shape({
 		data: PropTypes.shape({
 			createdAt: PropTypes.string,
-			departmentId: PropTypes.number,
 			departmentName: PropTypes.string,
+			departmentSlug: PropTypes.string,
 			firstName: PropTypes.string,
 			id: PropTypes.number,
 			img: PropTypes.string,

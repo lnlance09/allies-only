@@ -3,6 +3,8 @@ const Auth = require("../utils/authFunctions.ts")
 const Aws = require("../utils/awsFunctions.ts")
 const db = require("../models/index.ts")
 const axios = require("axios")
+const slugify = require("slugify")
+const UsaStates = require("usa-states").UsaStates
 const validator = require("validator")
 /* eslint-enable */
 const Department = db.department
@@ -18,9 +20,32 @@ exports.create = async (req, res) => {
 		return res.status(422).send({ error: true, msg: "You must provide a name" })
 	}
 
+	if (!validator.isAlpha(name)) {
+		return res
+			.status(401)
+			.send({ error: true, msg: "Department names can only contain letters" })
+	}
+
 	const location = await Location.findByPk(city, { raw: true })
-	if (typeof location === "undefined") {
+	if (typeof location === "undefined" || location === null) {
 		return res.status(422).send({ error: true, msg: "That is not a valid location" })
+	}
+
+	const count = await Department.count({
+		col: "department.id",
+		distinct: true,
+		where: {
+			city: location.city,
+			state: location.state,
+			type: 2
+		}
+	}).then((count) => count)
+
+	if (count === 1) {
+		return res.status(500).send({
+			error: true,
+			msg: `${location.city} already has a police department`
+		})
 	}
 
 	Department.create({
@@ -34,11 +59,26 @@ exports.create = async (req, res) => {
 		zipCode: location.zip_code
 	})
 		.then((data) => {
-			const { id } = data.dataValues
-			return res.status(200).send({
-				error: false,
-				id,
-				msg: "Success"
+			const department = data.dataValues
+			const slug = slugify(`${name} ${department.id}`, {
+				lower: true,
+				replacement: "-",
+				strict: true
+			})
+
+			Department.update(
+				{
+					slug
+				},
+				{
+					where: { id: department.id }
+				}
+			).then(() => {
+				department.slug = slug
+				return res.status(200).send({
+					department,
+					error: false
+				})
 			})
 		})
 		.catch((err) => {
@@ -50,10 +90,10 @@ exports.create = async (req, res) => {
 }
 
 exports.findAll = (req, res) => {
-	const { forAutocomplete, forOptions, page, q, state, type } = req.query
+	const { forAutocomplete, forOptions, id, page, q } = req.query
 
 	let limit = 20
-	const order = [["name", "ASC"]]
+	let order = [[db.Sequelize.col("interactionCount"), "DESC"]]
 	let where = {
 		name: {
 			[Op.like]: `%${q}%`
@@ -64,14 +104,6 @@ exports.findAll = (req, res) => {
 		where = {}
 	}
 
-	if (typeof state !== "undefined" && state !== "") {
-		where.state = state
-	}
-
-	if (typeof type !== "undefined" && type !== "") {
-		where.type = type
-	}
-
 	let attributes = [
 		"city",
 		"county",
@@ -79,6 +111,7 @@ exports.findAll = (req, res) => {
 		"lat",
 		"lon",
 		"name",
+		"slug",
 		"state",
 		"type",
 		"zipCode",
@@ -89,7 +122,7 @@ exports.findAll = (req, res) => {
 		[
 			db.Sequelize.fn(
 				"COUNT",
-				db.Sequelize.fn("DISTINCT", db.Sequelize.col("officers->interactions.id"))
+				db.Sequelize.fn("DISTINCT", db.Sequelize.col("interactions.id"))
 			),
 			"interactionCount"
 		]
@@ -97,13 +130,11 @@ exports.findAll = (req, res) => {
 	let include = [
 		{
 			attributes: [],
-			include: [
-				{
-					attributes: [],
-					model: Interaction
-				}
-			],
 			model: Officer
+		},
+		{
+			attributes: [],
+			model: Interaction
 		}
 	]
 
@@ -117,6 +148,11 @@ exports.findAll = (req, res) => {
 			["id", "value"]
 		]
 		include = null
+		order = [["name", "ASC"]]
+
+		if (typeof id !== "undefined") {
+			where.id = id
+		}
 	}
 
 	if (forAutocomplete === "1") {
@@ -124,11 +160,13 @@ exports.findAll = (req, res) => {
 			"city",
 			"id",
 			"name",
+			"slug",
 			"state",
 			["type", "departmentType"],
 			[db.Sequelize.literal("'department'"), "type"]
 		]
 		include = null
+		order = [["name", "ASC"]]
 		limit = 4
 	}
 
@@ -187,7 +225,7 @@ exports.findOne = (req, res) => {
 			[
 				db.Sequelize.fn(
 					"COUNT",
-					db.Sequelize.fn("DISTINCT", db.Sequelize.col("officers->interactions.id"))
+					db.Sequelize.fn("DISTINCT", db.Sequelize.col("interactions.id"))
 				),
 				"interactionCount"
 			]
@@ -195,23 +233,22 @@ exports.findOne = (req, res) => {
 		include: [
 			{
 				attributes: [],
-				include: [
-					{
-						attributes: [],
-						model: Interaction
-					}
-				],
 				model: Officer
+			},
+			{
+				attributes: [],
+				model: Interaction
 			}
 		],
 		limit: 1,
 		raw: true,
 		subQuery: false,
 		where: {
-			id
+			slug: id
 		}
 	})
 		.then(async (data) => {
+			console.log("data", data)
 			if (data.length === 0) {
 				return res.status(404).send({
 					error: true,
@@ -220,14 +257,40 @@ exports.findOne = (req, res) => {
 			}
 
 			const department = data[0]
+			if (department.id === null) {
+				return res.status(404).send({
+					error: true,
+					msg: "That department does not exist"
+				})
+			}
+
+			let where = {
+				city: department.city,
+				state: department.state
+			}
+
+			// State police
+			if (department.type === 1) {
+				const states = new UsaStates()
+				const state = states.states.filter((state) => state.name === department.state)
+				where = {
+					city: state[0].capital,
+					state: department.state
+				}
+			}
+
+			// County sheriff
+			if (department.type === 3) {
+				where = {
+					county: department.county
+				}
+			}
+
 			const location = await Location.findAll({
 				attributes: ["lat", "lon"],
 				limit: 1,
 				raw: true,
-				where: {
-					city: department.city,
-					state: department.state
-				}
+				where
 			}).then((locations) => {
 				if (locations.length === 1) {
 					return locations[0]
@@ -263,12 +326,12 @@ exports.update = async (req, res) => {
 	}
 
 	const count = await Department.count({
+		col: "department.id",
+		distinct: true,
 		where: {
 			createdBy: user.data.id,
 			id
-		},
-		distinct: true,
-		col: "department.id"
+		}
 	}).then((count) => count)
 
 	if (count === 0) {

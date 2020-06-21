@@ -5,44 +5,86 @@ const db = require("../models/index.ts")
 const axios = require("axios")
 const path = require("path")
 const randomize = require("randomatic")
+const slugify = require("slugify")
 const validator = require("validator")
 /* eslint-enable */
 const Department = db.department
 const Interaction = db.interaction
 const Officer = db.officer
+const OfficerInteraction = db.officerInteraction
+const User = db.user
 const Op = db.Sequelize.Op
 
 exports.create = async (req, res) => {
-	if (typeof req.files === "undefined") {
-		return res.status(422).send({ error: true, msg: "You must include a video" })
-	}
-
-	const { file } = req.files
-	const { department, description, officer, title } = req.body
+	const { department, description, file, officer, title } = req.body
 	const { authenticated, user } = Auth.parseAuthentication(req)
 
-	const image = file.data
-	const timestamp = new Date().getTime()
-	const fileName = `interactions/${randomize("aa", 24)}-${timestamp}.png`
-	await Aws.uploadToS3(image, fileName, false)
-
-	if (typeof officer === "undefined" || officer === "") {
-		return res
-			.status(422)
-			.send({ error: true, msg: "You must link this interaction to an officer" })
+	if (typeof title === "undefined" || title === "") {
+		return res.status(422).send({ error: true, msg: "You must provide a title" })
 	}
 
-	/*
+	if (typeof department === "undefined" || department === "") {
+		return res
+			.status(422)
+			.send({ error: true, msg: "You must link this interaction to a department" })
+	}
+
+	if (typeof file === "undefined" || file === "") {
+		return res.status(422).send({ error: true, msg: "You must provide a video" })
+	}
+
 	Interaction.create({
-		department,
+		departmentId: department,
 		description,
-		officer,
 		title,
 		userId: authenticated ? user.data.id : 1,
-		video: fileName
+		video: file,
+		views: 1
 	})
 		.then((data) => {
 			const { id } = data.dataValues
+			const officers = JSON.parse(officer)
+			officers.map((o) => {
+				if (isNaN(o.value)) {
+					const names = o.value.split(" ")
+					const firstName = names[0]
+					const lastName = names[names.length - 1]
+
+					Officer.create({
+						createdBy: authenticated ? user.data.id : 1,
+						departmentId: department,
+						firstName,
+						lastName
+					}).then((data) => {
+						const officer = data.dataValues
+						const slug = slugify(`${firstName} ${lastName} ${officer.id}`, {
+							lower: true,
+							replacement: "-",
+							strict: true
+						})
+
+						Officer.update(
+							{
+								slug
+							},
+							{
+								where: { id: officer.id }
+							}
+						).then(() => {
+							OfficerInteraction.create({
+								interactionId: id,
+								officerId: officer.id
+							})
+						})
+					})
+				} else {
+					OfficerInteraction.create({
+						interactionId: id,
+						officerId: o.value
+					})
+				}
+			})
+
 			return res.status(200).send({
 				error: false,
 				id,
@@ -55,38 +97,96 @@ exports.create = async (req, res) => {
 				msg: err.message || "An error occurred"
 			})
 		})
-	*/
 }
 
 exports.findAll = (req, res) => {
 	const { departmentId, officerId, page, q, userId } = req.query
 
-	const limit = 10
+	const limit = 20
 	let where = {
-		name: {
-			[Op.like]: `%${q}%`
-		}
+		[Op.or]: [
+			{
+				description: {
+					[Op.like]: `%${q}%`
+				}
+			},
+			{
+				title: {
+					[Op.like]: `%${q}%`
+				}
+			}
+		]
 	}
+
+	let departmentWhere = {}
+	let departmentRequired = false
+
+	let officerWhere = {}
+	let officerRequired = false
+
+	let userWhere = {}
+	let userRequired = false
 
 	if (typeof q === "undefined" || q === "") {
 		where = {}
 	}
 
-	if (typeof state !== "undefined" && state !== "") {
-		where.state = state
+	if (typeof departmentId !== "undefined" && departmentId !== "") {
+		departmentWhere["id"] = departmentId
+		departmentRequired = true
 	}
 
-	if (typeof type !== "undefined" && type !== "") {
-		where.type = type
+	if (typeof officerId !== "undefined" && officerId !== "") {
+		officerWhere["officerId"] = officerId
+		officerRequired = true
 	}
+
+	if (typeof userId !== "undefined" && userId !== "") {
+		userWhere["id"] = userId
+		userRequired = true
+	}
+
+	const offset = isNaN(page) ? 0 : page * limit
 
 	Interaction.findAll({
-		attributes: ["id", "createdAt", "description", "video", "views"],
+		attributes: [
+			[db.Sequelize.col("interaction.createdAt"), "createdAt"],
+			[db.Sequelize.col("interaction.description"), "description"],
+			[db.Sequelize.col("interaction.id"), "id"],
+			[db.Sequelize.col("interaction.title"), "title"],
+			[db.Sequelize.col("interaction.video"), "video"],
+			[db.Sequelize.col("interaction.views"), "views"],
+			[db.Sequelize.col("department.name"), "departmentName"],
+			[db.Sequelize.col("department.slug"), "departmentSlug"],
+			[db.Sequelize.col("officerInteractions.officerId"), "officerId"]
+		],
+		group: ["interaction.id"],
+		include: [
+			{
+				attributes: [],
+				model: Department,
+				required: departmentRequired,
+				where: departmentWhere
+			},
+			{
+				attributes: ["officerId"],
+				model: OfficerInteraction,
+				required: officerRequired,
+				where: officerWhere
+			},
+			{
+				attributes: [],
+				model: User,
+				required: userRequired,
+				where: userWhere
+			}
+		],
 		limit,
-		offset: page * limit,
+		offset,
 		order: [["createdAt", "DESC"]],
 		raw: true,
 		required: true,
+		subQuery: false,
 		where
 	})
 		.then((interactions) => {
@@ -94,7 +194,7 @@ exports.findAll = (req, res) => {
 			return res.status(200).send({
 				error: false,
 				hasMore,
-				interactions,
+				interactions: interactions,
 				msg: "Success",
 				page: parseInt(page) + 1
 			})
@@ -112,20 +212,47 @@ exports.findOne = (req, res) => {
 
 	Interaction.findAll({
 		attributes: [
-			["id", "templateId"],
-			"createdAt",
-			["name", "templateName"],
-			"s3Link",
-			"user.id",
-			"user.img",
-			"user.name",
-			"user.username"
+			[db.Sequelize.col("interaction.createdAt"), "createdAt"],
+			[db.Sequelize.col("interaction.description"), "description"],
+			[db.Sequelize.col("interaction.id"), "id"],
+			[db.Sequelize.col("interaction.title"), "title"],
+			[db.Sequelize.col("interaction.video"), "video"],
+			[db.Sequelize.col("interaction.views"), "views"],
+			[db.Sequelize.col("user.img"), "userImg"],
+			[db.Sequelize.col("user.name"), "userName"],
+			[db.Sequelize.col("user.username"), "username"],
+			[db.Sequelize.col("department.name"), "departmentName"],
+			[db.Sequelize.col("department.slug"), "departmentSlug"],
+			[db.Sequelize.col("officerInteractions->officers.firstName"), "officerFirstName"],
+			[db.Sequelize.col("officerInteractions->officers.id"), "officerId"],
+			[db.Sequelize.col("officerInteractions->officers.img"), "officerImg"],
+			[db.Sequelize.col("officerInteractions->officers.lastName"), "officerLastName"],
+			[db.Sequelize.col("officerInteractions->officers.slug"), "officerSlug"]
 		],
 		include: [
 			{
+				attributes: [],
 				model: User,
-				required: true,
-				attributes: []
+				required: true
+			},
+			{
+				attributes: [],
+				model: Department,
+				required: true
+			},
+			{
+				attributes: [],
+				include: [
+					{
+						as: "officers",
+						attributes: [],
+						model: Officer,
+						required: true
+					}
+				],
+				model: OfficerInteraction,
+				required: false,
+				subQuery: false
 			}
 		],
 		raw: true,
@@ -134,19 +261,53 @@ exports.findOne = (req, res) => {
 			id
 		}
 	})
-		.then(async (interactions) => {
+		.then((interactions) => {
 			if (interactions.length === 0) {
 				return res.status(404).send({
 					error: true,
-					msg: "That department does not exist"
+					msg: "That interaction does not exist"
 				})
 			}
 
-			const interactionData = interactions[0]
+			const firstRow = interactions[0]
+			const interaction = {
+				createdAt: firstRow["createdAt"],
+				department: {
+					name: firstRow["departmentName"],
+					slug: firstRow["departmentSlug"]
+				},
+				description: firstRow["description"],
+				officers: [],
+				title: firstRow["title"],
+				video: firstRow["video"],
+				views: firstRow["views"],
+				user: {
+					img: firstRow["userImg"],
+					name: firstRow["userName"],
+					username: firstRow["username"]
+				}
+			}
+
+			const officerIds = []
+			interactions.map((_interaction) => {
+				const { officerId } = _interaction
+				const exists = officerIds.includes(officerId)
+
+				if (!exists && officerId !== null) {
+					officerIds.push(officerId)
+					interaction.officers.push({
+						firstName: _interaction.officerFirstName,
+						id: _interaction.officerId,
+						img: _interaction.officerImg,
+						lastName: _interaction.officerLastName,
+						slug: _interaction.officerSlug
+					})
+				}
+			})
 
 			return res.status(200).send({
 				error: false,
-				interaction: interactionData,
+				interaction,
 				msg: "Success"
 			})
 		})
@@ -240,5 +401,5 @@ exports.uploadVideo = async (req, res) => {
 			error: false,
 			video: fileName
 		})
-	}, 25000)
+	}, 60000)
 }

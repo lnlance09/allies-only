@@ -39,5 +39,9 @@ module.exports = (sequelize, Sequelize) => {
 		}
 	})
 
+	User.associate = (models) => {
+		User.hasMany(models.interaction, { foreignKey: "userId" })
+	}
+
 	return User
 }

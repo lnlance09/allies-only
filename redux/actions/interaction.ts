@@ -24,7 +24,7 @@ export const createInteraction = ({
 	formData.set("department", department)
 	formData.set("description", description)
 	formData.set("file", file)
-	formData.set("officer", officer)
+	formData.set("officer", JSON.stringify(officer))
 	formData.set("title", title)
 
 	axios
@@ -38,7 +38,7 @@ export const createInteraction = ({
 		.then(async (response) => {
 			const { data } = response
 			if (!data.error) {
-				Router.push(`/interaction/${data.id}`)
+				Router.push(`/interactions/${data.id}`)
 			}
 		})
 		.catch((error) => {
@@ -71,13 +71,17 @@ export const resetToInitial = () => (dispatch) => {
 	})
 }
 
-export const searchInteractions = ({ departmentId, page = 0, q = null }) => (dispatch) => {
+export const searchInteractions = ({ departmentId, officerId, page = 0, q = null, userId }) => (
+	dispatch
+) => {
 	axios
 		.get("/api/interaction/search", {
 			params: {
 				departmentId,
+				officerId,
 				page,
-				q
+				q,
+				userId
 			}
 		})
 		.then((response) => {

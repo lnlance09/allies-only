@@ -3,9 +3,9 @@ const Auth = require("../utils/authFunctions.ts")
 const Aws = require("../utils/awsFunctions.ts")
 const db = require("../models/index.ts")
 const Mail = require("../utils/mailFunctions.ts")
-const validator = require("validator")
 const randomize = require("randomatic")
 const sha1 = require("sha1")
+const validator = require("validator")
 /* eslint-enable */
 const Interaction = db.interaction
 const User = db.user
@@ -53,6 +53,15 @@ exports.changeProfilePic = async (req, res) => {
 	}, 3500)
 }
 
+exports.count = async (req, res) => {
+	const count = await User.count().then((count) => count)
+	return res.status(200).send({
+		count,
+		error: false,
+		msg: "success"
+	})
+}
+
 exports.create = async (req, res) => {
 	const { email, name, password, status, username } = req.body
 	if (typeof email === "undefined" || email === "") {
@@ -88,11 +97,11 @@ exports.create = async (req, res) => {
 	}
 
 	const usernameCount = await User.count({
+		col: "user.id",
+		distinct: true,
 		where: {
 			username
-		},
-		distinct: true,
-		col: "user.id"
+		}
 	}).then((count) => count)
 
 	if (usernameCount === 1) {
@@ -100,11 +109,11 @@ exports.create = async (req, res) => {
 	}
 
 	const emailCount = await User.count({
+		col: "user.id",
+		distinct: true,
 		where: {
 			email
-		},
-		distinct: true,
-		col: "user.id"
+		}
 	}).then((count) => count)
 
 	if (emailCount === 1) {
@@ -170,7 +179,7 @@ exports.findAll = async (req, res) => {
 
 	const limit = 20
 	const offset = isNaN(page) ? 0 : page * limit
-	const order = [["name", "ASC"]]
+	const order = [[db.Sequelize.col("interactionCount"), "DESC"]]
 	let where = {
 		name: {
 			[Op.like]: `%${q}%`
@@ -182,11 +191,34 @@ exports.findAll = async (req, res) => {
 	}
 
 	User.findAll({
-		attributes: ["createdAt", "id", "img", "name", "race", "username"],
+		attributes: [
+			"createdAt",
+			"id",
+			"img",
+			"name",
+			"race",
+			"username",
+			[
+				db.Sequelize.fn(
+					"COUNT",
+					db.Sequelize.fn("DISTINCT", db.Sequelize.col("interactions.id"))
+				),
+				"interactionCount"
+			]
+		],
+		group: ["id"],
+		include: [
+			{
+				attributes: [],
+				model: Interaction,
+				required: false
+			}
+		],
 		limit,
 		offset,
 		order,
 		raw: true,
+		subQuery: false,
 		where
 	})
 		.then((users) => {
@@ -331,12 +363,12 @@ exports.verify = async (req, res) => {
 	}
 
 	const count = await User.count({
+		col: "user.id",
+		distinct: true,
 		where: {
 			id: user.id,
 			verificationCode: code
-		},
-		distinct: true,
-		col: "user.id"
+		}
 	}).then((count) => count)
 
 	if (count === 0) {

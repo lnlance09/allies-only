@@ -36,8 +36,8 @@ const officer = (state = initial(), action) => {
 					...state.officer,
 					data: {
 						createdAt: officer.createdAt,
-						departmentId: officer.departmentId,
 						departmentName: officer.departmentName,
+						departmentSlug: officer.departmentSlug,
 						firstName: officer.firstName,
 						id: officer.id,
 						img: officer.img === null ? null : `${s3BaseUrl}${officer.img}`,
@@ -47,6 +47,28 @@ const officer = (state = initial(), action) => {
 					error: false,
 					errorMsg: "",
 					loading: false
+				}
+			}
+
+		case constants.SEARCH_INTERACTIONS:
+			let interactionResults = payload.interactions
+			if (payload.page > 1) {
+				interactionResults = [
+					...state.officer.interactions.results,
+					...payload.interactions
+				]
+			}
+
+			return {
+				...state,
+				officer: {
+					...state.officer,
+					interactions: {
+						hasMore: payload.hasMore,
+						loading: false,
+						page: payload.page,
+						results: interactionResults
+					}
 				}
 			}
 
@@ -80,18 +102,35 @@ const officer = (state = initial(), action) => {
 		case constants.SET_OFFICER_FETCH_ERROR:
 			return {
 				...state,
-				data: {},
-				error: true,
-				errorMsg: "This template does not exist",
-				loading: false
+				officer: {
+					data: {},
+					error: true,
+					errorMsg: "This template does not exist",
+					loading: false
+				}
 			}
 
 		case constants.UPDATE_OFFICER:
 			return {
 				...state,
-				data: {
-					...state.data,
-					name: payload.template.name
+				officer: {
+					...state.officer,
+					data: {
+						...state.officer.data,
+						img: payload.name
+					}
+				}
+			}
+
+		case constants.UPDATE_OFFICER_IMG:
+			return {
+				...state,
+				officer: {
+					...state.officer,
+					data: {
+						...state.officer.data,
+						img: `${s3BaseUrl}${payload.img}`
+					}
 				}
 			}
 

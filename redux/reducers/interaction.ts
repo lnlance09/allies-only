@@ -4,6 +4,8 @@ import { s3BaseUrl } from "@options/config"
 const initial = () => ({
 	interaction: {
 		data: {
+			department: {},
+			officers: [],
 			user: {},
 			video: null
 		},
@@ -25,14 +27,20 @@ const interaction = (state = initial(), action) => {
 
 	switch (action.type) {
 		case constants.GET_INTERACTION:
-			const { meme } = payload
-			if (meme.name === null) {
-				meme.name = `Untitled Meme #${meme.id}`
-			}
+			const { interaction } = payload
 			return {
 				...state,
-				meme: {
-					data: meme,
+				interaction: {
+					data: {
+						createdAt: interaction.createdAt,
+						department: interaction.department,
+						description: interaction.description,
+						officers: interaction.officers,
+						title: interaction.title,
+						user: interaction.user,
+						video: interaction.video,
+						views: interaction.views
+					},
 					error: false,
 					errorMsg: "",
 					loading: false
@@ -42,13 +50,31 @@ const interaction = (state = initial(), action) => {
 		case constants.RESET_INTERACTION_TO_INITIAL:
 			return initial()
 
+		case constants.SEARCH_INTERACTIONS:
+			let interactionResults = payload.interactions
+			if (payload.page > 1) {
+				interactionResults = [...state.interactions.results, ...payload.interactions]
+			}
+
+			return {
+				...state,
+				interactions: {
+					hasMore: payload.hasMore,
+					loading: false,
+					page: payload.page,
+					results: interactionResults
+				}
+			}
+
 		case constants.SET_INTERACTION_FETCH_ERROR:
 			return {
 				...state,
-				meme: {
+				interaction: {
 					data: {
-						templates: [],
-						user: {}
+						department: {},
+						officers: [],
+						user: {},
+						video: null
 					},
 					error: true,
 					errorMsg: "This interaction does not exist",

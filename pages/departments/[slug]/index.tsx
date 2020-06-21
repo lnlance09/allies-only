@@ -12,9 +12,9 @@ import {
 	Header,
 	Input,
 	List,
-	Loader,
-	Message
+	Loader
 } from "semantic-ui-react"
+import { formatPlural } from "@utils/textFunctions"
 import { Provider, connect } from "react-redux"
 import { fetchCities } from "@options/cities"
 import { useRouter } from "next/router"
@@ -54,6 +54,7 @@ const Department: React.FunctionComponent = ({
 			}
 
 			if (typeof slug !== "undefined" && slug !== "create") {
+				setCreateMode(false)
 				await getDepartment({
 					callback: (departmentId) => {
 						searchOfficers({ departmentId })
@@ -61,7 +62,6 @@ const Department: React.FunctionComponent = ({
 					},
 					id: slug
 				})
-				setCreateMode(false)
 			}
 		}
 
@@ -78,8 +78,13 @@ const Department: React.FunctionComponent = ({
 		const locationOptions = await fetchCities(q)
 		setLocationOptions(locationOptions)
 	}
+
 	const loadMore = (page, departmentId) => {
-		return searchOfficers({ departmentId, page })
+		if (activeItem === "officers") {
+			return searchOfficers({ departmentId, page })
+		}
+
+		return searchInteractions({ departmentId, page })
 	}
 
 	const selectCity = (e, { value }) => {
@@ -96,14 +101,16 @@ const Department: React.FunctionComponent = ({
 			<DefaultLayout
 				containerClassName="departmentsPage"
 				seo={{
-					description: `A `,
+					description: createMode
+						? "Add a new police department"
+						: `Keep tabs on the ${department.data.name} and their interactions with citizens in their jurisdiction`,
 					image: {
-						height: 200,
-						src: "",
-						width: 200
+						height: 500,
+						src: "/public/images/logos/logo.png",
+						width: 500
 					},
-					title: department.data.name,
-					url: `departments`
+					title: createMode ? "Add a department" : department.data.name,
+					url: `departments/${slug}`
 				}}
 				showFooter={false}
 			>
@@ -120,7 +127,6 @@ const Department: React.FunctionComponent = ({
 							style={{ marginTop: "24px" }}
 						>
 							<Form.Field>
-								<label>Name</label>
 								<Input
 									onChange={(e, { value }) => setName(value)}
 									placeholder="Name"
@@ -128,27 +134,17 @@ const Department: React.FunctionComponent = ({
 								/>
 							</Form.Field>
 							<Form.Field>
-								<label>Location</label>
 								<Dropdown
 									onChange={selectCity}
 									onSearchChange={changeCity}
 									options={locationOptions}
-									placeholder="City or county"
+									placeholder="City"
 									search
 									selection
 									value={city}
 								/>
 							</Form.Field>
 						</Form>
-
-						{department.error && (
-							<Message
-								content={department.errorMsg}
-								error
-								inverted={inverted}
-								size="big"
-							/>
-						)}
 
 						<Divider inverted={inverted} section />
 
@@ -172,7 +168,7 @@ const Department: React.FunctionComponent = ({
 									This department does not exist
 									<div />
 									<Button
-										color="blue"
+										color="yellow"
 										content="Search all departments"
 										inverted={inverted}
 										onClick={() => router.push(`/departments`)}
@@ -233,7 +229,7 @@ const Department: React.FunctionComponent = ({
 															inverted={inverted}
 															onClick={() =>
 																router.push(
-																	`/interactions/create?deparmentId=${department.data.id}`
+																	`/interactions/create?departmentId=${department.data.id}`
 																)
 															}
 														/>
@@ -245,7 +241,7 @@ const Department: React.FunctionComponent = ({
 															inverted={inverted}
 															onClick={() =>
 																router.push(
-																	`/officers/create?deparmentId=${department.data.id}`
+																	`/officers/create?departmentId=${department.data.id}`
 																)
 															}
 															style={{ marginLeft: "7px" }}
@@ -265,7 +261,10 @@ const Department: React.FunctionComponent = ({
 															}
 														>
 															<b>{department.data.officerCount}</b>{" "}
-															officers
+															{formatPlural(
+																department.data.officerCount,
+																"officer"
+															)}
 														</List.Item>
 														<List.Item
 															active={activeItem === "interactions"}
@@ -276,7 +275,10 @@ const Department: React.FunctionComponent = ({
 															<b>
 																{department.data.interactionCount}
 															</b>{" "}
-															interactions
+															{formatPlural(
+																department.data.interactionCount,
+																"interaction"
+															)}
 														</List.Item>
 													</List>
 												</Grid.Column>
@@ -286,6 +288,7 @@ const Department: React.FunctionComponent = ({
 
 										{!department.error && !department.loading ? (
 											<SearchResults
+												departmentId={department.data.id}
 												hasMore={results.hasMore}
 												inverted={inverted}
 												loading={results.loading}

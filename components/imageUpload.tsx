@@ -23,10 +23,6 @@ const ImageUpload: React.FunctionComponent = ({
 		}
 	}
 
-	const toggleDimmer = () => {
-		setActive(!active)
-	}
-
 	const content = (
 		<Dropzone onDrop={onDrop}>
 			{({ getRootProps, getInputProps }) => (
@@ -36,7 +32,7 @@ const ImageUpload: React.FunctionComponent = ({
 						<Header inverted={inverted} size={headerSize}>
 							{msg}
 						</Header>
-						<Button className="changePicBtn" color="blue" icon inverted={inverted}>
+						<Button className="changePicBtn" color="yellow" icon inverted={inverted}>
 							<Icon name="image" />
 						</Button>
 					</div>
@@ -53,8 +49,8 @@ const ImageUpload: React.FunctionComponent = ({
 				dimmer={{ active, content, inverted: false }}
 				fluid={fluid}
 				onError={(i) => (i.target.src = ImagePic)}
-				onMouseEnter={toggleDimmer}
-				onMouseLeave={toggleDimmer}
+				onMouseEnter={() => setActive(true)}
+				onMouseLeave={() => setActive(false)}
 				rounded
 				size={fluid ? null : imgSize}
 				src={img}

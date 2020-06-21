@@ -1,8 +1,10 @@
 import { logout } from "@actions/authentication"
 import { parseJwt } from "@utils/tokenFunctions"
-import { Button, Divider, Label, Menu } from "semantic-ui-react"
+import { Button, Divider, Menu, Statistic } from "semantic-ui-react"
 import { useRouter } from "next/router"
 import { Provider, connect } from "react-redux"
+import axios from "axios"
+import NumberFormat from "react-number-format"
 import PropTypes from "prop-types"
 import React, { Fragment, useEffect, useState } from "react"
 import Router from "next/router"
@@ -11,6 +13,7 @@ import store from "@store"
 const Sidebar: React.FunctionComponent = ({ activeItem, basic, inverted, logout }) => {
 	const router = useRouter()
 
+	const [allyCount, setAllyCount] = useState(null)
 	const [authenticated, setAuthenticated] = useState(null)
 	const [user, setUser] = useState({})
 
@@ -22,7 +25,14 @@ const Sidebar: React.FunctionComponent = ({ activeItem, basic, inverted, logout 
 		} else {
 			setAuthenticated(false)
 		}
+
+		getAllyCount()
 	}, [])
+
+	const getAllyCount = async () => {
+		const data = await axios.get("/api/user/count")
+		setAllyCount(data.data.count)
+	}
 
 	const { username } = user
 
@@ -103,9 +113,6 @@ const Sidebar: React.FunctionComponent = ({ activeItem, basic, inverted, logout 
 								onClick={() => router.push("/allies")}
 							>
 								Allies
-								<Label color="yellow" size="large">
-									1
-								</Label>
 							</Menu.Item>
 							<Menu.Item
 								active={activeItem === "interactions"}
@@ -132,6 +139,21 @@ const Sidebar: React.FunctionComponent = ({ activeItem, basic, inverted, logout 
 						</Fragment>
 					)}
 				</Menu>
+
+				{allyCount !== null && !authenticated ? (
+					<div style={{ textAlign: "center" }}>
+						<Statistic inverted={inverted}>
+							<Statistic.Value>
+								<NumberFormat
+									displayType={"text"}
+									thousandSeparator={true}
+									value={allyCount}
+								/>
+							</Statistic.Value>
+							<Statistic.Label>Allies</Statistic.Label>
+						</Statistic>
+					</div>
+				) : null}
 			</div>
 		</Provider>
 	)

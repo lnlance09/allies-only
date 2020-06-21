@@ -5,9 +5,8 @@
 @import './autocomplete.scss';
 @import './footer.scss';
 @import './header.scss';
-@import './sidebar.scss';
-@import './usersList.scss';
 @import './searchResults.scss';
+@import './sidebar.scss';
 
 @keyframes fadeInOpacity {
 	0% {
@@ -127,6 +126,84 @@ body {
 
 	.item {
 		cursor: pointer;
+	}
+}
+
+input, .dropdown.selection, textarea, {
+	background-color: transparent !important;
+	// border: none !important;
+	border: solid 1px rgba(255,255,255,0.4) !important;
+	caret-color: $white;
+	color: $white !important;
+	outline: none !important;
+
+	.dropdown.icon, .search.icon {
+		color: $white;
+	}
+}
+
+.input .search.icon {
+	color: $white;
+}
+
+.ui.active.visible.search.selection.dropdown {
+	.menu.visible.transition {
+		border: solid 1px rgba(0,0,0,0.5) !important;
+		max-height: 260px;
+
+		&.upward {
+			border-bottom: none !important;
+		}
+
+		.item {
+			background: $invertedBackgroundColor;
+			border: none !important;
+			color: $white;
+			font-size: 18px !important;
+			padding: 16px 21px !important;
+
+			&:hover {
+				background: darken($invertedBackgroundColor, 1%);
+			}
+		}
+	}
+}
+
+.ui.upward.selection.dropdown.visible {
+	border-radius: 0 !important;
+}
+
+.interactionsPage {
+	video {
+		border: solid 1px $black;
+	}
+
+	.videoBasicInfo {
+		&:nth-of-type(3), &:nth-of-type(4), {
+			margin-top: 30px;
+		}
+
+		.videoTitle {
+			margin-top: 0;
+			padding: 0 8px;
+
+			.sub.header {
+				a {
+					border-bottom: solid 1px transparent;
+					display: inline-block;
+
+					&:hover {
+						border-bottom: solid 1px $white;
+					}
+				}
+			}
+		}
+
+		.videoDescription {
+			color: $lightGrey;
+			font-size: 19px;
+			padding: 0 8px;
+		}
 	}
 }
 
