@@ -109,7 +109,8 @@ Officers.propTypes = {
 			])
 		)
 	}),
-	inverted: PropTypes.bool
+	inverted: PropTypes.bool,
+	searchOfficers: PropTypes.func
 }
 
 Officers.defaultProps = {

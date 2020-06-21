@@ -331,6 +331,7 @@ Officer.propTypes = {
 			errorMsg: PropTypes.string,
 			hasMore: PropTypes.bool,
 			loading: PropTypes.bool,
+			page: PropTypes.number,
 			results: PropTypes.arrayOf(
 				PropTypes.shape({
 					createdAt: PropTypes.string,

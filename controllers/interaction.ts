@@ -118,13 +118,13 @@ exports.findAll = (req, res) => {
 		]
 	}
 
-	let departmentWhere = {}
+	const departmentWhere = {}
 	let departmentRequired = false
 
-	let officerWhere = {}
+	const officerWhere = {}
 	let officerRequired = false
 
-	let userWhere = {}
+	const userWhere = {}
 	let userRequired = false
 
 	if (typeof q === "undefined" || q === "") {

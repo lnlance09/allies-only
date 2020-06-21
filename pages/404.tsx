@@ -3,11 +3,9 @@ import { changeProfilePic, getUser } from "@actions/user"
 import {
 	Button,
 	Container,
-	Dimmer,
 	Divider,
 	Grid,
 	Header,
-	Icon,
 	Image,
 	Label,
 	Placeholder
@@ -41,7 +39,6 @@ const User: React.FunctionComponent = ({
 
 	const { createdAt, id, img, interactionCount, interactions, name } = user
 
-	const [active, setActive] = useState(true)
 	const [bearer, setBearer] = useState(null)
 	const [currentUser, setCurrentUser] = useState({})
 
@@ -70,7 +67,7 @@ const User: React.FunctionComponent = ({
 			return (
 				<ImageUpload
 					bearer={bearer}
-					callback={(bearer, file, id) => changeProfilePic({ bearer, file })}
+					callback={(bearer, file) => changeProfilePic({ bearer, file })}
 					fluid
 					id={id}
 					img={imgSrc === null ? DefaultPic : imgSrc}

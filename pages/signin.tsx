@@ -3,6 +3,7 @@ import { withTheme } from "@redux/ThemeProvider"
 import { useRouter } from "next/router"
 import Authentication from "@components/authentication"
 import DefaultLayout from "@layouts/default"
+import PropTypes from "prop-types"
 import React, { useEffect, useState } from "react"
 import Router from "next/router"
 
@@ -43,6 +44,10 @@ const SignIn: React.FunctionComponent = ({ inverted }) => {
 			{loaded && <Authentication inverted={inverted} login={type !== "join"} />}
 		</DefaultLayout>
 	)
+}
+
+SignIn.propTypes = {
+	inverted: PropTypes.bool
 }
 
 export default withTheme("dark")(SignIn)
