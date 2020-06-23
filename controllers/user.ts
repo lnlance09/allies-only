@@ -2,10 +2,12 @@
 const Auth = require("../utils/authFunctions.ts")
 const Aws = require("../utils/awsFunctions.ts")
 const db = require("../models/index.ts")
+const fs = require("fs")
 const Mail = require("../utils/mailFunctions.ts")
 const randomize = require("randomatic")
 const sha1 = require("sha1")
 const template = require("../utils/emails/registration.ts")
+const { thumbnail } = require("easyimage")
 const validator = require("validator")
 const waitOn = require("wait-on")
 /* eslint-enable */
@@ -25,44 +27,76 @@ exports.changeProfilePic = async (req, res) => {
 		return res.status(401).send({ error: true, msg: "You must include a picture" })
 	}
 
-	const image = file.data
-	const timestamp = new Date().getTime()
-	const fileName = `users/${randomize("aa", 24)}-${timestamp}.png`
-	await Aws.uploadToS3(image, fileName, false)
+	try {
+		const image = file.data
+		const timestamp = new Date().getTime()
+		const fileName = `${randomize("aa", 24)}-${timestamp}-${file.name}`
 
-	setTimeout(() => {
-		User.update(
-			{
-				img: fileName
-			},
-			{
-				where: { id: user.data.id }
-			}
-		)
-			.then(async () => {
-				try {
-					await waitOn({
-						resources: [`https://alliesonly.s3-accelerate.amazonaws.com/${fileName}`]
-					})
-					return res.status(200).send({
-						error: false,
-						img: fileName,
-						msg: "success"
-					})
-				} catch (err) {
-					return res.status(500).send({
-						error: true,
-						msg: "There was an error"
-					})
-				}
-			})
-			.catch(() => {
+		await fs.writeFile(`uploads/${fileName}`, image, "buffer", (err) => {
+			if (err) {
 				return res.status(500).send({
 					error: true,
 					msg: "There was an error"
 				})
-			})
-	}, 3500)
+			}
+		})
+
+		const thumbnailInfo = await thumbnail({
+			src: `uploads/${fileName}`,
+			width: 250,
+			height: 250
+		})
+
+		await fs.readFile(thumbnailInfo.path, async (err, data) => {
+			if (err) {
+				throw err
+			}
+
+			const filePath = `users/${fileName}`
+			await Aws.uploadToS3(data, filePath, false)
+
+			User.update(
+				{
+					img: filePath
+				},
+				{
+					where: { id: user.data.id }
+				}
+			)
+				.then(async () => {
+					try {
+						await waitOn({
+							resources: [
+								`https://alliesonly.s3-accelerate.amazonaws.com/${filePath}`
+							]
+						})
+						await fs.unlinkSync(`uploads/${fileName}`)
+
+						return res.status(200).send({
+							error: false,
+							img: filePath,
+							msg: "success"
+						})
+					} catch (err) {
+						return res.status(500).send({
+							error: true,
+							msg: "There was an error"
+						})
+					}
+				})
+				.catch(() => {
+					return res.status(500).send({
+						error: true,
+						msg: "There was an error"
+					})
+				})
+		})
+	} catch (err) {
+		return res.status(500).send({
+			error: true,
+			msg: "There was an error"
+		})
+	}
 }
 
 exports.count = async (req, res) => {
@@ -195,11 +229,33 @@ exports.create = async (req, res) => {
 }
 
 exports.findAll = async (req, res) => {
-	const { page, q } = req.query
+	const { forAutocomplete, forOptions, page, q, userId } = req.query
 
-	const limit = 20
-	const offset = isNaN(page) ? 0 : page * limit
-	const order = [[db.Sequelize.col("interactionCount"), "DESC"]]
+	let limit = 20
+	let order = [[db.Sequelize.col("interactionCount"), "DESC"]]
+	let attributes = [
+		"createdAt",
+		"id",
+		"img",
+		"name",
+		"race",
+		"username",
+		[
+			db.Sequelize.fn(
+				"COUNT",
+				db.Sequelize.fn("DISTINCT", db.Sequelize.col("interactions.id"))
+			),
+			"interactionCount"
+		]
+	]
+	let include = [
+		{
+			attributes: [],
+			model: Interaction,
+			required: false
+		}
+	]
+
 	let where = {
 		name: {
 			[Op.like]: `%${q}%`
@@ -210,30 +266,33 @@ exports.findAll = async (req, res) => {
 		where = {}
 	}
 
-	User.findAll({
-		attributes: [
-			"createdAt",
-			"id",
-			"img",
-			"name",
-			"race",
-			"username",
-			[
-				db.Sequelize.fn(
-					"COUNT",
-					db.Sequelize.fn("DISTINCT", db.Sequelize.col("interactions.id"))
-				),
-				"interactionCount"
+	if (forAutocomplete === "1") {
+		attributes = ["img", "name", "username", [db.Sequelize.literal("'ally'"), "type"]]
+		include = null
+		limit = 4
+		order = [["name", "DESC"]]
+		where = {
+			[Op.or]: [
+				{
+					name: {
+						[Op.like]: `%${q}%`
+					}
+				},
+				{
+					username: {
+						[Op.like]: `%${q}%`
+					}
+				}
 			]
-		],
+		}
+	}
+
+	const offset = isNaN(page) ? 0 : page * limit
+
+	User.findAll({
+		attributes,
 		group: ["id"],
-		include: [
-			{
-				attributes: [],
-				model: Interaction,
-				required: false
-			}
-		],
+		include,
 		limit,
 		offset,
 		order,
@@ -340,13 +399,6 @@ exports.login = async (req, res) => {
 	})
 		.then((data) => {
 			if (data.length === 1) {
-				Mail.sendEmail(
-					"lnlance09@gmail.com",
-					"Sample Email",
-					"Hello world?",
-					"<b>Hello world?</b>"
-				)
-
 				const userData = data[0]
 				const token = Auth.signToken(userData)
 				return res.status(200).send({

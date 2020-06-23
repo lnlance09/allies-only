@@ -1,14 +1,25 @@
 import { Button, Container, Grid, Icon, Image, Menu, Sidebar } from "semantic-ui-react"
 import { useRouter } from "next/router"
+import { parseJwt } from "@utils/tokenFunctions"
 import Autocomplete from "@components/autocomplete"
 import Logo from "@public/images/logos/logo_72x72.png"
 import PropTypes from "prop-types"
-import React, { Fragment, useState } from "react"
+import React, { Fragment, useEffect, useState } from "react"
 
 const PageHeader: React.FunctionComponent = ({ basicHeader, loading }) => {
 	const router = useRouter()
 
+	const [authenticated, setAuthenticated] = useState(null)
 	const [sidebarVisible, setSidebarVisible] = useState(false)
+
+	useEffect(() => {
+		const userData = parseJwt()
+		if (userData) {
+			setAuthenticated(true)
+		} else {
+			setAuthenticated(false)
+		}
+	}, [])
 
 	return (
 		<div className="pageHeader">
@@ -49,24 +60,36 @@ const PageHeader: React.FunctionComponent = ({ basicHeader, loading }) => {
 					{basicHeader ? (
 						<Image className="logo" onClick={() => router.push("/")} src={Logo} />
 					) : (
-						<Grid>
-							<Grid.Column className="logoColumn" width={3}>
-								<Image
-									className="logo"
-									onClick={() => router.push("/")}
-									src={Logo}
-								/>
-							</Grid.Column>
-							<Grid.Column className="inputColumn" width={13}>
-								<Icon
-									color={sidebarVisible ? "yellow" : null}
-									inverted
-									name="sidebar"
-									onClick={() => setSidebarVisible(!sidebarVisible)}
-									size="big"
-								/>
-							</Grid.Column>
-						</Grid>
+						<Menu borderless fitted="vertically" fixed="top" fluid inverted>
+							<Container>
+								<Menu.Item position="left">
+									<Image
+										className="logo"
+										onClick={() => router.push("/")}
+										src={Logo}
+									/>
+								</Menu.Item>
+								<Menu.Item position="right">
+									{authenticated === false && (
+										<Button
+											className="allyButton"
+											color="yellow"
+											compact
+											content="Become an ally"
+											inverted
+											onClick={() => router.push("/signin?type=join")}
+										/>
+									)}
+									<Icon
+										color={sidebarVisible ? "yellow" : null}
+										inverted
+										name="ellipsis horizontal"
+										onClick={() => setSidebarVisible(!sidebarVisible)}
+										size="big"
+									/>
+								</Menu.Item>
+							</Container>
+						</Menu>
 					)}
 				</Container>
 
@@ -77,27 +100,30 @@ const PageHeader: React.FunctionComponent = ({ basicHeader, loading }) => {
 					direction="bottom"
 					icon="labeled"
 					inverted
-					size="huge"
+					size="massive"
 					style={{ textAlign: "left" }}
 					vertical
 					visible={sidebarVisible}
 				>
 					<Menu.Item as="a" onClick={() => router.push("/interactions")}>
+						<Icon name="crosshairs" size="small" />
 						Interactions
 					</Menu.Item>
 					<Menu.Item as="a" onClick={() => router.push("/officers")}>
+						<Icon name="user secret" size="small" />
 						Officers
 					</Menu.Item>
-					<Menu.Item as="a" onClick={() => router.push("/departments")}>
-						Departments
+					<Menu.Item as="a" onClick={() => router.push("/allies")}>
+						<Icon name="user circle" size="small" />
+						Allies
 					</Menu.Item>
-					<Menu.Item>
-						<Button
-							color="yellow"
-							content="Become an ally"
-							inverted
-							onClick={() => router.push("/signin?type=join")}
-						/>
+					<Menu.Item as="a" onClick={() => router.push("/departments")}>
+						<Icon name="building" size="small" />
+						Department
+					</Menu.Item>
+					<Menu.Item as="a" onClick={() => router.push("/interactions/create")}>
+						<Icon name="plus" size="small" />
+						Add an interaction
 					</Menu.Item>
 				</Sidebar>
 			</div>

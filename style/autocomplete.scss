@@ -19,10 +19,11 @@
         width: 100% !important;
 
         .category {
+            display: block !important;
             width: 100% !important;
 
             .name {
-                background: lighten($invertedBackgroundColor, 3%) !important;
+                background: lighten($invertedBackgroundColor, 1%) !important;
                 display: block !important;
                 padding: 0 !important;
                 width: 100% !important;
@@ -46,6 +47,11 @@
 
                     &:hover {
                         background: lighten($invertedBackgroundColor, 3%);
+                    }
+
+                    .image {
+                        height: 42px !important;
+                        width: 42px !important;
                     }
                 }
             }

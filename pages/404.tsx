@@ -76,7 +76,7 @@ const User: React.FunctionComponent = ({
 			)
 		}
 
-		return <Image onError={(i) => (i.target.src = DefaultPic)} src={imgSrc} />
+		return <Image onError={(i) => (i.target.src = DefaultPic)} rounded src={imgSrc} />
 	}
 
 	return (
@@ -111,9 +111,9 @@ const User: React.FunctionComponent = ({
 					</Container>
 				) : (
 					<Container>
-						<Grid stackable>
+						<Grid>
 							<Grid.Row>
-								<Grid.Column width={4}>
+								<Grid.Column width={5}>
 									{loading ? (
 										<Placeholder inverted={inverted}>
 											<Placeholder.Image square />
@@ -122,7 +122,7 @@ const User: React.FunctionComponent = ({
 										ProfilePic()
 									)}
 								</Grid.Column>
-								<Grid.Column width={12}>
+								<Grid.Column width={11}>
 									{!loading && (
 										<Fragment>
 											<Header as="h1" inverted={inverted}>

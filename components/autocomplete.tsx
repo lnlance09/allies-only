@@ -1,33 +1,13 @@
-import { Header, Input, Search, Segment } from "semantic-ui-react"
-import { fetchDepartments } from "@options/departments"
+import { Header, Image, Input, Search, Segment } from "semantic-ui-react"
+import { fetchUsers } from "@options/users"
 import { fetchOfficers } from "@options/officers"
+import { s3BaseUrl } from "@options/config"
+import AllyPic from "@public/images/avatar/large/joe.jpg"
+import OfficerPic from "@public/images/avatar/officer.png"
 import PropTypes from "prop-types"
 import React, { Fragment, useEffect, useState } from "react"
 import Router from "next/router"
 import useDebounce from "@utils/debounce"
-
-const resultRenderer = ({ departmentName, name, type }) => {
-	return (
-		<div className="searchItem">
-			<Header inverted size="small">
-				{name}
-				<Header.Subheader>
-					{type === "officer" ? (
-						<Fragment>{departmentName}</Fragment>
-					) : (
-						<Fragment></Fragment>
-					)}
-				</Header.Subheader>
-			</Header>
-		</div>
-	)
-}
-
-resultRenderer.propTypes = {
-	departmentName: PropTypes.string,
-	name: PropTypes.string,
-	type: PropTypes.string
-}
 
 const categoryRenderer = ({ name }) => {
 	return (
@@ -41,13 +21,44 @@ categoryRenderer.propTypes = {
 	name: PropTypes.string
 }
 
-const Autocomplete: React.FunctionComponent = ({
-	category,
-	disabled,
-	placeholder,
-	size,
-	width
-}) => {
+const resultRenderer = ({ departmentName, img, name, type, username }) => {
+	return (
+		<div className="searchItem">
+			{type === "officer" && (
+				<Image
+					onError={(i) => (i.target.src = OfficerPic)}
+					src={img === null ? OfficerPic : `${s3BaseUrl}${img}`}
+				/>
+			)}
+			{type === "ally" && (
+				<Image
+					onError={(i) => (i.target.src = AllyPic)}
+					src={img === null ? AllyPic : `${s3BaseUrl}${img}`}
+				/>
+			)}
+			<Header inverted size="small">
+				{name}
+				<Header.Subheader>
+					{type === "officer" ? (
+						<Fragment>{departmentName}</Fragment>
+					) : (
+						<Fragment>{username}</Fragment>
+					)}
+				</Header.Subheader>
+			</Header>
+		</div>
+	)
+}
+
+resultRenderer.propTypes = {
+	departmentName: PropTypes.string,
+	img: PropTypes.string,
+	name: PropTypes.string,
+	type: PropTypes.string,
+	username: PropTypes.string
+}
+
+const Autocomplete: React.FunctionComponent = ({ category, disabled, placeholder, width }) => {
 	const [loading, setLoading] = useState(false)
 	const [q, setQ] = useState("")
 	const [results, setResults] = useState([])
@@ -63,7 +74,7 @@ const Autocomplete: React.FunctionComponent = ({
 	}, [debouncedSearchTerm])
 
 	const fetchResults = async () => {
-		const departments = await fetchDepartments({
+		const allies = await fetchUsers({
 			q: debouncedSearchTerm,
 			forAutocomplete: 1,
 			forOptions: 0
@@ -74,19 +85,19 @@ const Autocomplete: React.FunctionComponent = ({
 			forOptions: 0
 		})
 		const results = {}
-		if (departments.length > 0) {
-			results.departments = { name: "Departments", results: departments }
-		}
 		if (officers.length > 0) {
 			results.officers = { name: "Officers", results: officers }
+		}
+		if (allies.length > 0) {
+			results.allies = { name: "Allies", results: allies }
 		}
 		setResults(results)
 		setLoading(false)
 	}
 
 	const onClick = (e, data) => {
-		const { slug, type } = data.result
-		let link = `/departments/${slug}`
+		const { slug, type, username } = data.result
+		let link = `/${username}`
 		if (type === "officer") {
 			link = `/officers/${slug}`
 		}
@@ -107,7 +118,6 @@ const Autocomplete: React.FunctionComponent = ({
 						icon="search"
 						iconPosition="left"
 						placeholder={placeholder}
-						size={size}
 					/>
 				}
 				loading={loading}
@@ -117,7 +127,6 @@ const Autocomplete: React.FunctionComponent = ({
 				results={results}
 				resultRenderer={resultRenderer}
 				showNoResults={false}
-				size={size}
 			/>
 		</div>
 	)
@@ -136,7 +145,7 @@ Autocomplete.defaultProps = {
 	category: true,
 	disabled: false,
 	placeholder: "Search",
-	size: "medium",
+	size: "small",
 	width: "100%"
 }
 

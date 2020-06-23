@@ -65,29 +65,15 @@
             margin: 0 !important;
             width: 100% !important;
 
-            .ui.grid {
-                margin-left: 0 !important;
-                margin-right: 0 !important;
+            .allyButton {
+                margin-right: 18px;
+            }
 
-                .logoColumn {
-                    padding-left: 0;
-                    padding-right: 0;
-                    width: auto !important;
-                }
-
-                .column.thirteen {
-                    padding-right: 0;
-                }
-
-                .icon.sidebar {
-                    display: flex;
-                    float: right;
-                    justify-content: flex-end;
-                    line-height: 48px;
-                }
+            .icon.ellipsis {
+                margin-right: 0;          
             }
         }
-
+ 
         img {
             cursor: pointer;
             height: 48px;
@@ -120,6 +106,19 @@
         @media only screen and (min-width: 768px) {
             .container.mobile {
                 display: none;
+            }
+        }
+
+        .sidebar.ui.labeled.icon.menu .item {
+            line-height: 24px !important;
+            text-align: left !important;
+
+            .icon {
+                color: $invertedYellow;
+                display: inline;
+                font-size: 24px !important;
+                padding-right: 16px;
+                vertical-align: middle;
             }
         }
     }

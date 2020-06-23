@@ -214,9 +214,9 @@ const Officer: React.FunctionComponent = ({
 									</Container>
 								) : (
 									<Fragment>
-										<Grid stackable>
+										<Grid>
 											<Grid.Row>
-												<Grid.Column width={4}>
+												<Grid.Column width={5}>
 													<ImageUpload
 														bearer={bearer}
 														callback={(bearer, file, id) =>
@@ -228,7 +228,7 @@ const Officer: React.FunctionComponent = ({
 														inverted={inverted}
 													/>
 												</Grid.Column>
-												<Grid.Column width={12}>
+												<Grid.Column width={11}>
 													{!officer.loading && (
 														<Fragment>
 															<Header as="h1" inverted={inverted}>

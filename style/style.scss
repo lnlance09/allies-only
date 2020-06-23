@@ -44,8 +44,6 @@ body {
 .segment.inverted {
 	&:not(.authSegment) {
 		background: lighten($invertedBackgroundColor, 3%) !important;
-		// background: lighten($invertedBackgroundColor, 2%);
-		// border: solid 1px $black;
 	}
 }
 
@@ -128,7 +126,7 @@ body {
 			color: $white;
 
 			&.active {
-				border-bottom: solid 1px $invertedYellow;
+				border-bottom: solid 1px $white;
 			}
 		}
 	}
@@ -138,16 +136,18 @@ body {
 	}
 }
 
-:not(.autocomplete) > input, textarea, .dropdown.selection {
-		background-color: transparent !important;
-		border: solid 1px rgba(255,255,255,0.4) !important;
-		caret-color: $white;
+.input:not(.autocomplete), .dropdown.selection {
+	.dropdown.icon, .search.icon {
 		color: $white !important;
-		outline: none !important;
-	
-		.dropdown.icon, .search.icon {
-			color: $white;
-		}
+	}
+}
+
+:not(.autocomplete) > input, textarea, .dropdown.selection {
+	background-color: transparent !important;
+	border: solid 1px rgba(255,255,255,0.4) !important;
+	caret-color: $white;
+	color: $white !important;
+	outline: none !important;
 }
 
 .ui.active.visible.search.selection.dropdown {
@@ -198,4 +198,40 @@ body {
 .Toastify__toast-container--bottom-left .Toastify__toast-body {
 	font-weight: bold;
     text-align: center;
+}
+
+@media only screen and (max-width: 767px) {
+	.pageDimmer {
+		.loader {
+			margin-top: 160px;
+		}
+	}
+
+	.ui.grid {
+		.five.column {
+			img, .placeholder {
+				border-radius: 50%;
+			}
+		}
+
+		&.departmentGrid {
+			.mapColumn {
+				display: none !important;
+
+				* {
+					display: none;
+				}
+			}
+		}
+	}
+
+	.interaction.officersList {
+		img {
+			display: none !important;
+		}
+	}
+}
+
+.mapboxgl-map {
+	border-radius: 4px !important;
 }

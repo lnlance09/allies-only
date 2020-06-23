@@ -38,6 +38,7 @@ import Moment from "react-moment"
 import PropTypes from "prop-types"
 import React, { useEffect, useState, Fragment } from "react"
 import ReactPlayer from "react-player"
+import SearchResults from "@components/searchResults"
 import store from "@store"
 
 const Interaction: React.FunctionComponent = ({
@@ -410,7 +411,7 @@ const Interaction: React.FunctionComponent = ({
 										/>
 
 										<Header as="h2" inverted>
-											About this interaction
+											Description
 											{user.id === interaction.data.user.id && (
 												<Button
 													color={editMode ? "red" : "yellow"}
@@ -488,6 +489,7 @@ const Interaction: React.FunctionComponent = ({
 											{hasOfficers ? (
 												<Fragment>
 													<List
+														className="interaction officersList"
 														inverted={inverted}
 														selection
 														size="big"
@@ -567,6 +569,24 @@ const Interaction: React.FunctionComponent = ({
 												size="big"
 											/>
 										)}
+
+										{/*
+										{!error && !loading ? (
+											<SearchResults
+												hasMore={interactions.hasMore}
+												inverted={inverted}
+												justImages
+												loading={interactions.loading}
+												loadMore={({ page, userId }) =>
+													loadMore(page, userId)
+												}
+												page={interactions.page}
+												results={interactions.results}
+												type="interactions"
+												userId={id}
+											/>
+										) : null}
+										*/}
 									</Fragment>
 								)}
 							</Container>

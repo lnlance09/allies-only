@@ -28,16 +28,7 @@
         }
 
         &.active {
-			background: lighten($invertedBackgroundColor, 3%) !important;
+            background: lighten($invertedBackgroundColor, 3%) !important;
 		}
-    }
-
-    &.basic {
-        .headerMenuItem.home {
-            // display: flex;
-            // justify-content: center;
-            // text-align: center;
-            // width: 100%;
-        }
     }
 }

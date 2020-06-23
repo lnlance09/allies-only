@@ -12,7 +12,7 @@ import store from "@store"
 const Authentication: React.FunctionComponent = (props) => {
 	const [buttonText, setButtonText] = useState(props.login ? "Create an account" : "Sign in")
 	const [email, setEmail] = useState("")
-	const [headerText, setHeaderText] = useState(props.login ? "Sign In" : "Become an ally")
+	const [headerText, setHeaderText] = useState(props.login ? "Sign In" : "Sign Up")
 	const [loadingLogin, setLoadingLogin] = useState(false)
 	const [loadingRegistration, setLoadingRegistration] = useState(false)
 	const [login, setLogin] = useState(props.login)

@@ -2,8 +2,10 @@
 const Auth = require("../utils/authFunctions.ts")
 const Aws = require("../utils/awsFunctions.ts")
 const db = require("../models/index.ts")
+const fs = require("fs")
 const randomize = require("randomatic")
 const slugify = require("slugify")
+const { thumbnail } = require("easyimage")
 const validator = require("validator")
 const waitOn = require("wait-on")
 /* eslint-enable */
@@ -322,7 +324,7 @@ exports.findOne = async (req, res) => {
 
 exports.update = async (req, res) => {
 	const { id } = req.params
-	const { caption, name } = req.body
+	const { firstName, lastName } = req.body
 	const { authenticated, user } = Auth.parseAuthentication(req)
 
 	if (!authenticated) {
@@ -335,7 +337,7 @@ exports.update = async (req, res) => {
 			id
 		},
 		distinct: true,
-		col: "meme.id"
+		col: "officer.id"
 	}).then((count) => count)
 
 	if (count === 0) {
@@ -345,23 +347,19 @@ exports.update = async (req, res) => {
 	}
 
 	const updateData = {}
-	if (typeof caption !== "undefined" && caption !== "") {
-		updateData.caption = caption
-	}
-
-	if (typeof name !== "undefined" && name !== "") {
-		updateData.name = name
+	if (typeof firstName !== "undefined" && firstName !== "") {
+		updateData.firstName = firstName
 	}
 
 	Officer.update(updateData, {
 		where: { id }
 	})
 		.then(async () => {
-			const meme = await Officer.findByPk(id, { raw: true })
+			const officer = await Officer.findByPk(id, { raw: true })
 			return res.status(200).send({
 				error: false,
-				meme,
-				msg: "Success"
+				msg: "Success",
+				officer
 			})
 		})
 		.catch(() => {
@@ -385,40 +383,74 @@ exports.updateImg = async (req, res) => {
 		return res.status(401).send({ error: true, msg: "You must include a picture" })
 	}
 
-	const image = file.data
-	const timestamp = new Date().getTime()
-	const fileName = `officers/${randomize("aa", 24)}-${timestamp}.png`
-	await Aws.uploadToS3(image, fileName, false)
+	try {
+		const image = file.data
+		const timestamp = new Date().getTime()
+		const fileName = `${randomize("aa", 24)}-${timestamp}-${file.name}`
 
-	Officer.update(
-		{
-			img: fileName
-		},
-		{
-			where: { id }
-		}
-	)
-		.then(async () => {
-			try {
-				await waitOn({
-					resources: [`https://alliesonly.s3-accelerate.amazonaws.com/${fileName}`]
-				})
-				return res.status(200).send({
-					error: false,
-					img: fileName,
-					msg: "success"
-				})
-			} catch (err) {
+		await fs.writeFile(`uploads/${fileName}`, image, "buffer", (err) => {
+			if (err) {
 				return res.status(500).send({
 					error: true,
 					msg: "There was an error"
 				})
 			}
 		})
-		.catch(() => {
-			return res.status(500).send({
-				error: true,
-				msg: "There was an error"
-			})
+
+		const thumbnailInfo = await thumbnail({
+			src: `uploads/${fileName}`,
+			width: 250,
+			height: 250
 		})
+
+		await fs.readFile(thumbnailInfo.path, async (err, data) => {
+			if (err) {
+				throw err
+			}
+
+			const filePath = `officers/${fileName}`
+			await Aws.uploadToS3(data, filePath, false)
+
+			Officer.update(
+				{
+					img: filePath
+				},
+				{
+					where: { id }
+				}
+			)
+				.then(async () => {
+					try {
+						await waitOn({
+							resources: [
+								`https://alliesonly.s3-accelerate.amazonaws.com/${filePath}`
+							]
+						})
+						await fs.unlinkSync(`uploads/${fileName}`)
+
+						return res.status(200).send({
+							error: false,
+							img: filePath,
+							msg: "success"
+						})
+					} catch (err) {
+						return res.status(500).send({
+							error: true,
+							msg: "There was an error"
+						})
+					}
+				})
+				.catch(() => {
+					return res.status(500).send({
+						error: true,
+						msg: "There was an error"
+					})
+				})
+		})
+	} catch (err) {
+		return res.status(500).send({
+			error: true,
+			msg: "There was an error"
+		})
+	}
 }

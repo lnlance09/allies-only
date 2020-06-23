@@ -176,7 +176,7 @@ const Department: React.FunctionComponent = ({
 								</Header>
 							</Container>
 						) : (
-							<Fragment>
+							<Container>
 								{department.loading ? (
 									<Container textAlign="center">
 										<Dimmer active className="pageDimmer">
@@ -187,9 +187,9 @@ const Department: React.FunctionComponent = ({
 									</Container>
 								) : (
 									<Fragment>
-										<Grid>
+										<Grid className="departmentGrid">
 											<Grid.Row>
-												<Grid.Column width={4}>
+												<Grid.Column className="mapColumn" width={4}>
 													<MapBox
 														lat={parseFloat(department.data.lat, 10)}
 														lng={parseFloat(department.data.lon, 10)}
@@ -302,7 +302,7 @@ const Department: React.FunctionComponent = ({
 										) : null}
 									</Fragment>
 								)}
-							</Fragment>
+							</Container>
 						)}
 					</Fragment>
 				)}
