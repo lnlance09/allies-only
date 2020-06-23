@@ -36,6 +36,7 @@ const officer = (state = initial(), action) => {
 					...state.officer,
 					data: {
 						createdAt: officer.createdAt,
+						departmentId: officer.departmentId,
 						departmentName: officer.departmentName,
 						departmentSlug: officer.departmentSlug,
 						firstName: officer.firstName,

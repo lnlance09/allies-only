@@ -3,10 +3,12 @@ const Auth = require("../utils/authFunctions.ts")
 const Aws = require("../utils/awsFunctions.ts")
 const db = require("../models/index.ts")
 const axios = require("axios")
+const isJSON = require("is-json")
 const path = require("path")
 const randomize = require("randomatic")
 const slugify = require("slugify")
 const validator = require("validator")
+const waitOn = require("wait-on")
 /* eslint-enable */
 const Department = db.department
 const Interaction = db.interaction
@@ -218,16 +220,22 @@ exports.findOne = (req, res) => {
 			[db.Sequelize.col("interaction.title"), "title"],
 			[db.Sequelize.col("interaction.video"), "video"],
 			[db.Sequelize.col("interaction.views"), "views"],
+			[db.Sequelize.col("user.id"), "userId"],
 			[db.Sequelize.col("user.img"), "userImg"],
 			[db.Sequelize.col("user.name"), "userName"],
 			[db.Sequelize.col("user.username"), "username"],
+			[db.Sequelize.col("department.id"), "departmentId"],
 			[db.Sequelize.col("department.name"), "departmentName"],
 			[db.Sequelize.col("department.slug"), "departmentSlug"],
 			[db.Sequelize.col("officerInteractions->officers.firstName"), "officerFirstName"],
 			[db.Sequelize.col("officerInteractions->officers.id"), "officerId"],
 			[db.Sequelize.col("officerInteractions->officers.img"), "officerImg"],
 			[db.Sequelize.col("officerInteractions->officers.lastName"), "officerLastName"],
-			[db.Sequelize.col("officerInteractions->officers.slug"), "officerSlug"]
+			[db.Sequelize.col("officerInteractions->officers.slug"), "officerSlug"],
+			[
+				db.Sequelize.col("officerInteractions->officers->department.name"),
+				"officerDepartmentName"
+			]
 		],
 		include: [
 			{
@@ -246,6 +254,13 @@ exports.findOne = (req, res) => {
 					{
 						as: "officers",
 						attributes: [],
+						include: [
+							{
+								attributes: [],
+								model: Department,
+								required: true
+							}
+						],
 						model: Officer,
 						required: true
 					}
@@ -273,15 +288,18 @@ exports.findOne = (req, res) => {
 			const interaction = {
 				createdAt: firstRow["createdAt"],
 				department: {
+					id: firstRow["departmentId"],
 					name: firstRow["departmentName"],
 					slug: firstRow["departmentSlug"]
 				},
 				description: firstRow["description"],
+				id: firstRow["id"],
 				officers: [],
 				title: firstRow["title"],
 				video: firstRow["video"],
 				views: firstRow["views"],
 				user: {
+					id: firstRow["userId"],
 					img: firstRow["userImg"],
 					name: firstRow["userName"],
 					username: firstRow["username"]
@@ -296,6 +314,7 @@ exports.findOne = (req, res) => {
 				if (!exists && officerId !== null) {
 					officerIds.push(officerId)
 					interaction.officers.push({
+						departmentName: _interaction.officerDepartmentName,
 						firstName: _interaction.officerFirstName,
 						id: _interaction.officerId,
 						img: _interaction.officerImg,
@@ -321,8 +340,65 @@ exports.findOne = (req, res) => {
 
 exports.update = async (req, res) => {
 	const { id } = req.params
-	const { description, officerId } = req.body
+	const { department, description, officer } = req.body
 	const { authenticated, user } = Auth.parseAuthentication(req)
+
+	await OfficerInteraction.destroy({
+		where: {
+			interactionId: id
+		}
+	})
+
+	if (isJSON(officer)) {
+		const officers = JSON.parse(officer)
+		officers.map((o) => {
+			if (isNaN(o.value)) {
+				const names = o.value.split(" ")
+				const firstName = names[0]
+				const lastName = names[names.length - 1]
+
+				Officer.create({
+					createdBy: authenticated ? user.data.id : 1,
+					departmentId: department,
+					firstName,
+					lastName
+				}).then((data) => {
+					const officer = data.dataValues
+					const slug = slugify(`${firstName} ${lastName} ${officer.id}`, {
+						lower: true,
+						replacement: "-",
+						strict: true
+					})
+
+					Officer.update(
+						{
+							slug
+						},
+						{
+							where: { id: officer.id }
+						}
+					).then(() => {
+						OfficerInteraction.create({
+							interactionId: id,
+							officerId: officer.id
+						})
+					})
+				})
+			} else {
+				OfficerInteraction.create({
+					interactionId: id,
+					officerId: o.value
+				})
+			}
+		})
+
+		if (!authenticated) {
+			return res.status(200).send({
+				error: false,
+				msg: "Success"
+			})
+		}
+	}
 
 	if (!authenticated) {
 		return res.status(401).send({ error: true, msg: "You must be logged in" })
@@ -332,7 +408,7 @@ exports.update = async (req, res) => {
 		col: "interaction.id",
 		distinct: true,
 		where: {
-			createdBy: user.data.id,
+			userId: user.data.id,
 			id
 		}
 	}).then((count) => count)
@@ -344,19 +420,17 @@ exports.update = async (req, res) => {
 	}
 
 	const updateData = {
-		description,
-		officerId
+		departmentId: department,
+		description
 	}
 
 	Interaction.update(updateData, {
 		where: { id }
 	})
-		.then(async () => {
-			const interaction = await Interaction.findByPk(id, { raw: true })
+		.then(() => {
 			return res.status(200).send({
 				error: false,
-				msg: "Success",
-				interaction
+				msg: "Success"
 			})
 		})
 		.catch(() => {
@@ -396,10 +470,18 @@ exports.uploadVideo = async (req, res) => {
 	const fileName = `interactions/${randomize("aa", 24)}-${timestamp}${ext}`
 	await Aws.uploadToS3(video, fileName, false, "video/mp4")
 
-	setTimeout(() => {
+	try {
+		await waitOn({
+			resources: [`https://alliesonly.s3-accelerate.amazonaws.com/${fileName}`]
+		})
 		return res.status(200).send({
 			error: false,
 			video: fileName
 		})
-	}, 60000)
+	} catch (err) {
+		return res.status(500).send({
+			error: true,
+			msg: "There was an error"
+		})
+	}
 }

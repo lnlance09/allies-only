@@ -1,6 +1,6 @@
 import { logout } from "@actions/authentication"
 import { parseJwt } from "@utils/tokenFunctions"
-import { Button, Divider, Menu, Statistic } from "semantic-ui-react"
+import { Button, Divider, Icon, Menu, Statistic } from "semantic-ui-react"
 import { useRouter } from "next/router"
 import { Provider, connect } from "react-redux"
 import axios from "axios"
@@ -112,6 +112,11 @@ const Sidebar: React.FunctionComponent = ({ activeItem, basic, inverted, logout 
 								className="headerMenuItem allies"
 								onClick={() => router.push("/allies")}
 							>
+								<Icon
+									color={activeItem === "allies" ? "yellow" : null}
+									inverted={inverted}
+									name="user circle"
+								/>
 								Allies
 							</Menu.Item>
 							<Menu.Item
@@ -119,6 +124,11 @@ const Sidebar: React.FunctionComponent = ({ activeItem, basic, inverted, logout 
 								className="headerMenuItem interactions"
 								onClick={() => router.push("/interactions")}
 							>
+								<Icon
+									color={activeItem === "interactions" ? "yellow" : null}
+									inverted={inverted}
+									name="crosshairs"
+								/>
 								Interactions
 							</Menu.Item>
 							<Menu.Item
@@ -126,6 +136,11 @@ const Sidebar: React.FunctionComponent = ({ activeItem, basic, inverted, logout 
 								className="headerMenuItem departments"
 								onClick={() => router.push("/departments")}
 							>
+								<Icon
+									color={activeItem === "departments" ? "yellow" : null}
+									inverted={inverted}
+									name="building"
+								/>
 								Departments
 							</Menu.Item>
 							<Menu.Item
@@ -133,6 +148,11 @@ const Sidebar: React.FunctionComponent = ({ activeItem, basic, inverted, logout 
 								className="headerMenuItem officers"
 								onClick={() => router.push("/officers")}
 							>
+								<Icon
+									color={activeItem === "officers" ? "yellow" : null}
+									inverted={inverted}
+									name="user secret"
+								/>
 								Officers
 							</Menu.Item>
 							{LoginButton()}

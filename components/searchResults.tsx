@@ -1,4 +1,4 @@
-import { Container, Divider, Header, Item, Label, Segment, Visibility } from "semantic-ui-react"
+import { Card, Container, Header, Item, Label, Segment, Visibility } from "semantic-ui-react"
 import { formatPlural } from "@utils/textFunctions"
 import { s3BaseUrl } from "@options/config"
 import AllyPic from "@public/images/avatar/large/joe.jpg"
@@ -75,40 +75,42 @@ const SearchResults: React.FunctionComponent = ({
 
 	const renderInteractionsList = () => {
 		return (
-			<div className={`resultsList ${inverted ? "inverted" : ""}`}>
+			<Card.Group
+				className={`resultsList ${inverted ? "inverted" : ""}`}
+				itemsPerRow={2}
+				stackable
+			>
 				{results.map((result, i) => {
 					return (
-						<Fragment key={`resultsListItem${result.id}`}>
-							{i !== 0 && <Divider inverted={inverted} section />}
-							<div
-								className="interactionCard"
-								onClick={() => Router.push(`/interactions/${result.id}`)}
-							>
-								<ReactPlayer
-									height="100%"
-									muted
-									playing={false}
-									style={{ lineHeight: 0.8 }}
-									url={result.video}
-									width="100%"
-								/>
-								<div className="interactionContent">
-									<Header as="h2" inverted size="large">
-										{result.title}
-										<Header.Subheader>
-											<Moment date={result.createdAt} fromNow /> •{" "}
-											<Link href={`/departments/${result.departmentId}`}>
-												<a>{result.departmentName}</a>
-											</Link>
-										</Header.Subheader>
-									</Header>
-									<p className="interactionDescription">{result.description}</p>
-								</div>
-							</div>
-						</Fragment>
+						<Card
+							fluid
+							key={`interaction${i}`}
+							onClick={() => Router.push(`/interactions/${result.id}`)}
+						>
+							<ReactPlayer
+								height="100%"
+								muted
+								playing={false}
+								style={{ lineHeight: 0.8 }}
+								url={result.video}
+								width="100%"
+							/>
+							<Card.Content>
+								<Card.Header>{result.title}</Card.Header>
+								<Card.Meta>
+									<Moment date={result.createdAt} fromNow /> •{" "}
+									<Link href={`/departments/${result.departmentId}`}>
+										<a>{result.departmentName}</a>
+									</Link>
+								</Card.Meta>
+								<Card.Description className="interactionDescription">
+									{result.description}
+								</Card.Description>
+							</Card.Content>
+						</Card>
 					)
 				})}
-			</div>
+			</Card.Group>
 		)
 	}
 

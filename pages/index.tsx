@@ -1,5 +1,5 @@
 import { searchInteractions } from "@actions/interaction"
-import { Header } from "semantic-ui-react"
+import { Container, Divider, Header } from "semantic-ui-react"
 import { Provider, connect } from "react-redux"
 import { withTheme } from "@redux/ThemeProvider"
 import { compose } from "redux"
@@ -36,19 +36,23 @@ const Home: React.FunctionComponent = ({ interactions, inverted, searchInteracti
 				}}
 				showFooter={false}
 			>
-				<Header as="h1" inverted={inverted}>
-					Recent Interactions
-				</Header>
+				<Container>
+					<Header as="h1" inverted={inverted}>
+						Recently added
+					</Header>
 
-				<SearchResults
-					hasMore={interactions.hasMore}
-					inverted={inverted}
-					loading={interactions.loading}
-					loadMore={({ page, q }) => loadMore(page, q)}
-					page={interactions.page}
-					results={interactions.results}
-					type="interactions"
-				/>
+					<div style={{ marginTop: "28px" }}>
+						<SearchResults
+							hasMore={interactions.hasMore}
+							inverted={inverted}
+							loading={interactions.loading}
+							loadMore={({ page, q }) => loadMore(page, q)}
+							page={interactions.page}
+							results={interactions.results}
+							type="interactions"
+						/>
+					</div>
+				</Container>
 			</DefaultLayout>
 		</Provider>
 	)

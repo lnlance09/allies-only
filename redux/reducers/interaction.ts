@@ -35,6 +35,7 @@ const interaction = (state = initial(), action) => {
 						createdAt: interaction.createdAt,
 						department: interaction.department,
 						description: interaction.description,
+						id: interaction.id,
 						officers: interaction.officers,
 						title: interaction.title,
 						user: interaction.user,
@@ -90,20 +91,6 @@ const interaction = (state = initial(), action) => {
 					data: {
 						...state.interaction.data,
 						video: `${s3BaseUrl}${payload.video}`
-					}
-				}
-			}
-
-		case constants.UPDATE_INTERACTION:
-			return {
-				...state,
-				meme: {
-					...state.meme,
-					data: {
-						...state.meme.data,
-						caption: payload.meme.caption,
-						img: payload.meme.img,
-						name: payload.meme.name
 					}
 				}
 			}

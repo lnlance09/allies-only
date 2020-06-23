@@ -77,7 +77,9 @@ const DefaultLayout: React.FunctionComponent = ({
 						<Grid.Column className="leftColumn" width={4}>
 							<Sidebar activeItem={activeItem} inverted={inverted} />
 						</Grid.Column>
-						<Grid.Column width={12}>{children}</Grid.Column>
+						<Grid.Column className="rightColumn" width={12}>
+							{children}
+						</Grid.Column>
 					</Grid>
 				) : (
 					<Fragment>{children}</Fragment>

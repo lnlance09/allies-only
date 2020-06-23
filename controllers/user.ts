@@ -5,7 +5,9 @@ const db = require("../models/index.ts")
 const Mail = require("../utils/mailFunctions.ts")
 const randomize = require("randomatic")
 const sha1 = require("sha1")
+const template = require("../utils/emails/registration.ts")
 const validator = require("validator")
+const waitOn = require("wait-on")
 /* eslint-enable */
 const Interaction = db.interaction
 const User = db.user
@@ -37,12 +39,22 @@ exports.changeProfilePic = async (req, res) => {
 				where: { id: user.data.id }
 			}
 		)
-			.then(() => {
-				return res.status(200).send({
-					error: false,
-					img: fileName,
-					msg: "success"
-				})
+			.then(async () => {
+				try {
+					await waitOn({
+						resources: [`https://alliesonly.s3-accelerate.amazonaws.com/${fileName}`]
+					})
+					return res.status(200).send({
+						error: false,
+						img: fileName,
+						msg: "success"
+					})
+				} catch (err) {
+					return res.status(500).send({
+						error: true,
+						msg: "There was an error"
+					})
+				}
 			})
 			.catch(() => {
 				return res.status(500).send({
@@ -159,6 +171,14 @@ exports.create = async (req, res) => {
 				verificationCode
 			}
 			const token = Auth.signToken(userData)
+
+			const to = `"${name}" <${email}>`
+			const subject = "Your Allies Only account"
+			const text = `Hi ${name}, Your verification code is: ${verificationCode}`
+			const emailTemplate = template.getTemplate()
+			const html = emailTemplate.replace("{CODE}", verificationCode).replace("{NAME}", name)
+			Mail.sendEmail(to, subject, text, html)
+
 			return res.status(200).send({
 				error: false,
 				msg: "Your account has been created",

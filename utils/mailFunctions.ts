@@ -4,25 +4,36 @@ const nodemailer = require("nodemailer")
 
 module.exports = {
 	sendEmail: async function (to, subject, text, html) {
-		const testAccount = await nodemailer.createTestAccount()
 		const transporter = nodemailer.createTransport({
-			host: "smtp.ethereal.email",
-			port: 587,
-			secure: false, // true for 465, false for other ports
 			auth: {
-				user: testAccount.user,
-				pass: testAccount.pass
+				user: "admin@alliesonly.com",
+				pass: "/_99[9517tV]9%y"
+			},
+			host: "smtpout.secureserver.net",
+			port: 465,
+			requireTLS: true,
+			secure: true,
+			secureConnection: false,
+			tls: {
+				ciphers: "SSLv3"
 			}
 		})
 
-		const info = await transporter.sendMail({
-			from: '"Fred Foo 👻" <foo@example.com>',
-			to,
-			subject,
-			text,
-			html
-		})
-
-		console.log("info", info)
+		await transporter.sendMail(
+			{
+				from: '"Allies Only" <noreply@alliesonly.com>',
+				to,
+				subject,
+				text,
+				html
+			},
+			(error) => {
+				if (error) {
+					console.log("error:", error)
+				} else {
+					console.log("good")
+				}
+			}
+		)
 	}
 }

@@ -1,5 +1,5 @@
 import { searchUsers } from "@actions/user"
-import { Divider, Header } from "semantic-ui-react"
+import { Container, Divider, Header } from "semantic-ui-react"
 import { DebounceInput } from "react-debounce-input"
 import { Provider, connect } from "react-redux"
 import { useRouter } from "next/router"
@@ -49,33 +49,35 @@ const Allies: React.FunctionComponent = ({ inverted, searchUsers, users }) => {
 				}}
 				showFooter={false}
 			>
-				<Header as="h1" inverted={inverted} size="huge">
-					Allies
-				</Header>
+				<Container>
+					<Header as="h1" inverted={inverted} size="huge">
+						Allies
+					</Header>
 
-				<div className={`ui icon input fluid big ${inverted ? "inverted" : ""}`}>
-					<DebounceInput
-						debounceTimeout={300}
-						minLength={2}
-						onChange={searchForResults}
-						placeholder="Search..."
-						value={searchVal}
+					<div className={`ui icon input fluid big ${inverted ? "inverted" : ""}`}>
+						<DebounceInput
+							debounceTimeout={300}
+							minLength={2}
+							onChange={searchForResults}
+							placeholder="Search allies"
+							value={searchVal}
+						/>
+						<i aria-hidden="true" className="search icon" />
+					</div>
+
+					<Divider inverted={inverted} section />
+
+					<SearchResults
+						hasMore={users.hasMore}
+						inverted={inverted}
+						loading={users.loading}
+						loadMore={({ page, q }) => loadMore(page, q)}
+						page={users.page}
+						q={searchVal}
+						results={users.results}
+						type="allies"
 					/>
-					<i aria-hidden="true" className="search icon" />
-				</div>
-
-				<Divider inverted={inverted} section />
-
-				<SearchResults
-					hasMore={users.hasMore}
-					inverted={inverted}
-					loading={users.loading}
-					loadMore={({ page, q }) => loadMore(page, q)}
-					page={users.page}
-					q={searchVal}
-					results={users.results}
-					type="allies"
-				/>
+				</Container>
 			</DefaultLayout>
 		</Provider>
 	)

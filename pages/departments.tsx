@@ -1,5 +1,5 @@
 import { searchDepartments } from "@actions/department"
-import { Button, Divider, Form, Header } from "semantic-ui-react"
+import { Button, Container, Divider, Form, Header } from "semantic-ui-react"
 import { DebounceInput } from "react-debounce-input"
 import { Provider, connect } from "react-redux"
 import { useRouter } from "next/router"
@@ -50,51 +50,55 @@ const Departments: React.FunctionComponent = ({ departments, inverted, searchDep
 				}}
 				showFooter={false}
 			>
-				<Header as="h1" inverted={inverted} size="huge">
-					Departments
-					<Button
-						className="addButton"
-						color="yellow"
-						content="Add a department"
-						icon="plus"
+				<Container>
+					<Header as="h1" inverted={inverted} size="huge">
+						Departments
+						<Button
+							className="addButton"
+							color="yellow"
+							content="Add"
+							icon="plus"
+							inverted={inverted}
+							onClick={() => {
+								router.push("/departments/create")
+							}}
+						/>
+					</Header>
+
+					<Form inverted={inverted}>
+						<Form.Group>
+							<Form.Field width={16}>
+								<div
+									className={`ui icon input fluid big ${
+										inverted ? "inverted" : ""
+									}`}
+								>
+									<DebounceInput
+										debounceTimeout={300}
+										minLength={2}
+										onChange={searchForResults}
+										placeholder="Find a department"
+										value={searchVal}
+									/>
+									<i aria-hidden="true" className="search icon" />
+								</div>
+							</Form.Field>
+						</Form.Group>
+					</Form>
+
+					<Divider inverted={inverted} section />
+
+					<SearchResults
+						hasMore={departments.hasMore}
 						inverted={inverted}
-						onClick={() => {
-							router.push("/departments/create")
-						}}
+						loading={departments.loading}
+						loadMore={({ page, q }) => loadMore(page, q)}
+						page={departments.page}
+						q={searchVal}
+						results={departments.results}
+						type="departments"
 					/>
-				</Header>
-
-				<Form inverted={inverted}>
-					<Form.Group>
-						<Form.Field width={16}>
-							<div
-								className={`ui icon input fluid big ${inverted ? "inverted" : ""}`}
-							>
-								<DebounceInput
-									debounceTimeout={300}
-									minLength={2}
-									onChange={searchForResults}
-									placeholder="Search..."
-									value={searchVal}
-								/>
-								<i aria-hidden="true" className="search icon" />
-							</div>
-						</Form.Field>
-					</Form.Group>
-				</Form>
-
-				<Divider inverted={inverted} section />
-
-				<SearchResults
-					hasMore={departments.hasMore}
-					inverted={inverted}
-					loading={departments.loading}
-					loadMore={({ page, q }) => loadMore(page, q)}
-					page={departments.page}
-					q={searchVal}
-					results={departments.results}
-					type="departments"
-				/>
+				</Container>
 			</DefaultLayout>
 		</Provider>
 	)

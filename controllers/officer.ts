@@ -5,6 +5,7 @@ const db = require("../models/index.ts")
 const randomize = require("randomatic")
 const slugify = require("slugify")
 const validator = require("validator")
+const waitOn = require("wait-on")
 /* eslint-enable */
 const Department = db.department
 const Interaction = db.interaction
@@ -183,7 +184,7 @@ exports.findAll = async (req, res) => {
 		]
 		include = [
 			{
-				attributes: ["id"],
+				attributes: [],
 				model: Department,
 				required: true
 			}
@@ -261,6 +262,7 @@ exports.findOne = async (req, res) => {
 			[db.Sequelize.col("officer.lastName"), "lastName"],
 			[db.Sequelize.col("officer.position"), "position"],
 			[db.Sequelize.col("officer.slug"), "slug"],
+			[db.Sequelize.col("department.id"), "departmentId"],
 			[db.Sequelize.col("department.name"), "departmentName"],
 			[db.Sequelize.col("department.slug"), "departmentSlug"],
 			[
@@ -388,27 +390,35 @@ exports.updateImg = async (req, res) => {
 	const fileName = `officers/${randomize("aa", 24)}-${timestamp}.png`
 	await Aws.uploadToS3(image, fileName, false)
 
-	setTimeout(() => {
-		Officer.update(
-			{
-				img: fileName
-			},
-			{
-				where: { id }
-			}
-		)
-			.then(() => {
+	Officer.update(
+		{
+			img: fileName
+		},
+		{
+			where: { id }
+		}
+	)
+		.then(async () => {
+			try {
+				await waitOn({
+					resources: [`https://alliesonly.s3-accelerate.amazonaws.com/${fileName}`]
+				})
 				return res.status(200).send({
 					error: false,
 					img: fileName,
-					msg: "Success"
+					msg: "success"
 				})
-			})
-			.catch(() => {
+			} catch (err) {
 				return res.status(500).send({
 					error: true,
 					msg: "There was an error"
 				})
+			}
+		})
+		.catch(() => {
+			return res.status(500).send({
+				error: true,
+				msg: "There was an error"
 			})
-	}, 5000)
+		})
 }

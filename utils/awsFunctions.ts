@@ -16,11 +16,11 @@ module.exports = {
 		}
 
 		const params = {
-			Bucket: "alliesonly",
-			Key: fileName,
 			Body: body,
+			Bucket: "alliesonly",
 			ContentEncoding: "base64",
-			ContentType: contentType
+			ContentType: contentType,
+			Key: fileName
 		}
 
 		s3.upload(params, function (err, data) {

@@ -203,7 +203,7 @@ const Officer: React.FunctionComponent = ({
 								</Header>
 							</Container>
 						) : (
-							<Fragment>
+							<Container>
 								{officer.loading ? (
 									<Container textAlign="center">
 										<Dimmer active className="pageDimmer">
@@ -214,7 +214,7 @@ const Officer: React.FunctionComponent = ({
 									</Container>
 								) : (
 									<Fragment>
-										<Grid>
+										<Grid stackable>
 											<Grid.Row>
 												<Grid.Column width={4}>
 													<ImageUpload
@@ -252,7 +252,7 @@ const Officer: React.FunctionComponent = ({
 																	inverted={inverted}
 																	onClick={() =>
 																		router.push(
-																			`/interactions/create?deparmentId=${id}`
+																			`/interactions/create?departmentId=${officer.data.departmentId}&officerId=${id}`
 																		)
 																	}
 																/>
@@ -263,7 +263,7 @@ const Officer: React.FunctionComponent = ({
 																inverted={inverted}
 																size="big"
 															>
-																<List.Item active>
+																<List.Item>
 																	<b>
 																		{
 																			officer.data
@@ -299,7 +299,7 @@ const Officer: React.FunctionComponent = ({
 										) : null}
 									</Fragment>
 								)}
-							</Fragment>
+							</Container>
 						)}
 					</Fragment>
 				)}
@@ -315,6 +315,7 @@ Officer.propTypes = {
 	officer: PropTypes.shape({
 		data: PropTypes.shape({
 			createdAt: PropTypes.string,
+			departmentId: PropTypes.number,
 			departmentName: PropTypes.string,
 			departmentSlug: PropTypes.string,
 			firstName: PropTypes.string,

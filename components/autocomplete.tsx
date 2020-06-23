@@ -9,7 +9,7 @@ import useDebounce from "@utils/debounce"
 const resultRenderer = ({ departmentName, name, type }) => {
 	return (
 		<div className="searchItem">
-			<Header inverted size="tiny">
+			<Header inverted size="small">
 				{name}
 				<Header.Subheader>
 					{type === "officer" ? (
@@ -31,7 +31,7 @@ resultRenderer.propTypes = {
 
 const categoryRenderer = ({ name }) => {
 	return (
-		<Segment basic className="categoryItem">
+		<Segment basic className="categoryItem" fluid>
 			<Header inverted>{name}</Header>
 		</Segment>
 	)
@@ -41,7 +41,13 @@ categoryRenderer.propTypes = {
 	name: PropTypes.string
 }
 
-const Autocomplete: React.FunctionComponent = ({ category, disabled, placeholder, width }) => {
+const Autocomplete: React.FunctionComponent = ({
+	category,
+	disabled,
+	placeholder,
+	size,
+	width
+}) => {
 	const [loading, setLoading] = useState(false)
 	const [q, setQ] = useState("")
 	const [results, setResults] = useState([])
@@ -92,16 +98,16 @@ const Autocomplete: React.FunctionComponent = ({ category, disabled, placeholder
 			<Search
 				category={category}
 				categoryRenderer={categoryRenderer}
-				className="autocompleteComponent inverted"
+				className="autocompleteComponent"
 				input={
 					<Input
+						className="autocomplete"
 						disabled={disabled}
 						fluid
 						icon="search"
 						iconPosition="left"
-						inverted
 						placeholder={placeholder}
-						size="big"
+						size={size}
 					/>
 				}
 				loading={loading}
@@ -111,7 +117,7 @@ const Autocomplete: React.FunctionComponent = ({ category, disabled, placeholder
 				results={results}
 				resultRenderer={resultRenderer}
 				showNoResults={false}
-				size="big"
+				size={size}
 			/>
 		</div>
 	)
@@ -122,6 +128,7 @@ Autocomplete.propTypes = {
 	defaultValue: PropTypes.string,
 	disabled: PropTypes.bool,
 	placeholder: PropTypes.string,
+	size: PropTypes.string,
 	width: PropTypes.string
 }
 
@@ -129,6 +136,7 @@ Autocomplete.defaultProps = {
 	category: true,
 	disabled: false,
 	placeholder: "Search",
+	size: "medium",
 	width: "100%"
 }
 

@@ -1,5 +1,5 @@
 import { searchOfficers } from "@actions/officer"
-import { Button, Divider, Header } from "semantic-ui-react"
+import { Button, Container, Divider, Header } from "semantic-ui-react"
 import { DebounceInput } from "react-debounce-input"
 import { Provider, connect } from "react-redux"
 import { useRouter } from "next/router"
@@ -49,43 +49,45 @@ const Officers: React.FunctionComponent = ({ inverted, officers, searchOfficers 
 				}}
 				showFooter={false}
 			>
-				<Header as="h1" inverted={inverted} size="huge">
-					Officers
-					<Button
-						className="addButton"
-						color="yellow"
-						content="Add an officer"
-						icon="plus"
+				<Container>
+					<Header as="h1" inverted={inverted} size="huge">
+						Officers
+						<Button
+							className="addButton"
+							color="yellow"
+							content="Add"
+							icon="plus"
+							inverted={inverted}
+							onClick={() => {
+								router.push("/officers/create")
+							}}
+						/>
+					</Header>
+
+					<div className={`ui icon input fluid big ${inverted ? "inverted" : ""}`}>
+						<DebounceInput
+							debounceTimeout={300}
+							minLength={2}
+							onChange={searchForResults}
+							placeholder="Find an officer"
+							value={searchVal}
+						/>
+						<i aria-hidden="true" className="search icon" />
+					</div>
+
+					<Divider inverted={inverted} section />
+
+					<SearchResults
+						hasMore={officers.hasMore}
 						inverted={inverted}
-						onClick={() => {
-							router.push("/officers/create")
-						}}
+						loading={officers.loading}
+						loadMore={({ page, q }) => loadMore(page, q)}
+						page={officers.page}
+						q={searchVal}
+						results={officers.results}
+						type="officers"
 					/>
-				</Header>
-
-				<div className={`ui icon input fluid big ${inverted ? "inverted" : ""}`}>
-					<DebounceInput
-						debounceTimeout={300}
-						minLength={2}
-						onChange={searchForResults}
-						placeholder="Search..."
-						value={searchVal}
-					/>
-					<i aria-hidden="true" className="search icon" />
-				</div>
-
-				<Divider inverted={inverted} section />
-
-				<SearchResults
-					hasMore={officers.hasMore}
-					inverted={inverted}
-					loading={officers.loading}
-					loadMore={({ page, q }) => loadMore(page, q)}
-					page={officers.page}
-					q={searchVal}
-					results={officers.results}
-					type="officers"
-				/>
+				</Container>
 			</DefaultLayout>
 		</Provider>
 	)

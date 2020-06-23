@@ -1,5 +1,5 @@
 import { searchInteractions } from "@actions/interaction"
-import { Button, Divider, Header } from "semantic-ui-react"
+import { Button, Container, Divider, Header } from "semantic-ui-react"
 import { DebounceInput } from "react-debounce-input"
 import { Provider, connect } from "react-redux"
 import { useRouter } from "next/router"
@@ -49,43 +49,45 @@ const Interactions: React.FunctionComponent = ({ interactions, inverted, searchI
 				}}
 				showFooter={false}
 			>
-				<Header as="h1" inverted={inverted} size="huge">
-					Interactions
-					<Button
-						className="addButton"
-						color="yellow"
-						content="Add an interaction"
-						icon="plus"
+				<Container>
+					<Header as="h1" inverted={inverted} size="huge">
+						Interactions
+						<Button
+							className="addButton"
+							color="yellow"
+							content="Add"
+							icon="plus"
+							inverted={inverted}
+							onClick={() => {
+								router.push("/interactions/create")
+							}}
+						/>
+					</Header>
+
+					<div className={`ui icon input fluid big ${inverted ? "inverted" : ""}`}>
+						<DebounceInput
+							debounceTimeout={300}
+							minLength={2}
+							onChange={searchForResults}
+							placeholder="Search interactions"
+							value={searchVal}
+						/>
+						<i aria-hidden="true" className="search icon" />
+					</div>
+
+					<Divider inverted={inverted} section />
+
+					<SearchResults
+						hasMore={interactions.hasMore}
 						inverted={inverted}
-						onClick={() => {
-							router.push("/interactions/create")
-						}}
+						loading={interactions.loading}
+						loadMore={({ page, q }) => loadMore(page, q)}
+						page={interactions.page}
+						q={searchVal}
+						results={interactions.results}
+						type="interactions"
 					/>
-				</Header>
-
-				<div className={`ui icon input fluid big ${inverted ? "inverted" : ""}`}>
-					<DebounceInput
-						debounceTimeout={300}
-						minLength={2}
-						onChange={searchForResults}
-						placeholder="Search..."
-						value={searchVal}
-					/>
-					<i aria-hidden="true" className="search icon" />
-				</div>
-
-				<Divider inverted={inverted} section />
-
-				<SearchResults
-					hasMore={interactions.hasMore}
-					inverted={inverted}
-					loading={interactions.loading}
-					loadMore={({ page, q }) => loadMore(page, q)}
-					page={interactions.page}
-					q={searchVal}
-					results={interactions.results}
-					type="interactions"
-				/>
+				</Container>
 			</DefaultLayout>
 		</Provider>
 	)

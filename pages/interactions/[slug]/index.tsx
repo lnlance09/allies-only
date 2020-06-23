@@ -1,4 +1,10 @@
-import { createInteraction, getInteraction, updateViews, uploadVideo } from "@actions/interaction"
+import {
+	createInteraction,
+	getInteraction,
+	updateInteraction,
+	updateViews,
+	uploadVideo
+} from "@actions/interaction"
 import {
 	Button,
 	Container,
@@ -18,13 +24,16 @@ import {
 import { Provider, connect } from "react-redux"
 import { fetchDepartments } from "@options/departments"
 import { fetchOfficers } from "@options/officers"
-import { useRouter, Router } from "next/router"
+import { s3BaseUrl } from "@options/config"
+import { useRouter } from "next/router"
 import { parseJwt } from "@utils/tokenFunctions"
 import { withTheme } from "@redux/ThemeProvider"
 import { compose } from "redux"
 import DefaultLayout from "@layouts/default"
+import DefaultPic from "@public/images/avatar/officer.png"
 import Dropzone from "react-dropzone"
 import Link from "next/link"
+import LinkedText from "@components/linkedText"
 import Moment from "react-moment"
 import PropTypes from "prop-types"
 import React, { useEffect, useState, Fragment } from "react"
@@ -36,23 +45,26 @@ const Interaction: React.FunctionComponent = ({
 	interaction,
 	getInteraction,
 	inverted,
+	updateInteraction,
 	updateViews,
 	uploadVideo
 }) => {
 	const router = useRouter()
-	const { departmentId, slug } = router.query
+	const { departmentId, officerId, slug } = router.query
 
 	const [bearer, setBearer] = useState(null)
 	const [createMode, setCreateMode] = useState(false)
 	const [department, setDepartment] = useState("")
 	const [departmentOptions, setDepartmentOptions] = useState([])
-	const [description, setDescription] = useState("")
+	const [description, setDescription] = useState(interaction.data.description)
+	const [editMode, setEditMode] = useState(false)
 	const [formLoading, setFormLoading] = useState(false)
 	const [loading, setLoading] = useState(false)
 	const [officer, setOfficer] = useState([])
 	const [officerOptions, setOfficerOptions] = useState([])
 	const [selectedOfficers, setSelectedOfficers] = useState([])
 	const [title, setTitle] = useState("")
+	const [user, setUser] = useState({})
 
 	useEffect(() => {
 		const getInitialProps = async () => {
@@ -69,14 +81,44 @@ const Interaction: React.FunctionComponent = ({
 					setDepartmentOptions(departmentOptions)
 				}
 
-				const officerOptions = await fetchOfficers({ departentId: departmentId, q: "" })
+				const officerOptions = await fetchOfficers({ departentId: departmentId })
 				setOfficerOptions(officerOptions)
+
+				if (typeof officerId !== "undefined") {
+					setOfficer([parseInt(officerId, 10)])
+					const officers = officerOptions.filter(
+						(officer) => officer.value === parseInt(officerId, 10)
+					)
+					setSelectedOfficers(officers)
+				}
 			}
 
 			if (typeof slug !== "undefined" && slug !== "create") {
 				setCreateMode(false)
-				await getInteraction({ id: slug })
-				updateViews({ id: slug })
+				await getInteraction({
+					callback: async (departmentId, description, officers) => {
+						updateViews({ id: slug })
+						setDescription(description)
+						setDepartment(departmentId)
+						const departmentOptions = await fetchDepartments({
+							id: departmentId
+						})
+						setDepartmentOptions(departmentOptions)
+
+						if (officers.length > 0) {
+							const officerOptions = await fetchOfficers({ departmentId })
+							setOfficerOptions(officerOptions)
+							setSelectedOfficers(officerOptions)
+
+							const officerValues = []
+							officers.map((o) => {
+								officerValues.push(o.id)
+							})
+							setOfficer(officerValues)
+						}
+					},
+					id: slug
+				})
 			}
 		}
 
@@ -87,6 +129,7 @@ const Interaction: React.FunctionComponent = ({
 		const userData = parseJwt()
 		if (userData) {
 			setBearer(localStorage.getItem("jwtToken"))
+			setUser(userData)
 		}
 	}, [bearer])
 
@@ -122,35 +165,49 @@ const Interaction: React.FunctionComponent = ({
 	})
 
 	const selectDepartment = async (e, { value }) => {
-		setDepartment(value)
-		const officerOptions = await fetchOfficers({ departmentId: value })
-		setOfficerOptions(officerOptions)
+		if (department !== value) {
+			setDepartment(value)
+			const officerOptions = await fetchOfficers({ departmentId: value })
+			setOfficerOptions(officerOptions)
+			setOfficer([])
+			setSelectedOfficers([])
+		}
 	}
 
 	const changeOfficer = async (e) => {
 		const q = e.target.value
 		const officerOptions = await fetchOfficers({ departmentId: department, q })
-		setOfficerOptions([...selectedOfficers, ...officerOptions])
+
+		if (slug === "create") {
+			setOfficerOptions([...selectedOfficers, ...officerOptions])
+		} else {
+			setOfficerOptions([selectedOfficers, ...officerOptions])
+		}
 	}
 
 	const selectOfficer = async (e, { value }) => {
+		const removed = officer.length > value.length
 		setOfficer(value)
 
-		const officer = await officerOptions.filter(
-			(officer) => officer.value === value[value.length - 1]
-		)
+		if (removed) {
+			const officers = selectedOfficers.filter((officer) => value.includes(officer.value))
+			setSelectedOfficers(officers)
+		} else {
+			const officers = await officerOptions.filter(
+				(officer) => officer.value === value[value.length - 1]
+			)
+			if (officers.length > 0) {
+				const o = officers[0]
+				const text = typeof o.text === "undefined" ? o.value : o.text
+				const newItem = { color: "yellow", text, value: o.value }
 
-		if (officer.length > 0) {
-			const o = officer[0]
-			const text = typeof o.text === "undefined" ? o.value : o.text
-			const newItem = { color: "yellow", text, value: o.value }
+				const departmentOptions = await fetchDepartments({ q: o.departmentName })
+				setDepartmentOptions(departmentOptions)
+				setDepartment(o.departmentId)
 
-			const departmentOptions = await fetchDepartments({ q: o.departmentName })
-			setDepartmentOptions(departmentOptions)
-			setDepartment(o.departmentId)
-
-			setOfficerOptions([newItem, ...officerOptions])
-			setSelectedOfficers([newItem, ...selectedOfficers])
+				setOfficerOptions([newItem, ...officerOptions])
+				setSelectedOfficers([newItem, ...selectedOfficers])
+			}
 		}
 	}
 
@@ -160,6 +217,61 @@ const Interaction: React.FunctionComponent = ({
 		setOfficerOptions([newItem, ...officerOptions])
 		setSelectedOfficers([newItem, ...selectedOfficers])
 	}
+
+	const titleField = (
+		<Input
+			inverted={inverted}
+			onChange={(e, { value }) => setTitle(value)}
+			placeholder="Title"
+			value={title}
+		/>
+	)
+
+	const descriptionField = (
+		<TextArea
+			onChange={(e, { value }) => setDescription(value)}
+			placeholder="Describe this interaction"
+			rows={7}
+			value={description}
+		/>
+	)
+
+	const departmentField = (
+		<Dropdown
+			fluid
+			noResultsMessage={null}
+			onChange={selectDepartment}
+			onSearchChange={changeDepartment}
+			options={departmentOptions}
+			placeholder="Police Department"
+			search
+			selection
+			upward
+			value={department}
+		/>
+	)
+
+	const officerField = (
+		<Dropdown
+			allowAdditions
+			closeOnChange
+			fluid
+			multiple
+			noResultsMessage={null}
+			onAddItem={handleAddition}
+			onChange={selectOfficer}
+			onSearchChange={changeOfficer}
+			options={officerOptions}
+			placeholder="Officers Involved (Optional)"
+			renderLabel={renderLabel}
+			search
+			selection
+			upward
+			value={officer}
+		/>
+	)
+
+	const hasOfficers = interaction.data.officers.length > 0
 
 	return (
 		<Provider store={store}>
@@ -213,7 +325,6 @@ const Interaction: React.FunctionComponent = ({
 									controls
 									height="100%"
 									muted
-									onReady={(e) => console.log("e", e)}
 									playing
 									url={interaction.data.video}
 									width="100%"
@@ -227,55 +338,10 @@ const Interaction: React.FunctionComponent = ({
 							size="big"
 							style={{ marginTop: "24px" }}
 						>
-							<Form.Field>
-								<Input
-									inverted={inverted}
-									onChange={(e, { value }) => setTitle(value)}
-									placeholder="Title"
-									value={title}
-								/>
-							</Form.Field>
-							<Form.Field>
-								<TextArea
-									onChange={(e, { value }) => setDescription(value)}
-									placeholder="Describe this interaction"
-									rows={7}
-									value={description}
-								/>
-							</Form.Field>
-							<Form.Field>
-								<Dropdown
-									fluid
-									noResultsMessage={null}
-									onChange={selectDepartment}
-									onSearchChange={changeDepartment}
-									options={departmentOptions}
-									placeholder="Police Department"
-									search
-									selection
-									upward
-									value={department}
-								/>
-							</Form.Field>
-							<Form.Field>
-								<Dropdown
-									allowAdditions
-									closeOnChange
-									fluid
-									multiple
-									noResultsMessage={null}
-									onAddItem={handleAddition}
-									onChange={selectOfficer}
-									onSearchChange={changeOfficer}
-									options={officerOptions}
-									placeholder="Officers Involved (Optional)"
-									renderLabel={renderLabel}
-									search
-									selection
-									upward
-									value={officer}
-								/>
-							</Form.Field>
+							<Form.Field>{titleField}</Form.Field>
+							<Form.Field>{descriptionField}</Form.Field>
+							<Form.Field>{departmentField}</Form.Field>
+							<Form.Field>{officerField}</Form.Field>
 						</Form>
 
 						<Divider inverted={inverted} section />
@@ -308,7 +374,7 @@ const Interaction: React.FunctionComponent = ({
 								</Header>
 							</Container>
 						) : (
-							<Fragment>
+							<Container>
 								{interaction.loading ? (
 									<Container textAlign="center">
 										<Dimmer active className="pageDimmer">
@@ -319,95 +385,191 @@ const Interaction: React.FunctionComponent = ({
 									</Container>
 								) : (
 									<Fragment>
-										<div className="videoPlayer">
-											<ReactPlayer
-												controls
-												height="100%"
-												muted
-												onReady={(e) => console.log("e", e)}
-												playing
-												url={interaction.data.video}
-												width="100%"
-											/>
-										</div>
-										<div className="videoBasicInfo">
-											<Header
-												as="h1"
-												className="videoTitle"
-												inverted
-												size="huge"
-											>
-												{interaction.data.title}
-												<Header.Subheader>
-													<Moment
-														date={interaction.data.createdAt}
-														fromNow
-													/>{" "}
-													•{" "}
-													<Link
-														href={`/${interaction.data.user.username}`}
-													>
-														<a>{interaction.data.user.name}</a>
-													</Link>{" "}
-													• {interaction.data.views} views
-												</Header.Subheader>
-											</Header>
-											<p className="videoDescription">
-												{interaction.data.description}
-											</p>
-										</div>
-										<Divider inverted={inverted} section />
-										<div className="videoBasicInfo">
-											<Header as="h2" inverted>
-												Officers Involved
-											</Header>
-											{interaction.data.officers.length > 0 ? (
+										<Header as="h1" inverted={inverted}>
+											{interaction.data.title}
+											<Header.Subheader>
+												Submitted{" "}
+												<Moment date={interaction.data.createdAt} fromNow />{" "}
+												•{" "}
+												<Link href={`/${interaction.data.user.username}`}>
+													<a>{interaction.data.user.name}</a>
+												</Link>{" "}
+												• {interaction.data.views} views
+											</Header.Subheader>
+										</Header>
+
+										<ReactPlayer
+											controls
+											height="100%"
+											muted
+											onReady={(e) => console.log("e", e)}
+											playing
+											style={{ lineHeight: 0.8 }}
+											url={interaction.data.video}
+											width="100%"
+										/>
+
+										<Header as="h2" inverted>
+											About this interaction
+											{user.id === interaction.data.user.id && (
+												<Button
+													color={editMode ? "red" : "yellow"}
+													compact
+													content={editMode ? "Cancel" : "Edit"}
+													floated="right"
+													icon={editMode ? "close" : "pencil"}
+													inverted
+													onClick={() => {
+														setEditMode(!editMode)
+													}}
+												/>
+											)}
+										</Header>
+										<Segment inverted={inverted} size="big">
+											{editMode ? (
+												<Form inverted={inverted} size="big">
+													{descriptionField}
+												</Form>
+											) : (
+												<Fragment>
+													{typeof interaction.data.description ===
+														"undefined" ||
+													interaction.data.description === null ||
+													interaction.data.description === "" ? (
+														"No description"
+													) : (
+														<LinkedText
+															text={interaction.data.description}
+														/>
+													)}
+												</Fragment>
+											)}
+										</Segment>
+
+										<Header as="h2" inverted>
+											Police Department
+										</Header>
+										<Segment inverted={inverted}>
+											{editMode ? (
+												<Form size="big">
+													<Form.Field>{departmentField}</Form.Field>
+												</Form>
+											) : (
 												<List
 													inverted={inverted}
 													selection
 													size="big"
 													verticalAlign="middle"
 												>
-													{interaction.data.officers.map((officer) => (
-														<List.Item
-															key={`officerInvolved${officer.slug}`}
-															onClick={() =>
-																router.push(
-																	`/officers/${officer.slug}`
-																)
-															}
-														>
-															<Image
-																avatar
-																src="/images/avatar/small/rachel.png"
-															/>
-															<List.Content>
-																<List.Header>
-																	{officer.firstName}{" "}
-																	{officer.lastName}
-																</List.Header>
-																<List.Description>
-																	{
-																		interaction.data.department
-																			.name
-																	}
-																</List.Description>
-															</List.Content>
-														</List.Item>
-													))}
+													<List.Item
+														onClick={() =>
+															router.push(
+																`/departments/${interaction.data.department.slug}`
+															)
+														}
+													>
+														<List.Content>
+															<List.Header>
+																{interaction.data.department.name}
+															</List.Header>
+														</List.Content>
+													</List.Item>
 												</List>
+											)}
+										</Segment>
+
+										<Header as="h2" inverted>
+											Officers Involved
+										</Header>
+										<Segment
+											inverted={inverted}
+											size={hasOfficers ? "medium" : "big"}
+										>
+											{hasOfficers ? (
+												<Fragment>
+													<List
+														inverted={inverted}
+														selection
+														size="big"
+														verticalAlign="middle"
+													>
+														{interaction.data.officers.map(
+															(officer) => (
+																<List.Item
+																	key={`officerInvolved${officer.slug}`}
+																	onClick={() =>
+																		router.push(
+																			`/officers/${officer.slug}`
+																		)
+																	}
+																>
+																	<Image
+																		onError={(i) =>
+																			(i.target.src = DefaultPic)
+																		}
+																		rounded
+																		size="tiny"
+																		src={
+																			officer.img === null
+																				? DefaultPic
+																				: `${s3BaseUrl}${officer.img}`
+																		}
+																	/>
+																	<List.Content verticalAlign="top">
+																		<List.Header>
+																			{officer.firstName}{" "}
+																			{officer.lastName}
+																		</List.Header>
+																		<List.Description>
+																			{officer.departmentName}
+																		</List.Description>
+																	</List.Content>
+																</List.Item>
+															)
+														)}
+													</List>
+													{editMode && (
+														<Form size="big">{officerField}</Form>
+													)}
+												</Fragment>
 											) : (
 												<div>
 													<p>
 														The officer(s) in this video have not been
 														identified. Can you help us spot them?
 													</p>
+													{officerField}
 												</div>
 											)}
-										</div>
+										</Segment>
+
+										<Divider inverted={inverted} section />
+
+										{(editMode || !hasOfficers) && (
+											<Button
+												color="yellow"
+												content="Save"
+												fluid
+												inverted={inverted}
+												onClick={() =>
+													updateInteraction({
+														bearer,
+														callback: async (id) => {
+															await getInteraction({ id })
+															setEditMode(false)
+														},
+														department,
+														description,
+														id: interaction.data.id,
+														officer: selectedOfficers
+													})
+												}
+												size="big"
+											/>
+										)}
 									</Fragment>
 								)}
-							</Fragment>
+							</Container>
 						)}
 					</Fragment>
 				)}
@@ -428,8 +590,10 @@ Interaction.propTypes = {
 				slug: PropTypes.string
 			}),
 			description: PropTypes.string,
+			id: PropTypes.number,
 			officers: PropTypes.arrayOf(
 				PropTypes.shape({
+					departmentName: PropTypes.string,
 					firstName: PropTypes.string,
 					id: PropTypes.number,
 					img: PropTypes.string,
@@ -439,6 +603,7 @@ Interaction.propTypes = {
 			),
 			title: PropTypes.string,
 			user: PropTypes.shape({
+				id: PropTypes.number,
 				img: PropTypes.string,
 				name: PropTypes.string,
 				username: PropTypes.string
@@ -451,6 +616,7 @@ Interaction.propTypes = {
 		loading: PropTypes.bool
 	}),
 	inverted: PropTypes.bool,
+	updateInteraction: PropTypes.func,
 	updateViews: PropTypes.func,
 	uploadVideo: PropTypes.func
 }
@@ -469,6 +635,7 @@ Interaction.defaultProps = {
 		errorMsg: "",
 		loading: true
 	},
+	updateInteraction,
 	updateViews,
 	uploadVideo
 }
@@ -482,6 +649,7 @@ export default compose(
 	connect(mapStateToProps, {
 		createInteraction,
 		getInteraction,
+		updateInteraction,
 		updateViews,
 		uploadVideo
 	}),

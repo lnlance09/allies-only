@@ -8,7 +8,8 @@ toast.configure({
 	closeOnClick: true,
 	draggable: true,
 	hideProgressBar: true,
-	newestOnTop: true
+	newestOnTop: true,
+	position: "bottom-left"
 })
 
 export const createInteraction = ({
@@ -56,7 +57,11 @@ export const getInteraction = ({ callback = () => null, id }) => (dispatch) => {
 				payload: data,
 				type: constants.GET_INTERACTION
 			})
-			callback()
+
+			if (!data.error) {
+				const { interaction } = data
+				callback(interaction.department.id, interaction.description, interaction.officers)
+			}
 		})
 		.catch((error) => {
 			dispatch({
@@ -96,20 +101,33 @@ export const searchInteractions = ({ departmentId, officerId, page = 0, q = null
 		})
 }
 
-export const updateInteraction = ({ bearer, callback = () => null, data, id }) => (dispatch) => {
+export const updateInteraction = ({
+	bearer,
+	callback = () => null,
+	department,
+	description,
+	id,
+	officer
+}) => () => {
 	axios
-		.post(`/api/interaction/${id}/update`, data, {
-			headers: {
-				Authorization: bearer
+		.post(
+			`/api/interaction/${id}/update`,
+			{
+				department,
+				description,
+				officer: JSON.stringify(officer)
+			},
+			{
+				headers: {
+					Authorization: bearer
+				}
 			}
-		})
+		)
 		.then(async (response) => {
 			const { data } = response
-			dispatch({
-				payload: data,
-				type: constants.UPDATE_INTERACTION
-			})
-			callback()
+			if (!data.error) {
+				callback(id)
+			}
 		})
 		.catch((error) => {
 			console.log(error)

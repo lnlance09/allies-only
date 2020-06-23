@@ -8,7 +8,8 @@ toast.configure({
 	closeOnClick: true,
 	draggable: true,
 	hideProgressBar: true,
-	newestOnTop: true
+	newestOnTop: true,
+	position: "bottom-left"
 })
 
 export const createOfficer = ({

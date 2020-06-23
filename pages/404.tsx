@@ -110,8 +110,8 @@ const User: React.FunctionComponent = ({
 						</Header>
 					</Container>
 				) : (
-					<Fragment>
-						<Grid>
+					<Container>
+						<Grid stackable>
 							<Grid.Row>
 								<Grid.Column width={4}>
 									{loading ? (
@@ -155,7 +155,7 @@ const User: React.FunctionComponent = ({
 								userId={id}
 							/>
 						) : null}
-					</Fragment>
+					</Container>
 				)}
 			</DefaultLayout>
 		</Provider>

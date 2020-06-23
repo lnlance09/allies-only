@@ -1,7 +1,7 @@
 .searchResults {
 	.resultsList {
 		@media only screen and (max-width: 767px) {
-			padding: 0 7px !important;
+			padding: 0 !important;
 		}
 
 		&.inverted {
@@ -43,22 +43,32 @@
 				}
 			}
 
-			.interactionCard {
-				background: $invertedBackgroundColor;
-				cursor: pointer;				
+			.card {
+			background: $invertedBackgroundColor !important;
+				border: none;
+				box-shadow: none;
+				cursor: pointer;
+				
+				&:hover {
+					box-shadow: none !important;
+				}
 
 				video {
-					background-color: $invertedBackgroundColor;
+					background: lighten($invertedBackgroundColor, 6%);
+					border-top-left-radius: 4px;
+					border-top-right-radius: 4px;
 					line-height: 0.8 !important;
 				}
 
-				.interactionContent {
-					background-color: lighten($invertedBackgroundColor, 7%);
-					color: $white;
-					padding: 13px 17px;
+				.content {
+					background: lighten($invertedBackgroundColor, 6%);
 
-					p {
-						font-size: 16px;
+					.header, .meta, .description {
+						color: $white;
+
+						a {
+							color: $white;
+						}
 					}
 				}
 			}
