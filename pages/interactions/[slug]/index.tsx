@@ -279,6 +279,19 @@ const Interaction: React.FunctionComponent = ({
 
 	const hasOfficers = interaction.data.officers.length > 0
 
+	let seoTitle = "Add an ineraction"
+	let seoDescription = "Help document police brutality"
+	let seoImage = {
+		height: 500,
+		src: "/public/images/logos/logo.png",
+		width: 500
+	}
+	if (!createMode) {
+		seoTitle = typeof interaction.data.title === "undefined" ? "" : interaction.data.title
+		seoDescription =
+			typeof interaction.data.description === "undefined" ? "" : interaction.data.description
+	}
+
 	return (
 		<Provider store={store}>
 			<DefaultLayout
@@ -286,14 +299,10 @@ const Interaction: React.FunctionComponent = ({
 				containerClassName="interactionsPage"
 				loading={loading}
 				seo={{
-					description: `A `,
-					image: {
-						height: 200,
-						src: "",
-						width: 200
-					},
-					title: createMode ? "Add an interaction" : interaction.data.title,
-					url: `interactions`
+					description: seoDescription,
+					image: seoImage,
+					title: seoTitle,
+					url: `interactions/${slug}`
 				}}
 				showFooter={false}
 			>

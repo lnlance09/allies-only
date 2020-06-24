@@ -593,7 +593,7 @@ exports.uploadVideo = async (req, res) => {
 
 	try {
 		await waitOn({
-			resources: [`https://alliesonly.s3-accelerate.amazonaws.com/${fileName}`]
+			resources: [`https://alliesonly.s3-us-west-2.amazonaws.com/${fileName}`]
 		})
 		return res.status(200).send({
 			error: false,

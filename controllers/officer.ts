@@ -422,9 +422,7 @@ exports.updateImg = async (req, res) => {
 				.then(async () => {
 					try {
 						await waitOn({
-							resources: [
-								`https://alliesonly.s3-accelerate.amazonaws.com/${filePath}`
-							]
+							resources: [`https://alliesonly.s3-us-west-2.amazonaws.com/${filePath}`]
 						})
 						await fs.unlinkSync(`uploads/${fileName}`)
 

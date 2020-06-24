@@ -38,11 +38,11 @@ const Allies: React.FunctionComponent = ({ inverted, searchUsers, users }) => {
 				activeItem="allies"
 				containerClassName="alliesPage"
 				seo={{
-					description: "",
+					description: "Allies in the fight against police brutality",
 					image: {
-						height: 200,
-						src: "",
-						width: 200
+						height: 500,
+						src: "/public/images/logos/logo.png",
+						width: 500
 					},
 					title: "Allies",
 					url: `allies`
