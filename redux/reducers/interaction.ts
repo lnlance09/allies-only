@@ -83,6 +83,18 @@ const interaction = (state = initial(), action) => {
 				}
 			}
 
+		case constants.SET_VIDEO:
+			return {
+				...state,
+				interaction: {
+					...state.interaction,
+					data: {
+						...state.interaction.data,
+						video: `${s3BaseUrl}${payload}`
+					}
+				}
+			}
+
 		case constants.UPLOAD_VIDEO:
 			return {
 				...state,

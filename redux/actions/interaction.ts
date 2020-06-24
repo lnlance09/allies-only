@@ -101,6 +101,13 @@ export const searchInteractions = ({ departmentId, officerId, page = 0, q = null
 		})
 }
 
+export const setVideo = ({ value }) => (dispatch) => {
+	dispatch({
+		payload: value,
+		type: constants.SET_VIDEO
+	})
+}
+
 export const updateInteraction = ({
 	bearer,
 	callback = () => null,

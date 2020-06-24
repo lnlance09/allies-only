@@ -1,6 +1,7 @@
 import {
 	createInteraction,
 	getInteraction,
+	setVideo,
 	updateInteraction,
 	updateViews,
 	uploadVideo
@@ -40,12 +41,14 @@ import React, { useEffect, useState, Fragment } from "react"
 import ReactPlayer from "react-player"
 import SearchResults from "@components/searchResults"
 import store from "@store"
+import VideoInput from "@components/videoInput"
 
 const Interaction: React.FunctionComponent = ({
 	createInteraction,
 	interaction,
 	getInteraction,
 	inverted,
+	setVideo,
 	updateInteraction,
 	updateViews,
 	uploadVideo
@@ -57,7 +60,9 @@ const Interaction: React.FunctionComponent = ({
 	const [createMode, setCreateMode] = useState(false)
 	const [department, setDepartment] = useState("")
 	const [departmentOptions, setDepartmentOptions] = useState([])
-	const [description, setDescription] = useState(interaction.data.description)
+	const [description, setDescription] = useState(
+		typeof interaction.data.description === "undefined" ? "" : interaction.data.description
+	)
 	const [editMode, setEditMode] = useState(false)
 	const [formLoading, setFormLoading] = useState(false)
 	const [loading, setLoading] = useState(false)
@@ -298,40 +303,54 @@ const Interaction: React.FunctionComponent = ({
 							Add an interaction
 						</Header>
 
-						{interaction.data.video === null ? (
-							<Segment inverted={inverted} padded="very" placeholder>
-								<Header as="h1" icon size="huge">
-									<Icon color="yellow" inverted name="film" />
+						<Segment inverted={inverted}>
+							{interaction.data.video === null ? (
+								<Segment basic inverted={inverted} padded="very" placeholder>
+									<Header as="h1" icon size="huge">
+										<Icon color="yellow" inverted name="film" />
+									</Header>
+									<Dropzone onDrop={onDrop}>
+										{({ getRootProps, getInputProps }) => (
+											<div {...getRootProps()}>
+												<input
+													className="fileUploadInput"
+													{...getInputProps()}
+												/>
+												<Button
+													color="yellow"
+													content="Upload a video"
+													inverted={inverted}
+													loading={loading}
+												/>
+											</div>
+										)}
+									</Dropzone>
+								</Segment>
+							) : (
+								<div className="videoPlayer">
+									<ReactPlayer
+										controls
+										height="100%"
+										muted
+										playing
+										url={interaction.data.video}
+										width="100%"
+									/>
+								</div>
+							)}
+
+							<Divider horizontal inverted={inverted}>
+								<Header as="h2" inverted={inverted}>
+									OR
 								</Header>
-								<Dropzone onDrop={onDrop}>
-									{({ getRootProps, getInputProps }) => (
-										<div {...getRootProps()}>
-											<input
-												className="fileUploadInput"
-												{...getInputProps()}
-											/>
-											<Button
-												color="yellow"
-												content="Upload a video"
-												inverted={inverted}
-												loading={loading}
-											/>
-										</div>
-									)}
-								</Dropzone>
-							</Segment>
-						) : (
-							<div className="videoPlayer">
-								<ReactPlayer
-									controls
-									height="100%"
-									muted
-									playing
-									url={interaction.data.video}
-									width="100%"
-								/>
-							</div>
-						)}
+							</Divider>
+
+							<VideoInput
+								onPasteInstagram={(value) => setVideo(value)}
+								onPasteYouTube={(value) => setVideo(value)}
+								setLoading={setLoading}
+							/>
+						</Segment>
 
 						<Form
 							error={interaction.error}
@@ -636,6 +655,7 @@ Interaction.propTypes = {
 		loading: PropTypes.bool
 	}),
 	inverted: PropTypes.bool,
+	setVideo: PropTypes.func,
 	updateInteraction: PropTypes.func,
 	updateViews: PropTypes.func,
 	uploadVideo: PropTypes.func
@@ -655,6 +675,7 @@ Interaction.defaultProps = {
 		errorMsg: "",
 		loading: true
 	},
+	setVideo,
 	updateInteraction,
 	updateViews,
 	uploadVideo
@@ -669,6 +690,7 @@ export default compose(
 	connect(mapStateToProps, {
 		createInteraction,
 		getInteraction,
+		setVideo,
 		updateInteraction,
 		updateViews,
 		uploadVideo

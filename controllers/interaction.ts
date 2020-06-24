@@ -3,12 +3,15 @@ const Auth = require("../utils/authFunctions.ts")
 const Aws = require("../utils/awsFunctions.ts")
 const db = require("../models/index.ts")
 const axios = require("axios")
+const fs = require("fs")
 const isJSON = require("is-json")
 const path = require("path")
 const randomize = require("randomatic")
+const save = require("instagram-save")
 const slugify = require("slugify")
 const validator = require("validator")
 const waitOn = require("wait-on")
+const youtubedl = require("youtube-dl")
 /* eslint-enable */
 const Department = db.department
 const Interaction = db.interaction
@@ -336,6 +339,124 @@ exports.findOne = (req, res) => {
 				msg: err.message || "An error occurred"
 			})
 		})
+}
+
+exports.saveVideo = async (req, res) => {
+	const { id, type } = req.body
+
+	const fileName = `${type}-${id}.mp4`
+	const filePath = `interactions/${fileName}`
+	const exists = await Aws.fileExists(filePath)
+	if (exists) {
+		return res.status(200).send({
+			error: false,
+			video: filePath
+		})
+	}
+
+	if (type === "instagram") {
+		try {
+			const video = await save(id, "uploads").then((res) => {
+				console.log("res", res)
+				return res
+			})
+
+			if (video.label !== "video") {
+				await fs.unlinkSync(video.file)
+				return res.status(500).send({
+					error: true,
+					msg: "Only videos from be used from Instagram",
+					video: false
+				})
+			}
+
+			await fs.readFile(video.file, async (err, data) => {
+				if (err) {
+					throw err
+				}
+
+				await Aws.uploadToS3(data, filePath, false, "video/mp4")
+				await fs.unlinkSync(video.file)
+
+				try {
+					await waitOn({
+						resources: [`https://alliesonly.s3-us-west-2.amazonaws.com/${filePath}`]
+					})
+					return res.status(200).send({
+						error: false,
+						video: filePath
+					})
+				} catch (err) {
+					return res.status(500).send({
+						error: true,
+						msg: "That link is not valid",
+						video: false
+					})
+				}
+			})
+		} catch (err) {
+			return res.status(500).send({
+				error: true,
+				msg: "That link is not valid",
+				video: false
+			})
+		}
+	}
+
+	if (type === "youtube") {
+		const video = youtubedl(
+			`http://www.youtube.com/watch?v=${id}`,
+			// Optional arguments passed to youtube-dl.
+			["--format=18"]
+			// Additional options can be given for calling `child_process.execFile()`.
+			// { cwd: __dirname }
+		)
+
+		video.on("info", (info) => {
+			console.log("Download started")
+			console.log("filename: " + info._filename)
+			console.log("size: " + info.size)
+			console.log("info", info)
+		})
+
+		video.on("error", (err) => {
+			return res.status(500).send({
+				error: true,
+				msg: "That link is not valid",
+				video: false
+			})
+		})
+
+		video.pipe(fs.createWriteStream(`uploads/${fileName}`))
+
+		video.on("end", async () => {
+			await fs.readFile(`uploads/${fileName}`, async (err, data) => {
+				if (err) {
+					throw err
+				}
+
+				console.log("data", data)
+				await Aws.uploadToS3(data, filePath, false, "video/mp4")
+				await fs.unlinkSync(`uploads/${fileName}`)
+
+				try {
+					await waitOn({
+						resources: [`https://alliesonly.s3-us-west-2.amazonaws.com/${filePath}`]
+					})
+					return res.status(200).send({
+						error: false,
+						video: filePath
+					})
+				} catch (err) {
+					return res.status(500).send({
+						error: true,
+						msg: "That link is not valid",
+						video: false
+					})
+				}
+			})
+		})
+	}
 }
 
 exports.update = async (req, res) => {

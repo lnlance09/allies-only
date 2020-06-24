@@ -22,6 +22,7 @@ export const RESET_INTERACTION_TO_INITIAL = "interaction:RESET_INTERACTION_TO_IN
 export const SEARCH_INTERACTIONS = "interaction:SEARCH_INTERACTIONS"
 export const SET_INTERACTION_CREATE_ERROR = "interaction:SET_INTERACTION_CREATE_ERROR"
 export const SET_INTERACTION_FETCH_ERROR = "interaction:SET_INTERACTION_FETCH_ERROR"
+export const SET_VIDEO = "interaction:SET_VIDEO"
 export const UPLOAD_VIDEO = "interaction:UPLOAD_VIDEO"
 export const UPDATE_INTERACTION = "interaction:UPDATE_INTERACTION"
 

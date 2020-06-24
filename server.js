@@ -36,6 +36,7 @@ app.prepare().then(() => {
 	server.post("/api/interaction/create", interactions.create)
 	server.get("/api/interaction/search", interactions.findAll)
 	server.get("/api/interaction/:id", interactions.findOne)
+	server.post("/api/interaction/saveVideo", interactions.saveVideo)
 	server.post("/api/interaction/:id/update", interactions.update)
 	server.post("/api/interaction/:id/updateViews", interactions.updateViews)
 	server.post("/api/interaction/uploadVideo", interactions.uploadVideo)
