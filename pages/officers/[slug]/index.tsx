@@ -112,6 +112,16 @@ const Officer: React.FunctionComponent = ({
 		setDepartment(value)
 	}
 
+	let seoTitle = error ? "Not found" : name
+	let seoDescription = error
+		? "Become an ally in the fight against police brutality and corruption"
+		: `${name}'s interactions with the police on AlliesOnly`
+	let seoImage = {
+		height: 500,
+		src: img,
+		width: 500
+	}
+
 	return (
 		<Provider store={store}>
 			<DefaultLayout

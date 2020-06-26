@@ -35,14 +35,14 @@ const DefaultLayout: React.FunctionComponent = ({
 				<meta property="og:image" content={image.src} />
 				<meta property="og:image:height" content={image.height} />
 				<meta property="og:image:width" content={image.width} />
-				<meta property="og:site_name" content="Blather" />
+				<meta property="og:site_name" content="Allies Only" />
 				<meta property="og:title" content={`${title} - ${siteName}`} />
 				<meta property="og:type" content="website" />
 				<meta property="og:url" content={fullUrl} />
 
 				<meta name="twitter:card" content="summary_large_image" />
-				<meta name="twitter:site" content="@blatherio" />
-				<meta name="twitter:creator" content="@blatherio" />
+				<meta name="twitter:site" content="@onlyallies" />
+				<meta name="twitter:creator" content="@onlyallies" />
 				<meta name="twitter:title" content={`${title} - ${siteName}`} />
 				<meta name="twitter:description" content={description} />
 				<meta name="twitter:image" content={image.src} />

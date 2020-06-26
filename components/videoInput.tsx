@@ -1,19 +1,14 @@
 import { Form, Icon, Input, Segment } from "semantic-ui-react"
 import { toast } from "react-toastify"
+import { getConfig } from "@options/toast"
 import axios from "axios"
 import parse from "url-parse"
 import PropTypes from "prop-types"
 import queryString from "query-string"
 import React, { useState } from "react"
 
-toast.configure({
-	autoClose: 2000,
-	closeOnClick: true,
-	draggable: true,
-	hideProgressBar: true,
-	newestOnTop: true,
-	position: "bottom-left"
-})
+const toastConfig = getConfig()
+toast.configure(toastConfig)
 
 const VideoInput: React.FunctionComponent = ({ onPasteInstagram, onPasteYouTube, setLoading }) => {
 	const [youtubeUrl, setYoutubeUrl] = useState("")

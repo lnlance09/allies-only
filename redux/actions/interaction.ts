@@ -1,16 +1,11 @@
 import * as constants from "../constants"
 import { toast } from "react-toastify"
+import { getConfig } from "@options/toast"
 import axios from "axios"
 import Router from "next/router"
 
-toast.configure({
-	autoClose: 2000,
-	closeOnClick: true,
-	draggable: true,
-	hideProgressBar: true,
-	newestOnTop: true,
-	position: "bottom-left"
-})
+const toastConfig = getConfig()
+toast.configure(toastConfig)
 
 export const createInteraction = ({
 	bearer,

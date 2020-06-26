@@ -279,7 +279,7 @@ const Interaction: React.FunctionComponent = ({
 
 	const hasOfficers = interaction.data.officers.length > 0
 
-	let seoTitle = "Add an ineraction"
+	let seoTitle = "Add an Ineraction"
 	let seoDescription = "Help document police brutality"
 	let seoImage = {
 		height: 500,
@@ -295,7 +295,7 @@ const Interaction: React.FunctionComponent = ({
 	return (
 		<Provider store={store}>
 			<DefaultLayout
-				activeItem="interactions"
+				activeItem={slug === "create" ? "addInteraction" : "interactions"}
 				containerClassName="interactionsPage"
 				loading={loading}
 				seo={{

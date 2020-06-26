@@ -6,8 +6,8 @@ module.exports = {
 	sendEmail: async function (to, subject, text, html) {
 		const transporter = nodemailer.createTransport({
 			auth: {
-				user: "admin@alliesonly.com",
-				pass: "/_99[9517tV]9%y"
+				user: "noreply@alliesonly.com",
+				pass: "t3hT!Pvs94wt1Wk"
 			},
 			host: "smtpout.secureserver.net",
 			port: 465,

@@ -4,6 +4,7 @@ const next = require("next")
 const bodyParser = require("body-parser")
 const fileupload = require("express-fileupload")
 const db = require("./models/index.ts")
+const contact = require("./controllers/contact.ts")
 const departments = require("./controllers/department.ts")
 const locations = require("./controllers/location.ts")
 const interactions = require("./controllers/interaction.ts")
@@ -23,6 +24,8 @@ app.prepare().then(() => {
 	server.use(bodyParser.json({ limit: "50mb" }))
 	server.use(bodyParser.urlencoded({ extended: false }))
 	db.sequelize.sync()
+
+	server.post("/api/contact/send", contact.send)
 
 	// Departments
 	server.post("/api/department/create", departments.create)

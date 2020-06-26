@@ -1,9 +1,10 @@
 import { logout } from "@actions/authentication"
 import { parseJwt } from "@utils/tokenFunctions"
-import { Button, Divider, Icon, Menu, Statistic } from "semantic-ui-react"
+import { Button, Divider, Icon, List, Menu, Statistic } from "semantic-ui-react"
 import { useRouter } from "next/router"
 import { Provider, connect } from "react-redux"
 import axios from "axios"
+import Link from "next/link"
 import NumberFormat from "react-number-format"
 import PropTypes from "prop-types"
 import React, { Fragment, useEffect, useState } from "react"
@@ -108,6 +109,18 @@ const Sidebar: React.FunctionComponent = ({ activeItem, basic, inverted, logout 
 					{!basic && (
 						<Fragment>
 							<Menu.Item
+								active={activeItem === "addInteraction"}
+								className="headerMenuItem addInteraction"
+								onClick={() => router.push("/interactions/create")}
+							>
+								<Icon
+									color={activeItem === "addInteraction" ? "yellow" : null}
+									inverted={inverted}
+									name="plus"
+								/>
+								Add Interaction
+							</Menu.Item>
+							<Menu.Item
 								active={activeItem === "allies"}
 								className="headerMenuItem allies"
 								onClick={() => router.push("/allies")}
@@ -127,7 +140,7 @@ const Sidebar: React.FunctionComponent = ({ activeItem, basic, inverted, logout 
 								<Icon
 									color={activeItem === "interactions" ? "yellow" : null}
 									inverted={inverted}
-									name="crosshairs"
+									name="film"
 								/>
 								Interactions
 							</Menu.Item>
@@ -161,18 +174,33 @@ const Sidebar: React.FunctionComponent = ({ activeItem, basic, inverted, logout 
 				</Menu>
 
 				{allyCount !== null && !authenticated ? (
-					<div style={{ textAlign: "center" }}>
-						<Statistic inverted={inverted}>
-							<Statistic.Value>
-								<NumberFormat
-									displayType={"text"}
-									thousandSeparator={true}
-									value={allyCount}
-								/>
-							</Statistic.Value>
-							<Statistic.Label>Allies</Statistic.Label>
-						</Statistic>
-					</div>
+					<Fragment>
+						<List className="aboutList" horizontal inverted={inverted}>
+							<List.Item>
+								<Link href="/about">
+									<a>About</a>
+								</Link>
+							</List.Item>
+							<List.Item>
+								<Link href="/contact">
+									<a>Contact</a>
+								</Link>
+							</List.Item>
+							<List.Item>© 2020, Allies Only</List.Item>
+						</List>
+						<div style={{ textAlign: "center" }}>
+							<Statistic inverted={inverted}>
+								<Statistic.Value>
+									<NumberFormat
+										displayType={"text"}
+										thousandSeparator={true}
+										value={allyCount}
+									/>
+								</Statistic.Value>
+								<Statistic.Label>Allies</Statistic.Label>
+							</Statistic>
+						</div>
+					</Fragment>
 				) : null}
 			</div>
 		</Provider>

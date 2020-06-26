@@ -79,19 +79,25 @@ const User: React.FunctionComponent = ({
 		return <Image onError={(i) => (i.target.src = DefaultPic)} rounded src={imgSrc} />
 	}
 
+	const seoTitle = error ? "Not found" : name
+	const seoDescription = error
+		? "Become an ally in the fight against police brutality and corruption"
+		: `${name}'s interactions with the police on AlliesOnly`
+	const seoImage = {
+		height: 500,
+		src: img,
+		width: 500
+	}
+
 	return (
 		<Provider store={store}>
 			<DefaultLayout
 				activeItem={currentUser.id === id && bearer !== null ? "profile" : "allies"}
 				containerClassName="allyPage"
 				seo={{
-					description: `${name}'s interactions with the police on AlliesOnly`,
-					image: {
-						height: 200,
-						src: imgSrc,
-						width: 200
-					},
-					title: name,
+					description: seoDescription,
+					image: seoImage,
+					title: seoTitle,
 					url: username
 				}}
 				showFooter={false}
