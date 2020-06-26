@@ -37,6 +37,7 @@ const interaction = (state = initial(), action) => {
 						description: interaction.description,
 						id: interaction.id,
 						officers: interaction.officers,
+						thumbnail: interaction.thumbnail,
 						title: interaction.title,
 						user: interaction.user,
 						video: interaction.video,
@@ -90,7 +91,8 @@ const interaction = (state = initial(), action) => {
 					...state.interaction,
 					data: {
 						...state.interaction.data,
-						video: `${s3BaseUrl}${payload}`
+						thumbnail: `${s3BaseUrl}${payload.thumbnail}`,
+						video: `${s3BaseUrl}${payload.video}`
 					}
 				}
 			}
@@ -102,6 +104,7 @@ const interaction = (state = initial(), action) => {
 					...state.interaction,
 					data: {
 						...state.interaction.data,
+						thumbnail: `${s3BaseUrl}${payload.thumbnail}`,
 						video: `${s3BaseUrl}${payload.video}`
 					}
 				}

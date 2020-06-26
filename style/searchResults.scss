@@ -58,11 +58,9 @@
 					box-shadow: none !important;
 				}
 
-				video {
-					background: lighten($invertedBackgroundColor, 6%);
-					border-top-left-radius: 4px;
-					border-top-right-radius: 4px;
-					line-height: 0.8 !important;
+				.image {
+					height: 225px;
+					overflow-y: hidden;
 				}
 
 				.content {

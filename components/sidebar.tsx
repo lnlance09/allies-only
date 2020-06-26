@@ -173,34 +173,33 @@ const Sidebar: React.FunctionComponent = ({ activeItem, basic, inverted, logout 
 					)}
 				</Menu>
 
+				<List className="aboutList" horizontal inverted={inverted}>
+					<List.Item>
+						<Link href="/about">
+							<a>About</a>
+						</Link>
+					</List.Item>
+					<List.Item>
+						<Link href="/contact">
+							<a>Contact</a>
+						</Link>
+					</List.Item>
+					<List.Item>© 2020, Allies Only</List.Item>
+				</List>
+
 				{allyCount !== null && !authenticated ? (
-					<Fragment>
-						<List className="aboutList" horizontal inverted={inverted}>
-							<List.Item>
-								<Link href="/about">
-									<a>About</a>
-								</Link>
-							</List.Item>
-							<List.Item>
-								<Link href="/contact">
-									<a>Contact</a>
-								</Link>
-							</List.Item>
-							<List.Item>© 2020, Allies Only</List.Item>
-						</List>
-						<div style={{ textAlign: "center" }}>
-							<Statistic inverted={inverted}>
-								<Statistic.Value>
-									<NumberFormat
-										displayType={"text"}
-										thousandSeparator={true}
-										value={allyCount}
-									/>
-								</Statistic.Value>
-								<Statistic.Label>Allies</Statistic.Label>
-							</Statistic>
-						</div>
-					</Fragment>
+					<div style={{ textAlign: "center" }}>
+						<Statistic inverted={inverted}>
+							<Statistic.Value>
+								<NumberFormat
+									displayType={"text"}
+									thousandSeparator={true}
+									value={allyCount}
+								/>
+							</Statistic.Value>
+							<Statistic.Label>Allies</Statistic.Label>
+						</Statistic>
+					</div>
 				) : null}
 			</div>
 		</Provider>

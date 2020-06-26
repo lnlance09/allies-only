@@ -1,4 +1,4 @@
-import { Card, Container, Header, Item, Label, Segment, Visibility } from "semantic-ui-react"
+import { Card, Container, Header, Image, Item, Label, Segment, Visibility } from "semantic-ui-react"
 import { formatPlural } from "@utils/textFunctions"
 import { s3BaseUrl } from "@options/config"
 import AllyPic from "@public/images/avatar/large/joe.jpg"
@@ -7,8 +7,7 @@ import Link from "next/link"
 import Moment from "react-moment"
 import OfficerPic from "@public/images/avatar/officer.png"
 import PropTypes from "prop-types"
-import React, { Fragment, useState } from "react"
-import ReactPlayer from "react-player"
+import React, { useState } from "react"
 import Router from "next/router"
 
 const SearchResults: React.FunctionComponent = ({
@@ -76,7 +75,7 @@ const SearchResults: React.FunctionComponent = ({
 	const renderInteractionsList = () => {
 		return (
 			<Card.Group
-				className={`resultsList ${inverted ? "inverted" : ""}`}
+				className={`resultsList interactions ${inverted ? "inverted" : ""}`}
 				itemsPerRow={2}
 				stackable
 			>
@@ -87,13 +86,10 @@ const SearchResults: React.FunctionComponent = ({
 							key={`interaction${i}`}
 							onClick={() => Router.push(`/interactions/${result.id}`)}
 						>
-							<ReactPlayer
-								height="100%"
-								muted
-								playing={false}
-								style={{ lineHeight: 0.8 }}
-								url={result.video}
-								width="100%"
+							<Image
+								onError={(i) => (i.target.src = DefaultPic)}
+								src={result.img}
+								wrapped={false}
 							/>
 							<Card.Content>
 								<Card.Header>{result.title}</Card.Header>
@@ -124,7 +120,7 @@ const SearchResults: React.FunctionComponent = ({
 							onClick={() => Router.push(`/officers/${result.slug}`)}
 						>
 							<Item.Image
-								onError={(i) => (i.target.src = DefaultPic)}
+								onError={(i) => (i.target.src = OfficerPic)}
 								src={result.img === null ? OfficerPic : `${s3BaseUrl}${result.img}`}
 							/>
 							<Item.Content>

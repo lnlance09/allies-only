@@ -3,6 +3,7 @@ const Auth = require("../utils/authFunctions.ts")
 const Aws = require("../utils/awsFunctions.ts")
 const db = require("../models/index.ts")
 const axios = require("axios")
+const ffmpeg = require("fluent-ffmpeg")
 const fs = require("fs")
 const isJSON = require("is-json")
 const path = require("path")
@@ -21,7 +22,7 @@ const User = db.user
 const Op = db.Sequelize.Op
 
 exports.create = async (req, res) => {
-	const { department, description, file, officer, title } = req.body
+	const { department, description, file, officer, thumbnail, title } = req.body
 	const { authenticated, user } = Auth.parseAuthentication(req)
 
 	if (typeof title === "undefined" || title === "") {
@@ -41,14 +42,16 @@ exports.create = async (req, res) => {
 	Interaction.create({
 		departmentId: department,
 		description,
+		img: thumbnail,
 		title,
 		userId: authenticated ? user.data.id : 1,
 		video: file,
 		views: 1
 	})
-		.then((data) => {
+		.then(async (data) => {
 			const { id } = data.dataValues
 			const officers = JSON.parse(officer)
+
 			officers.map((o) => {
 				if (isNaN(o.value)) {
 					const names = o.value.split(" ")
@@ -105,7 +108,7 @@ exports.create = async (req, res) => {
 }
 
 exports.findAll = (req, res) => {
-	const { departmentId, officerId, page, q, userId } = req.query
+	const { departmentId, exclude, officerId, page, q, userId } = req.query
 
 	const limit = 20
 	let where = {
@@ -151,6 +154,10 @@ exports.findAll = (req, res) => {
 		userRequired = true
 	}
 
+	if (exclude) {
+		where.id = { [Op.notIn]: exclude }
+	}
+
 	const offset = isNaN(page) ? 0 : page * limit
 
 	Interaction.findAll({
@@ -158,6 +165,7 @@ exports.findAll = (req, res) => {
 			[db.Sequelize.col("interaction.createdAt"), "createdAt"],
 			[db.Sequelize.col("interaction.description"), "description"],
 			[db.Sequelize.col("interaction.id"), "id"],
+			[db.Sequelize.col("interaction.img"), "img"],
 			[db.Sequelize.col("interaction.title"), "title"],
 			[db.Sequelize.col("interaction.video"), "video"],
 			[db.Sequelize.col("interaction.views"), "views"],
@@ -220,6 +228,7 @@ exports.findOne = (req, res) => {
 			[db.Sequelize.col("interaction.createdAt"), "createdAt"],
 			[db.Sequelize.col("interaction.description"), "description"],
 			[db.Sequelize.col("interaction.id"), "id"],
+			[db.Sequelize.col("interaction.img"), "img"],
 			[db.Sequelize.col("interaction.title"), "title"],
 			[db.Sequelize.col("interaction.video"), "video"],
 			[db.Sequelize.col("interaction.views"), "views"],
@@ -350,6 +359,7 @@ exports.saveVideo = async (req, res) => {
 	if (exists) {
 		return res.status(200).send({
 			error: false,
+			thumbnail: `thumbnails/${type}-${id}.png`,
 			video: filePath
 		})
 	}
@@ -370,6 +380,34 @@ exports.saveVideo = async (req, res) => {
 				})
 			}
 
+			await ffmpeg()
+				.input(fs.createReadStream(video.file))
+				.screenshots({
+					count: 1,
+					filename: `${type}-${id}.png`,
+					folder: "thumbnails",
+					timemarks: [02]
+				})
+				.on("error", () => {
+					return res.status(500).send({
+						error: true,
+						msg: "There was en error creating the thumbnail"
+					})
+				})
+				.on("end", async () => {
+					await fs.readFile(`thumbnails/${type}-${id}.png`, async (err, data) => {
+						if (err) {
+							return res.status(500).send({
+								error: true,
+								msg: "There was en error creating the thumbnail"
+							})
+						}
+
+						await Aws.uploadToS3(data, `thumbnails/${type}-${id}.png`, false)
+						await fs.unlinkSync(`thumbnails/${type}-${id}.png`)
+					})
+				})
+
 			await fs.readFile(video.file, async (err, data) => {
 				if (err) {
 					throw err
@@ -384,6 +422,7 @@ exports.saveVideo = async (req, res) => {
 					})
 					return res.status(200).send({
 						error: false,
+						thumbnail: `thumbnails/${type}-${id}.png`,
 						video: filePath
 					})
 				} catch (err) {
@@ -414,12 +453,12 @@ exports.saveVideo = async (req, res) => {
 
 		video.on("info", (info) => {
 			console.log("Download started")
-			console.log("filename: " + info._filename)
-			console.log("size: " + info.size)
-			console.log("info", info)
+			// console.log("filename: " + info._filename)
+			// console.log("size: " + info.size)
+			// console.log("info", info)
 		})
 
-		video.on("error", (err) => {
+		video.on("error", () => {
 			return res.status(500).send({
 				error: true,
 				msg: "That link is not valid",
@@ -435,7 +474,35 @@ exports.saveVideo = async (req, res) => {
 					throw err
 				}
 
-				console.log("data", data)
+				await ffmpeg()
+					.input(fs.createReadStream(`uploads/${fileName}`))
+					.screenshots({
+						count: 1,
+						filename: `${type}-${id}.png`,
+						folder: "thumbnails",
+						timemarks: [02]
+					})
+					.on("error", () => {
+						return res.status(500).send({
+							error: true,
+							msg: "There was en error creating the thumbnail",
+							video: false
+						})
+					})
+					.on("end", async () => {
+						await fs.readFile(`thumbnails/${type}-${id}.png`, async (err, data) => {
+							if (err) {
+								return res.status(500).send({
+									error: true,
+									msg: "There was en error creating the thumbnail"
+								})
+							}
+
+							await Aws.uploadToS3(data, `thumbnails/${type}-${id}.png`, false)
+							await fs.unlinkSync(`thumbnails/${type}-${id}.png`)
+						})
+					})
+
 				await Aws.uploadToS3(data, filePath, false, "video/mp4")
 				await fs.unlinkSync(`uploads/${fileName}`)
 
@@ -445,13 +512,13 @@ exports.saveVideo = async (req, res) => {
 					})
 					return res.status(200).send({
 						error: false,
+						thumbnail: `thumbnails/${type}-${id}.png`,
 						video: filePath
 					})
 				} catch (err) {
 					return res.status(500).send({
 						error: true,
-						msg: "That link is not valid",
-						video: false
+						msg: "That link is not valid"
 					})
 				}
 			})
@@ -588,8 +655,40 @@ exports.uploadVideo = async (req, res) => {
 
 	const video = file.data
 	const timestamp = new Date().getTime()
-	const fileName = `interactions/${randomize("aa", 24)}-${timestamp}${ext}`
+	const fileId = `${randomize("aa", 24)}-${timestamp}`
+	const fileName = `interactions/${fileId}${ext}`
 	await Aws.uploadToS3(video, fileName, false, "video/mp4")
+
+	await fs.writeFile(`uploads/${fileId}${ext}`, video, (err, data) => {})
+
+	await ffmpeg()
+		.input(fs.createReadStream(`uploads/${fileId}${ext}`))
+		.screenshots({
+			count: 1,
+			filename: `${fileId}.png`,
+			folder: "thumbnails",
+			timemarks: [02]
+		})
+		.on("error", () => {
+			return res.status(500).send({
+				error: true,
+				msg: "There was en error creating the thumbnail"
+			})
+		})
+		.on("end", async () => {
+			await fs.readFile(`thumbnails/${fileId}.png`, async (err, data) => {
+				if (err) {
+					return res.status(500).send({
+						error: true,
+						msg: "There was en error creating the thumbnail"
+					})
+				}
+
+				await Aws.uploadToS3(data, `thumbnails/${fileId}.png`, false)
+				await fs.unlinkSync(`thumbnails/${fileId}.png`)
+				await fs.unlinkSync(`uploads/${fileId}${ext}`)
+			})
+		})
 
 	try {
 		await waitOn({
@@ -597,6 +696,7 @@ exports.uploadVideo = async (req, res) => {
 		})
 		return res.status(200).send({
 			error: false,
+			thumbnail: `thumbnails/${fileId}.png`,
 			video: fileName
 		})
 	} catch (err) {

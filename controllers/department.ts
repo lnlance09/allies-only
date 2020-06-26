@@ -144,7 +144,15 @@ exports.findAll = (req, res) => {
 				db.Sequelize.fn("concat", db.Sequelize.col("name"), "-", db.Sequelize.col("id")),
 				"key"
 			],
-			["name", "text"],
+			[
+				db.Sequelize.fn(
+					"concat",
+					db.Sequelize.col("name"),
+					" - ",
+					db.Sequelize.col("state")
+				),
+				"text"
+			],
 			["id", "value"]
 		]
 		include = null

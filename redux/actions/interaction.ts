@@ -14,6 +14,7 @@ export const createInteraction = ({
 	description,
 	file,
 	officer,
+	thumbnail,
 	title
 }) => (dispatch) => {
 	const formData = new FormData()
@@ -21,6 +22,7 @@ export const createInteraction = ({
 	formData.set("description", description)
 	formData.set("file", file)
 	formData.set("officer", JSON.stringify(officer))
+	formData.set("thumbnail", thumbnail)
 	formData.set("title", title)
 
 	axios
@@ -71,13 +73,19 @@ export const resetToInitial = () => (dispatch) => {
 	})
 }
 
-export const searchInteractions = ({ departmentId, officerId, page = 0, q = null, userId }) => (
-	dispatch
-) => {
+export const searchInteractions = ({
+	departmentId,
+	exclude,
+	officerId,
+	page = 0,
+	q = null,
+	userId
+}) => (dispatch) => {
 	axios
 		.get("/api/interaction/search", {
 			params: {
 				departmentId,
+				exclude,
 				officerId,
 				page,
 				q,
@@ -96,9 +104,12 @@ export const searchInteractions = ({ departmentId, officerId, page = 0, q = null
 		})
 }
 
-export const setVideo = ({ value }) => (dispatch) => {
+export const setVideo = ({ thumbnail, video }) => (dispatch) => {
 	dispatch({
-		payload: value,
+		payload: {
+			thumbnail,
+			video
+		},
 		type: constants.SET_VIDEO
 	})
 }

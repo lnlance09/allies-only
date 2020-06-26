@@ -1,6 +1,7 @@
 import {
 	createInteraction,
 	getInteraction,
+	searchInteractions,
 	setVideo,
 	updateInteraction,
 	updateViews,
@@ -45,9 +46,11 @@ import VideoInput from "@components/videoInput"
 
 const Interaction: React.FunctionComponent = ({
 	createInteraction,
-	interaction,
 	getInteraction,
+	interaction,
+	interactions,
 	inverted,
+	searchInteractions,
 	setVideo,
 	updateInteraction,
 	updateViews,
@@ -122,6 +125,8 @@ const Interaction: React.FunctionComponent = ({
 							})
 							setOfficer(officerValues)
 						}
+
+						searchInteractions({ exclude: [slug], page: 0 })
 					},
 					id: slug
 				})
@@ -148,6 +153,7 @@ const Interaction: React.FunctionComponent = ({
 			description,
 			file: interaction.data.video,
 			officer: selectedOfficers,
+			thumbnail: interaction.data.thumbnail,
 			title
 		})
 	}
@@ -156,6 +162,10 @@ const Interaction: React.FunctionComponent = ({
 		const q = e.target.value
 		const departmentOptions = await fetchDepartments({ q })
 		setDepartmentOptions(departmentOptions)
+	}
+
+	const loadMore = (exclude, page) => {
+		return searchInteractions({ exclude, page })
 	}
 
 	const onDrop = (files) => {
@@ -355,8 +365,12 @@ const Interaction: React.FunctionComponent = ({
 							</Divider>
 
 							<VideoInput
-								onPasteInstagram={(value) => setVideo(value)}
-								onPasteYouTube={(value) => setVideo(value)}
+								onPasteInstagram={({ thumbnail, video }) =>
+									setVideo({ thumbnail, video })
+								}
+								onPasteYouTube={({ thumbnail, video }) =>
+									setVideo({ thumbnail, video })
+								}
 								setLoading={setLoading}
 							/>
 						</Segment>
@@ -573,48 +587,53 @@ const Interaction: React.FunctionComponent = ({
 											)}
 										</Segment>
 
-										<Divider inverted={inverted} section />
-
 										{(editMode || !hasOfficers) && (
-											<Button
-												color="yellow"
-												content="Save"
-												fluid
-												inverted={inverted}
-												onClick={() =>
-													updateInteraction({
-														bearer,
-														callback: async (id) => {
-															await getInteraction({ id })
-															setEditMode(false)
-														},
-														department,
-														description,
-														id: interaction.data.id,
-														officer: selectedOfficers
-													})
-												}
-												size="big"
-											/>
+											<Fragment>
+												<Button
+													color="yellow"
+													content="Save"
+													fluid
+													inverted={inverted}
+													onClick={() =>
+														updateInteraction({
+															bearer,
+															callback: async (id) => {
+																await getInteraction({ id })
+																setEditMode(false)
+															},
+															department,
+															description,
+															id: interaction.data.id,
+															officer: selectedOfficers
+														})
+													}
+													size="big"
+												/>
+												<Divider inverted={inverted} section />
+											</Fragment>
 										)}
 
-										{/*
-										{!error && !loading ? (
+										<Header
+											as="h3"
+											content="More Interactions"
+											inverted={inverted}
+											size="large"
+										/>
+
+										{!interaction.error && !interaction.loading ? (
 											<SearchResults
 												hasMore={interactions.hasMore}
 												inverted={inverted}
 												justImages
 												loading={interactions.loading}
-												loadMore={({ page, userId }) =>
-													loadMore(page, userId)
+												loadMore={({ exclude, page }) =>
+													loadMore(exclude, page)
 												}
 												page={interactions.page}
 												results={interactions.results}
 												type="interactions"
-												userId={id}
 											/>
 										) : null}
-										*/}
 									</Fragment>
 								)}
 							</Container>
@@ -649,6 +668,7 @@ Interaction.propTypes = {
 					slug: PropTypes.string
 				})
 			),
+			thumbnail: PropTypes.string,
 			title: PropTypes.string,
 			user: PropTypes.shape({
 				id: PropTypes.number,
@@ -663,7 +683,23 @@ Interaction.propTypes = {
 		errorMsg: PropTypes.string,
 		loading: PropTypes.bool
 	}),
+	interactions: PropTypes.shape({
+		hasMore: PropTypes.bool,
+		loading: PropTypes.bool,
+		page: PropTypes.number,
+		results: PropTypes.arrayOf(
+			PropTypes.oneOfType([
+				PropTypes.bool,
+				PropTypes.shape({
+					createdAt: PropTypes.string,
+					description: PropTypes.string,
+					video: PropTypes.string
+				})
+			])
+		)
+	}),
 	inverted: PropTypes.bool,
+	searchInteractions: PropTypes.func,
 	setVideo: PropTypes.func,
 	updateInteraction: PropTypes.func,
 	updateViews: PropTypes.func,
@@ -684,6 +720,13 @@ Interaction.defaultProps = {
 		errorMsg: "",
 		loading: true
 	},
+	interactions: {
+		hasMore: false,
+		loading: true,
+		page: 0,
+		results: [false, false, false, false, false, false]
+	},
+	searchInteractions,
 	setVideo,
 	updateInteraction,
 	updateViews,
@@ -699,6 +742,7 @@ export default compose(
 	connect(mapStateToProps, {
 		createInteraction,
 		getInteraction,
+		searchInteractions,
 		setVideo,
 		updateInteraction,
 		updateViews,

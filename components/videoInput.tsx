@@ -49,9 +49,10 @@ const VideoInput: React.FunctionComponent = ({ onPasteInstagram, onPasteYouTube,
 		setLoading(true)
 
 		const id = paths[1]
-		const videoUrl = await fetchVideo(id, "instagram")
-		if (videoUrl) {
-			onPasteInstagram({ value: videoUrl })
+		const videoInfo = await fetchVideo(id, "instagram")
+		const { thumbnail, video } = videoInfo
+		if (videoInfo) {
+			onPasteInstagram({ thumbnail, video })
 		}
 
 		setLoading(false)
@@ -73,9 +74,10 @@ const VideoInput: React.FunctionComponent = ({ onPasteInstagram, onPasteYouTube,
 		setInstagramUrl("")
 		setLoading(true)
 
-		const videoUrl = await fetchVideo(qs.v, "youtube")
-		if (videoUrl) {
-			onPasteYouTube({ value: videoUrl })
+		const videoInfo = await fetchVideo(qs.v, "youtube")
+		const { thumbnail, video } = videoInfo
+		if (videoInfo) {
+			onPasteYouTube({ thumbnail, video })
 		}
 
 		setLoading(false)
@@ -88,7 +90,11 @@ const VideoInput: React.FunctionComponent = ({ onPasteInstagram, onPasteYouTube,
 				type
 			})
 			.then((response) => {
-				return response.data.video
+				const { thumbnail, video } = response.data
+				return {
+					thumbnail,
+					video
+				}
 			})
 			.catch((error) => {
 				toast.error(error.response.data.msg)

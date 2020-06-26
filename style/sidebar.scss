@@ -40,8 +40,8 @@
                 color: $lightGrey;
 
                 &:hover {
-                    color: $lightGrey !important;
                     border-bottom: solid 1px $white;
+                    color: $lightGrey !important;
                     padding-bottom: 3px;
                 }
             }

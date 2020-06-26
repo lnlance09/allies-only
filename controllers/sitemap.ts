@@ -81,6 +81,9 @@ exports.sitemap = async (req, res) => {
 		smStream.write({ url: "/signin", changefreq: "monthly", priority: 0.4 })
 		smStream.write({ url: "/signin?type=join", changefreq: "monthly", priority: 0.4 })
 
+		smStream.write({ url: "/about", changefreq: "monthly", priority: 0.4 })
+		smStream.write({ url: "/contact", changefreq: "monthly", priority: 0.4 })
+
 		smStream.end()
 
 		streamToPromise(pipeline).then((sm) => (sitemap = sm))

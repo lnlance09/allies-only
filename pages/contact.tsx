@@ -29,16 +29,16 @@ const Contact: React.FunctionComponent = ({ inverted }) => {
 	return (
 		<DefaultLayout
 			activeItem={null}
-			containerClassName="aboutPage"
+			containerClassName="contactPage"
 			seo={{
-				description: "About Allies Only. How it works and what our goals are.",
+				description: "Contact Us",
 				image: {
 					height: 500,
 					src: "/public/images/logos/logo.png",
 					width: 500
 				},
-				title: "About",
-				url: "about"
+				title: "Contact",
+				url: "contact"
 			}}
 			showFooter={false}
 		>

@@ -77,7 +77,7 @@ body {
 			color: $lightGrey;
 
 			&:hover {
-				color: darken($lightGrey, 5%) !important;
+				color: $lightGrey !important;
 			}
 		}
 	}
@@ -178,6 +178,15 @@ body {
 }
 
 .interactionsPage {
+	.header {
+		a {
+			&:hover {
+				border-bottom: solid 1px $white;
+                color: $lightGrey !important;
+            	padding-bottom: 3px;
+			}
+		}
+	}
 	video {
 		border-radius: 4px;
 	}
