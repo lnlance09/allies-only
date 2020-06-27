@@ -14,6 +14,8 @@ import {
 	List,
 	Loader
 } from "semantic-ui-react"
+import { RootState } from "@store/reducer"
+import { InitialPageState } from "@interfaces/options"
 import { formatPlural } from "@utils/textFunctions"
 import { Provider, connect } from "react-redux"
 import { fetchCities } from "@options/cities"
@@ -25,9 +27,9 @@ import MapBox from "@components/mapBox"
 import PropTypes from "prop-types"
 import React, { useEffect, useState, Fragment } from "react"
 import SearchResults from "@components/searchResults"
-import store from "@store"
+import store from "@store/index"
 
-const Department: React.FunctionComponent = ({
+const Department: React.FC = ({
 	createDepartment,
 	department,
 	getDepartment,
@@ -79,7 +81,7 @@ const Department: React.FunctionComponent = ({
 		setLocationOptions(locationOptions)
 	}
 
-	const loadMore = (page, departmentId) => {
+	const loadMore = (page: number, departmentId: number) => {
 		if (activeItem === "officers") {
 			return searchOfficers({ departmentId, page })
 		}
@@ -392,7 +394,7 @@ Department.defaultProps = {
 	searchOfficers
 }
 
-const mapStateToProps = (state: any, ownProps: any) => ({
+const mapStateToProps = (state: RootState, ownProps: InitialPageState) => ({
 	...state.department,
 	...ownProps
 })

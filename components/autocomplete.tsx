@@ -9,7 +9,7 @@ import React, { Fragment, useEffect, useState } from "react"
 import Router from "next/router"
 import useDebounce from "@utils/debounce"
 
-const categoryRenderer = ({ name }) => {
+const categoryRenderer = ({ name }: { name: string }) => {
 	return (
 		<Segment basic className="categoryItem" fluid>
 			<Header inverted>{name}</Header>
@@ -21,7 +21,19 @@ categoryRenderer.propTypes = {
 	name: PropTypes.string
 }
 
-const resultRenderer = ({ departmentName, img, name, type, username }) => {
+const resultRenderer = ({
+	departmentName,
+	img,
+	name,
+	type,
+	username
+}: {
+	departmentName: string,
+	img: string,
+	name: string,
+	type: string,
+	username: string
+}) => {
 	return (
 		<div className="searchItem">
 			{type === "officer" && (
@@ -58,7 +70,7 @@ resultRenderer.propTypes = {
 	username: PropTypes.string
 }
 
-const Autocomplete: React.FunctionComponent = ({ category, disabled, placeholder, width }) => {
+const Autocomplete: React.FC = ({ category, disabled, placeholder, width }) => {
 	const [loading, setLoading] = useState(false)
 	const [q, setQ] = useState("")
 	const [results, setResults] = useState([])

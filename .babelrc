@@ -14,11 +14,13 @@
 		[
 			"module-resolver",
 			{
+				"root": ["./"],
 				"alias": {
 					"@actions": "./redux/actions",
 					"@components": "./components",
 					"@controllers": "./controllers",
 					"@dummy": "./dummy",
+					"@interfaces": "./interfaces",
 					"@layouts": "./layouts",
 					"@lib": "./lib",
 					"@models": "./models",
@@ -31,7 +33,8 @@
 					"@store": "./store",
 					"@sagas": "./sagas",
 					"@utils": "./utils"
-				}
+				},
+				"extensions": [".ts", ".tsx"]
 			}
 		]
 	],

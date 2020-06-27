@@ -10,7 +10,7 @@ const s3 = new AWS.S3({
 })
 
 module.exports = {
-	fileExists: async function (fileName) {
+	fileExists: async function (fileName: string) {
 		const exists = await s3
 			.headObject({
 				Bucket: bucketName,
@@ -28,7 +28,12 @@ module.exports = {
 			)
 		return exists
 	},
-	uploadToS3: async function (file, fileName, useBuffer = true, contentType = "image/jpeg") {
+	uploadToS3: async function (
+		file: string,
+		fileName: string,
+		useBuffer = true,
+		contentType = "image/jpeg"
+	) {
 		let body = file
 		if (useBuffer) {
 			const base64 = file.replace(/^data:image\/\w+;base64,/, "")

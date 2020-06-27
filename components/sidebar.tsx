@@ -1,6 +1,8 @@
 import { logout } from "@actions/authentication"
 import { parseJwt } from "@utils/tokenFunctions"
 import { Button, Divider, Icon, List, Menu, Statistic } from "semantic-ui-react"
+import { RootState } from "@store/reducer"
+import { InitialPageState } from "@interfaces/options"
 import { useRouter } from "next/router"
 import { Provider, connect } from "react-redux"
 import axios from "axios"
@@ -11,7 +13,17 @@ import React, { Fragment, useEffect, useState } from "react"
 import Router from "next/router"
 import store from "@store"
 
-const Sidebar: React.FunctionComponent = ({ activeItem, basic, inverted, logout }) => {
+const Sidebar: React.FC = ({
+	activeItem,
+	basic,
+	inverted,
+	logout
+}: {
+	activeItem: string,
+	basic: boolean,
+	inverted: boolean,
+	logout: void
+}) => {
 	const router = useRouter()
 
 	const [allyCount, setAllyCount] = useState(null)
@@ -221,7 +233,7 @@ Sidebar.defaultProps = {
 	logout
 }
 
-const mapStateToProps = (state: any, ownProps: any) => ({
+const mapStateToProps = (state: RootState, ownProps: InitialPageState) => ({
 	...state.authentication,
 	...ownProps
 })

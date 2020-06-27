@@ -1,7 +1,7 @@
 // Auth
 export const CHANGE_PASSWORD = "authentication:CHANGE_PASSWORD"
 export const LOGOUT = "authentication:LOGOUT"
-export const RESET_PASSWORD_PROPS = "authentication:RESET_PASSWORD_PROPS"
+export const RESET_PASSWORD = "authentication:RESET_PASSWORD"
 export const SET_LOGIN_ERROR = "authentication:SET_LOGIN_ERROR"
 export const SET_REGISTER_ERROR = "authentication:SET_REGISTER_ERROR"
 export const SET_USER_DATA = "authentication:SET_USER_DATA"

@@ -1,5 +1,7 @@
 import { searchInteractions } from "@actions/interaction"
 import { Button, Container, Divider, Header } from "semantic-ui-react"
+import { RootState } from "@store/reducer"
+import { InitialPageState } from "@interfaces/options"
 import { DebounceInput } from "react-debounce-input"
 import { Provider, connect } from "react-redux"
 import { useRouter } from "next/router"
@@ -123,7 +125,7 @@ Interactions.defaultProps = {
 	searchInteractions
 }
 
-const mapStateToProps = (state: any, ownProps: any) => ({
+const mapStateToProps = (state: RootState, ownProps: InitialPageState) => ({
 	...state.interaction,
 	...ownProps
 })

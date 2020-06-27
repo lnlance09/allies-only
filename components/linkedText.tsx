@@ -5,14 +5,14 @@ import Linkify from "linkifyjs/react"
 import PropTypes from "prop-types"
 import React from "react"
 
-const LinkedText: React.FunctionComponent = ({ text }) => {
+const LinkedText: React.FC = ({ text }: { text: string }) => {
 	hashtag(linkify)
 
 	return (
 		<Linkify
 			options={{
 				formatHref: {
-					hashtag: (val) => `${baseUrl}explore/memes?q=${val.substr(1)}`
+					// hashtag: (val) => `${baseUrl}explore/memes?q=${val.substr(1)}`
 				}
 			}}
 		>

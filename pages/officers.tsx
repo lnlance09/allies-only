@@ -1,5 +1,7 @@
 import { searchOfficers } from "@actions/officer"
 import { Button, Container, Divider, Header } from "semantic-ui-react"
+import { RootState } from "@store/reducer"
+import { InitialPageState } from "@interfaces/options"
 import { DebounceInput } from "react-debounce-input"
 import { Provider, connect } from "react-redux"
 import { useRouter } from "next/router"
@@ -23,7 +25,7 @@ const Officers: React.FunctionComponent = ({ inverted, officers, searchOfficers 
 	}, [q])
 
 	const loadMore = (page, q) => {
-		return searchOfficers({ page, q: searchVal })
+		return searchOfficers({ page, q })
 	}
 
 	const searchForResults = (e) => {
@@ -125,7 +127,7 @@ Officers.defaultProps = {
 	searchOfficers
 }
 
-const mapStateToProps = (state: any, ownProps: any) => ({
+const mapStateToProps = (state: RootState, ownProps: InitialPageState) => ({
 	...state.officer,
 	...ownProps
 })

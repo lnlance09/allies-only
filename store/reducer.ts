@@ -5,10 +5,14 @@ import interaction from "@reducers/interaction"
 import officer from "@reducers/officer"
 import user from "@reducers/user"
 
-export default combineReducers({
+const rootReducer = combineReducers({
 	authentication,
 	department,
 	interaction,
 	officer,
 	user
 })
+
+export default rootReducer
+
+export type RootState = ReturnType<typeof rootReducer>

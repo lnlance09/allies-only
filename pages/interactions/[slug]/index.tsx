@@ -23,6 +23,8 @@ import {
 	Segment,
 	TextArea
 } from "semantic-ui-react"
+import { RootState } from "@store/reducer"
+import { InitialPageState } from "@interfaces/options"
 import { Provider, connect } from "react-redux"
 import { fetchDepartments } from "@options/departments"
 import { fetchOfficers } from "@options/officers"
@@ -291,7 +293,7 @@ const Interaction: React.FunctionComponent = ({
 
 	let seoTitle = "Add an Ineraction"
 	let seoDescription = "Help document police brutality"
-	let seoImage = {
+	const seoImage = {
 		height: 500,
 		src: "/public/images/logos/logo.png",
 		width: 500
@@ -733,7 +735,7 @@ Interaction.defaultProps = {
 	uploadVideo
 }
 
-const mapStateToProps = (state: any, ownProps: any) => ({
+const mapStateToProps = (state: RootState, ownProps: InitialPageState) => ({
 	...state.interaction,
 	...ownProps
 })

@@ -1,5 +1,7 @@
 import { searchUsers } from "@actions/user"
 import { Container, Divider, Header } from "semantic-ui-react"
+import { RootState } from "@store/reducer"
+import { InitialPageState } from "@interfaces/options"
 import { DebounceInput } from "react-debounce-input"
 import { Provider, connect } from "react-redux"
 import { useRouter } from "next/router"
@@ -23,7 +25,7 @@ const Allies: React.FunctionComponent = ({ inverted, searchUsers, users }) => {
 	}, [q])
 
 	const loadMore = (page, q) => {
-		return searchUsers({ page, q: searchVal })
+		return searchUsers({ page, q })
 	}
 
 	const searchForResults = (e) => {
@@ -113,7 +115,7 @@ Allies.defaultProps = {
 	}
 }
 
-const mapStateToProps = (state: any, ownProps: any) => ({
+const mapStateToProps = (state: RootState, ownProps: InitialPageState) => ({
 	...state.user,
 	...ownProps
 })

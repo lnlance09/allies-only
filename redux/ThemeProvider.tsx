@@ -12,7 +12,7 @@ const themes = {
 
 const { Provider, Consumer } = React.createContext(themes)
 
-export const ThemeProvider = ({ children }) => {
+export const ThemeProvider = ({ children }: { children: JSX.Element }): JSX.Element => {
 	return <Provider value={themes}>{children}</Provider>
 }
 
@@ -21,7 +21,7 @@ ThemeProvider.propTypes = {
 }
 
 export const withTheme = (theme: string) => {
-	return (Component) => (props) => (
+	return (Component: React.FC) => (props: JSX.Element[] | JSX.Element): JSX.Element => (
 		<Consumer>
 			{(themes) => {
 				return (

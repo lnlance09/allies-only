@@ -13,6 +13,8 @@ import {
 	List,
 	Loader
 } from "semantic-ui-react"
+import { RootState } from "@store/reducer"
+import { InitialPageState } from "@interfaces/options"
 import { formatPlural } from "@utils/textFunctions"
 import { parseJwt } from "@utils/tokenFunctions"
 import { Provider, connect } from "react-redux"
@@ -44,7 +46,6 @@ const Officer: React.FunctionComponent = ({
 
 	const [bearer, setBearer] = useState(null)
 	const [createMode, setCreateMode] = useState(null)
-	const [currentUser, setCurrentUser] = useState({})
 	const [department, setDepartment] = useState("")
 	const [departmentOptions, setDepartmentOptions] = useState([])
 	const [firstName, setFirstName] = useState("")
@@ -56,7 +57,6 @@ const Officer: React.FunctionComponent = ({
 			const userData = parseJwt()
 			if (userData) {
 				setBearer(localStorage.getItem("jwtToken"))
-				setCurrentUser(userData)
 			}
 
 			if (slug === "create") {
@@ -112,11 +112,11 @@ const Officer: React.FunctionComponent = ({
 		setDepartment(value)
 	}
 
-	let seoTitle = error ? "Not found" : name
-	let seoDescription = error
+	const seoTitle = error ? "Not found" : name
+	const seoDescription = error
 		? "Become an ally in the fight against police brutality and corruption"
 		: `${name}'s interactions with the police on AlliesOnly`
-	let seoImage = {
+	const seoImage = {
 		height: 500,
 		src: img,
 		width: 500
@@ -348,7 +348,7 @@ Officer.propTypes = {
 					createdAt: PropTypes.string,
 					description: PropTypes.string,
 					officer: PropTypes.shape({
-						name: PropTypes.name
+						name: PropTypes.string
 					})
 				})
 			)
@@ -379,7 +379,7 @@ Officer.defaultProps = {
 	updateImg
 }
 
-const mapStateToProps = (state: any, ownProps: any) => ({
+const mapStateToProps = (state: RootState, ownProps: InitialPageState) => ({
 	...state.officer,
 	...ownProps
 })

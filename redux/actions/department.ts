@@ -1,13 +1,28 @@
 import * as constants from "../constants"
 import { toast } from "react-toastify"
 import { getConfig } from "@options/toast"
+import {
+	CreateDepartmentAction,
+	CreateDepartmentPayload,
+	GetDepartmentAction,
+	SearchDepartmentsAction,
+	SetDepartmentErrorAction,
+	UpdateDepartmentAction,
+	UpdateDepartmentPayload
+} from "@interfaces/department"
+import { GetItemPayload, PaginationPayload } from "@interfaces/options"
+import { AppDispatch } from "@store"
 import axios from "axios"
 import Router from "next/router"
 
 const toastConfig = getConfig()
 toast.configure(toastConfig)
 
-export const createDepartment = ({ callback = () => null, city, name }) => (dispatch) => {
+export const createDepartment = ({
+	callback = () => null,
+	city,
+	name
+}: CreateDepartmentPayload): CreateDepartmentAction => (dispatch: AppDispatch) => {
 	axios
 		.post("/api/department/create", {
 			city,
@@ -29,7 +44,10 @@ export const createDepartment = ({ callback = () => null, city, name }) => (disp
 		})
 }
 
-export const getDepartment = ({ callback = () => null, id }) => (dispatch) => {
+export const getDepartment = ({
+	callback = () => null,
+	id
+}: GetItemPayload): GetDepartmentAction | SetDepartmentErrorAction => (dispatch: AppDispatch) => {
 	axios
 		.get(`/api/department/${id}`)
 		.then(async (response) => {
@@ -43,14 +61,16 @@ export const getDepartment = ({ callback = () => null, id }) => (dispatch) => {
 				callback(data.department.id)
 			}
 		})
-		.catch((error) => {
+		.catch(() => {
 			dispatch({
 				type: constants.SET_DEPARTMENT_FETCH_ERROR
 			})
 		})
 }
 
-export const searchDepartments = ({ page = 0, q }) => (dispatch) => {
+export const searchDepartments = ({ page = 0, q }: PaginationPayload): SearchDepartmentsAction => (
+	dispatch: AppDispatch
+) => {
 	axios
 		.get("/api/department/search", {
 			params: {
@@ -70,7 +90,12 @@ export const searchDepartments = ({ page = 0, q }) => (dispatch) => {
 		})
 }
 
-export const updateDepartment = ({ bearer, callback = () => null, data, id }) => (dispatch) => {
+export const updateDepartment = ({
+	bearer,
+	callback = () => null,
+	data,
+	id
+}: UpdateDepartmentPayload): UpdateDepartmentAction => (dispatch: AppDispatch) => {
 	axios
 		.post(`/api/department/${id}/update`, data, {
 			headers: {

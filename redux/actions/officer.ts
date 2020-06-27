@@ -1,6 +1,17 @@
 import * as constants from "../constants"
 import { toast } from "react-toastify"
 import { getConfig } from "@options/toast"
+import {
+	CreateOfficerPayload,
+	GetOfficerAction,
+	ResetOfficerAction,
+	SetOfficerErrorAction,
+	UpdateImgPayload,
+	UpdateOfficerImgAction,
+	UpdateOfficerPayload
+} from "@interfaces/officer"
+import { GetItemPayload, PaginationPayload } from "@interfaces/options"
+import { AppDispatch } from "@store"
 import axios from "axios"
 import Router from "next/router"
 
@@ -13,7 +24,7 @@ export const createOfficer = ({
 	department,
 	firstName,
 	lastName
-}) => (dispatch) => {
+}: CreateOfficerPayload): void => (dispatch: AppDispatch) => {
 	axios
 		.post(
 			"/api/officer/create",
@@ -45,7 +56,10 @@ export const createOfficer = ({
 		})
 }
 
-export const getOfficer = ({ callback = () => null, id }) => (dispatch) => {
+export const getOfficer = ({
+	callback = () => null,
+	id
+}: GetItemPayload): GetOfficerAction | SetOfficerErrorAction => (dispatch) => {
 	axios
 		.get(`/api/officer/${id}`)
 		.then(async (response) => {
@@ -66,7 +80,17 @@ export const getOfficer = ({ callback = () => null, id }) => (dispatch) => {
 		})
 }
 
-export const searchOfficers = ({ departmentId = null, page = 0, q = null }) => (dispatch) => {
+export const resetToInitial = (): ResetOfficerAction => (dispatch: AppDispatch): void => {
+	dispatch({
+		type: constants.RESET_OFFICER_TO_INITIAL
+	})
+}
+
+export const searchOfficers = ({
+	departmentId = null,
+	page = 0,
+	q = null
+}: PaginationPayload): void => (dispatch: AppDispatch) => {
 	axios
 		.get("/api/officer/search", {
 			params: {
@@ -87,13 +111,9 @@ export const searchOfficers = ({ departmentId = null, page = 0, q = null }) => (
 		})
 }
 
-export const resetToInitial = () => (dispatch) => {
-	dispatch({
-		type: constants.RESET_OFFICER_TO_INITIAL
-	})
-}
-
-export const updateImg = ({ bearer, file, id }) => (dispatch) => {
+export const updateImg = ({ bearer, file, id }: UpdateImgPayload): UpdateOfficerImgAction => (
+	dispatch: AppDispatch
+) => {
 	const formData = new FormData()
 	formData.set("file", file)
 
@@ -117,7 +137,12 @@ export const updateImg = ({ bearer, file, id }) => (dispatch) => {
 		})
 }
 
-export const updateOfficer = ({ bearer, callback = () => null, data, id }) => (dispatch) => {
+export const updateOfficer = ({
+	bearer,
+	callback = () => null,
+	data,
+	id
+}: UpdateOfficerPayload): void => (dispatch: AppDispatch) => {
 	axios
 		.post(`/api/officer/${id}/update`, data, {
 			headers: {

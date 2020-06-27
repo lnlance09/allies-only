@@ -4,6 +4,7 @@ import { toast } from "react-toastify"
 import { getConfig } from "@options/toast"
 import axios from "axios"
 import DefaultLayout from "@layouts/default"
+import PropTypes from "prop-types"
 import React, { useState } from "react"
 
 const toastConfig = getConfig()
@@ -71,6 +72,10 @@ const Contact: React.FunctionComponent = ({ inverted }) => {
 			</Container>
 		</DefaultLayout>
 	)
+}
+
+Contact.propTypes = {
+	inverted: PropTypes.bool
 }
 
 export default withTheme("dark")(Contact)

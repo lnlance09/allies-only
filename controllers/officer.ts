@@ -10,7 +10,6 @@ const validator = require("validator")
 const waitOn = require("wait-on")
 /* eslint-enable */
 const Department = db.department
-const Interaction = db.interaction
 const Officer = db.officer
 const OfficerInteraction = db.officerInteraction
 const Op = db.Sequelize.Op
@@ -301,7 +300,6 @@ exports.findOne = async (req, res) => {
 			}
 
 			const officer = officers[0]
-
 			if (officer.id === null) {
 				return res.status(404).send({
 					error: true,
@@ -349,6 +347,10 @@ exports.update = async (req, res) => {
 	const updateData = {}
 	if (typeof firstName !== "undefined" && firstName !== "") {
 		updateData.firstName = firstName
+	}
+
+	if (typeof lastName !== "undefined" && lastName !== "") {
+		updateData.lastName = lastName
 	}
 
 	Officer.update(updateData, {

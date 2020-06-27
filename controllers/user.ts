@@ -227,7 +227,7 @@ exports.create = async (req, res) => {
 }
 
 exports.findAll = async (req, res) => {
-	const { forAutocomplete, forOptions, page, q, userId } = req.query
+	const { forAutocomplete, page, q } = req.query
 
 	let limit = 20
 	let order = [[db.Sequelize.col("interactionCount"), "DESC"]]

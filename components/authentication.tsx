@@ -4,12 +4,14 @@ import {
 	submitVerificationForm
 } from "@actions/authentication"
 import { Button, Divider, Form, Header, Input, Segment } from "semantic-ui-react"
+import { RootState } from "@store/reducer"
+import { InitialPageState } from "@interfaces/options"
 import { Provider, connect } from "react-redux"
 import PropTypes from "prop-types"
 import React, { Fragment, useCallback, useState } from "react"
-import store from "@store"
+import store from "@store/index"
 
-const Authentication: React.FunctionComponent = (props) => {
+const Authentication: React.FC = (props) => {
 	const [buttonText, setButtonText] = useState(props.login ? "Create an account" : "Sign in")
 	const [email, setEmail] = useState("")
 	const [headerText, setHeaderText] = useState(props.login ? "Sign In" : "Sign Up")
@@ -291,7 +293,7 @@ Authentication.defaultProps = {
 	submitVerificationForm
 }
 
-const mapStateToProps = (state: any, ownProps: any) => ({
+const mapStateToProps = (state: RootState, ownProps: InitialPageState) => ({
 	...state.authentication,
 	...ownProps
 })

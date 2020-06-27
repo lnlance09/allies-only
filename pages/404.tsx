@@ -10,6 +10,8 @@ import {
 	Label,
 	Placeholder
 } from "semantic-ui-react"
+import { RootState } from "@store/reducer"
+import { InitialPageState } from "@interfaces/options"
 import { s3BaseUrl } from "@options/config"
 import { parseJwt } from "@utils/tokenFunctions"
 import { useRouter } from "next/router"
@@ -209,7 +211,7 @@ User.defaultProps = {
 	searchInteractions
 }
 
-const mapStateToProps = (state: any, ownProps: any) => ({
+const mapStateToProps = (state: RootState, ownProps: InitialPageState) => ({
 	...state.user,
 	...ownProps
 })

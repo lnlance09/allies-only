@@ -1,5 +1,4 @@
 import * as constants from "../constants"
-import { getCookies } from "@utils/auth"
 
 const initial = () => ({
 	data: {},
@@ -22,7 +21,7 @@ const authentication = (state = initial(), action) => {
 		case constants.LOGOUT:
 			return initial()
 
-		case constants.RESET_PASSWORD_PROPS:
+		case constants.RESET_PASSWORD:
 			return {
 				...state,
 				loading: false,

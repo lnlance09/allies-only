@@ -1,6 +1,19 @@
 import * as constants from "../constants"
 import { toast } from "react-toastify"
 import { getConfig } from "@options/toast"
+import {
+	CreateInteractionPayload,
+	GetInteractionAction,
+	Interaction,
+	ResetInteractionAction,
+	SearchInteractionsAction,
+	SetVideoAction,
+	SetVideoPayload,
+	UpdateViewsPayload,
+	UploadVideoPayload
+} from "@interfaces/interaction"
+import { GetItemPayload, PaginationPayload } from "@interfaces/options"
+import { AppDispatch } from "@store"
 import axios from "axios"
 import Router from "next/router"
 
@@ -16,7 +29,7 @@ export const createInteraction = ({
 	officer,
 	thumbnail,
 	title
-}) => (dispatch) => {
+}: CreateInteractionPayload) => (): void => {
 	const formData = new FormData()
 	formData.set("department", department)
 	formData.set("description", description)
@@ -45,7 +58,10 @@ export const createInteraction = ({
 		})
 }
 
-export const getInteraction = ({ callback = () => null, id }) => (dispatch) => {
+export const getInteraction = ({
+	callback = () => null,
+	id
+}: GetItemPayload): GetInteractionAction => (dispatch: AppDispatch) => {
 	axios
 		.get(`/api/interaction/${id}`)
 		.then(async (response) => {
@@ -60,14 +76,14 @@ export const getInteraction = ({ callback = () => null, id }) => (dispatch) => {
 				callback(interaction.department.id, interaction.description, interaction.officers)
 			}
 		})
-		.catch((error) => {
+		.catch(() => {
 			dispatch({
 				type: constants.SET_INTERACTION_FETCH_ERROR
 			})
 		})
 }
 
-export const resetToInitial = () => (dispatch) => {
+export const resetToInitial = (): ResetInteractionAction => (dispatch: AppDispatch) => {
 	dispatch({
 		type: constants.RESET_INTERACTION_TO_INITIAL
 	})
@@ -80,7 +96,7 @@ export const searchInteractions = ({
 	page = 0,
 	q = null,
 	userId
-}) => (dispatch) => {
+}: PaginationPayload): SearchInteractionsAction => (dispatch: AppDispatch) => {
 	axios
 		.get("/api/interaction/search", {
 			params: {
@@ -104,7 +120,9 @@ export const searchInteractions = ({
 		})
 }
 
-export const setVideo = ({ thumbnail, video }) => (dispatch) => {
+export const setVideo = ({ thumbnail, video }: SetVideoPayload): SetVideoAction => (
+	dispatch: AppDispatch
+) => {
 	dispatch({
 		payload: {
 			thumbnail,
@@ -121,7 +139,7 @@ export const updateInteraction = ({
 	description,
 	id,
 	officer
-}) => () => {
+}: CreateInteractionPayload): void => () => {
 	axios
 		.post(
 			`/api/interaction/${id}/update`,
@@ -147,7 +165,7 @@ export const updateInteraction = ({
 		})
 }
 
-export const updateViews = ({ id }) => (dispatch) => {
+export const updateViews = ({ id }: UpdateViewsPayload): void => () => {
 	axios
 		.post(`/api/interaction/${id}/updateViews`)
 		.then(() => null)
@@ -156,7 +174,9 @@ export const updateViews = ({ id }) => (dispatch) => {
 		})
 }
 
-export const uploadVideo = ({ callback = () => null, file }) => (dispatch) => {
+export const uploadVideo = ({ callback = () => null, file }: UploadVideoPayload): Interaction => (
+	dispatch: AppDispatch
+) => {
 	const formData = new FormData()
 	formData.set("file", file)
 

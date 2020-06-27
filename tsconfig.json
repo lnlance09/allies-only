@@ -1,14 +1,15 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "esnext",
     "lib": [
       "dom",
       "dom.iterable",
       "esnext"
     ],
     "allowJs": true,
+    "declaration": false,
     "skipLibCheck": true,
-    "strict": false,
+    "strict": true,
     "strictNullChecks": true,
     "noImplicitAny": true,
     "noImplicitReturns": true,
@@ -19,54 +20,59 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve"
-  },
-  "paths": {
-    "@actions/*": [
-      "redux/actions/*"
-    ],
-    "@components/*": [
-      "components/*"
-    ],
-    "@controllers/*": [
-      "controllers/*"
-    ],
-    "@layouts/*": [
-      "layouts/*"
-    ],
-    "@lib/*": [
-      "lib/*"
-    ],
-    "@models/*": [
-      "models/*"
-    ],
-    "@options/*": [
-      "options/*"
-    ],
-    "@public/*": [
-      "public/*"
-    ],
-    "@reducers/*": [
-      "redux/reducers/*"
-    ],
-    "@redux/*": [
-      "redux/*"
-    ],
-    "@static/*": [
-      "static/*"
-    ],
-    "@store/*": [
-      "store/*"
-    ],
-    "@style": [
-      "style/*"
-    ],
-    "@utils": [
-      "utils/*"
-    ],
-    "@dummy/*": [
-      "__dummy__/*"
-    ]
+    "jsx": "preserve",
+    "sourceMap": true,
+    "baseUrl": ".",
+    "paths": {
+      "@actions/*": [
+        "redux/actions/*"
+      ],
+      "@components/*": [
+        "components/*"
+      ],
+      "@controllers/*": [
+        "controllers/*"
+      ],
+      "@interfaces/*": [
+        "interfaces/*"
+      ],
+      "@layouts/*": [
+        "layouts/*"
+      ],
+      "@lib/*": [
+        "lib/*"
+      ],
+      "@models/*": [
+        "models/*"
+      ],
+      "@options/*": [
+        "options/*"
+      ],
+      "@public/*": [
+        "public/*"
+      ],
+      "@reducers/*": [
+        "redux/reducers/*"
+      ],
+      "@redux/*": [
+        "redux/*"
+      ],
+      "@static/*": [
+        "static/*"
+      ],
+      "@store/*": [
+        "store/*"
+      ],
+      "@style": [
+        "style/*"
+      ],
+      "@utils": [
+        "utils/*"
+      ],
+      "@dummy/*": [
+        "__dummy__/*"
+      ]
+    }
   },
   "exclude": [
     "node_modules"

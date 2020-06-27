@@ -451,7 +451,7 @@ exports.saveVideo = async (req, res) => {
 			// { cwd: __dirname }
 		)
 
-		video.on("info", (info) => {
+		video.on("info", () => {
 			console.log("Download started")
 			// console.log("filename: " + info._filename)
 			// console.log("size: " + info.size)
@@ -659,7 +659,7 @@ exports.uploadVideo = async (req, res) => {
 	const fileName = `interactions/${fileId}${ext}`
 	await Aws.uploadToS3(video, fileName, false, "video/mp4")
 
-	await fs.writeFile(`uploads/${fileId}${ext}`, video, (err, data) => {})
+	await fs.writeFile(`uploads/${fileId}${ext}`, video, () => null)
 
 	await ffmpeg()
 		.input(fs.createReadStream(`uploads/${fileId}${ext}`))

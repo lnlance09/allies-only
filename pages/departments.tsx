@@ -1,5 +1,7 @@
 import { searchDepartments } from "@actions/department"
 import { Button, Container, Divider, Form, Header } from "semantic-ui-react"
+import { RootState } from "@store/reducer"
+import { InitialPageState } from "@interfaces/options"
 import { DebounceInput } from "react-debounce-input"
 import { Provider, connect } from "react-redux"
 import { useRouter } from "next/router"
@@ -23,7 +25,7 @@ const Departments: React.FunctionComponent = ({ departments, inverted, searchDep
 	}, [q])
 
 	const loadMore = (page, q) => {
-		return searchDepartments({ page, q: searchVal })
+		return searchDepartments({ page, q })
 	}
 
 	const searchForResults = (e) => {
@@ -136,7 +138,7 @@ Departments.defaultProps = {
 	searchDepartments
 }
 
-const mapStateToProps = (state: any, ownProps: any) => ({
+const mapStateToProps = (state: RootState, ownProps: InitialPageState) => ({
 	...state.department,
 	...ownProps
 })

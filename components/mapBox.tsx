@@ -2,7 +2,19 @@ import React, { useState } from "react"
 import ReactMapGL from "react-map-gl"
 import PropTypes from "prop-types"
 
-const MapBox: React.FunctionComponent = ({ height, lat, lng, width, zoom }) => {
+const MapBox: React.FC = ({
+	height,
+	lat,
+	lng,
+	width,
+	zoom
+}: {
+	height: string,
+	lat: string,
+	lng: string,
+	width: string,
+	zoom: number
+}) => {
 	const [viewport, setViewport] = useState({
 		height,
 		latitude: lat,

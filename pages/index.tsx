@@ -1,8 +1,10 @@
 import { searchInteractions } from "@actions/interaction"
-import { Container, Divider, Header } from "semantic-ui-react"
+import { Container, Header } from "semantic-ui-react"
 import { Provider, connect } from "react-redux"
 import { withTheme } from "@redux/ThemeProvider"
 import { compose } from "redux"
+import { RootState } from "@store/reducer"
+import { InitialPageState } from "@interfaces/options"
 import DefaultLayout from "@layouts/default"
 import PropTypes from "prop-types"
 import React, { useEffect } from "react"
@@ -88,7 +90,7 @@ Home.defaultProps = {
 	searchInteractions
 }
 
-const mapStateToProps = (state: any, ownProps: any) => ({
+const mapStateToProps = (state: RootState, ownProps: InitialPageState) => ({
 	...state.interaction,
 	...ownProps
 })

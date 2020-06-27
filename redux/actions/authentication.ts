@@ -2,21 +2,47 @@ import * as constants from "../constants"
 import { setToken } from "@utils/tokenFunctions"
 import { toast } from "react-toastify"
 import { getConfig } from "@options/toast"
+import {
+	ChangePasswordAction,
+	ChangePasswordPayload,
+	LoginErrorAction,
+	LoginPayload,
+	LogoutAction,
+	RegistrationErrorAction,
+	RegistrationPayload,
+	ResetPasswordAction,
+	SetUserDataAction,
+	VerificationErrorAction,
+	VerificationPayload,
+	VerifyEmailAction
+} from "@interfaces/authentication"
+import { AppDispatch } from "@store/index"
 import axios from "axios"
 import Router from "next/router"
 
 const toastConfig = getConfig()
 toast.configure(toastConfig)
 
-export const changePassword = ({ bearer, confirmPassword, newPassword, password }) => (
-	dispatch
-) => {
+export const changePassword = ({
+	bearer,
+	confirmPassword,
+	newPassword,
+	password
+}: ChangePasswordPayload): ChangePasswordAction => (dispatch: AppDispatch) => {
 	axios
-		.post("/api/user/changePassword", {
-			confirmPassword,
-			password,
-			newPassword
-		})
+		.post(
+			"/api/user/changePassword",
+			{
+				confirmPassword,
+				password,
+				newPassword
+			},
+			{
+				headers: {
+					Authorization: bearer
+				}
+			}
+		)
 		.then((response) => {
 			dispatch({
 				payload: response,
@@ -28,19 +54,22 @@ export const changePassword = ({ bearer, confirmPassword, newPassword, password 
 		})
 }
 
-export const logout = () => async (dispatch) => {
+export const logout = (): LogoutAction => (dispatch: AppDispatch) => {
 	dispatch({
 		type: constants.LOGOUT
 	})
 }
 
-export const resetPasswordProps = () => (dispatch) => {
+export const resetPasswordProps = (): ResetPasswordAction => (dispatch: AppDispatch) => {
 	dispatch({
-		type: constants.RESET_PASSWORD_PROPS
+		type: constants.RESET_PASSWORD
 	})
 }
 
-export const submitLoginForm = ({ email, password }) => (dispatch) => {
+export const submitLoginForm = ({
+	email,
+	password
+}: LoginPayload): SetUserDataAction | LoginErrorAction => (dispatch: AppDispatch) => {
 	axios
 		.post("/api/user/login", {
 			email,
@@ -68,9 +97,13 @@ export const submitLoginForm = ({ email, password }) => (dispatch) => {
 		})
 }
 
-export const submitRegistrationForm = ({ email, name, password, status, username }) => (
-	dispatch
-) => {
+export const submitRegistrationForm = ({
+	email,
+	name,
+	password,
+	status,
+	username
+}: RegistrationPayload): SetUserDataAction | RegistrationErrorAction => (dispatch: AppDispatch) => {
 	axios
 		.post("/api/user/create", {
 			email,
@@ -98,7 +131,10 @@ export const submitRegistrationForm = ({ email, name, password, status, username
 		})
 }
 
-export const submitVerificationForm = ({ code, bearer }) => (dispatch) => {
+export const submitVerificationForm = ({
+	bearer,
+	code
+}: VerificationPayload): VerifyEmailAction | VerificationErrorAction => (dispatch: AppDispatch) => {
 	axios
 		.post(
 			"/api/user/verify",

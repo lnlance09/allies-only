@@ -359,9 +359,9 @@ exports.update = async (req, res) => {
 		.then(async () => {
 			const department = await Department.findByPk(id, { raw: true })
 			return res.status(200).send({
+				department,
 				error: false,
-				msg: "Success",
-				department
+				msg: "Success"
 			})
 		})
 		.catch(() => {

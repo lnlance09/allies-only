@@ -6,7 +6,7 @@ import Logo from "@public/images/logos/logo_72x72.png"
 import PropTypes from "prop-types"
 import React, { Fragment, useEffect, useState } from "react"
 
-const PageHeader: React.FunctionComponent = ({ basicHeader, loading }) => {
+const PageHeader: React.FC = ({ basicHeader, loading }) => {
 	const router = useRouter()
 
 	const [authenticated, setAuthenticated] = useState(null)
@@ -106,7 +106,7 @@ const PageHeader: React.FunctionComponent = ({ basicHeader, loading }) => {
 					visible={sidebarVisible}
 				>
 					<Menu.Item as="a" onClick={() => router.push("/interactions")}>
-						<Icon name="crosshairs" size="small" />
+						<Icon name="film" size="small" />
 						Interactions
 					</Menu.Item>
 					<Menu.Item as="a" onClick={() => router.push("/officers")}>

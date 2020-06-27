@@ -1,6 +1,8 @@
 import * as constants from "../constants"
+import { InitialPageState } from "@interfaces/options"
+import { DepartmentActionTypes } from "@interfaces/department"
 
-const initial = () => ({
+const initial: InitialPageState = () => ({
 	department: {
 		data: {},
 		error: false,
@@ -30,7 +32,7 @@ const initial = () => ({
 	}
 })
 
-const department = (state = initial(), action) => {
+const department = (state = initial(), action: DepartmentActionTypes): InitialPageState => {
 	const { payload } = action
 
 	switch (action.type) {

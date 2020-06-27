@@ -1,7 +1,9 @@
 import * as constants from "../constants"
 import { s3BaseUrl } from "@options/config"
+import { InitialPageState } from "@interfaces/options"
+import { InteractionActionTypes } from "@interfaces/interaction"
 
-const initial = () => ({
+const initial: InitialPageState = () => ({
 	interaction: {
 		data: {
 			department: {},
@@ -22,7 +24,7 @@ const initial = () => ({
 	}
 })
 
-const interaction = (state = initial(), action) => {
+const interaction = (state = initial(), action: InteractionActionTypes): InitialPageState => {
 	const { payload } = action
 
 	switch (action.type) {

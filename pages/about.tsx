@@ -1,6 +1,7 @@
 import { Container, Header } from "semantic-ui-react"
 import { withTheme } from "@redux/ThemeProvider"
 import DefaultLayout from "@layouts/default"
+import PropTypes from "prop-types"
 import React from "react"
 
 const About: React.FunctionComponent = ({ inverted }) => {
@@ -35,6 +36,10 @@ const About: React.FunctionComponent = ({ inverted }) => {
 			</Container>
 		</DefaultLayout>
 	)
+}
+
+About.propTypes = {
+	inverted: PropTypes.bool
 }
 
 export default withTheme("dark")(About)

@@ -1,4 +1,6 @@
-export const getConfig = () => ({
+import { ToastOption } from "@interfaces/options"
+
+export const getConfig = (): ToastOption => ({
 	autoClose: 2000,
 	closeOnClick: true,
 	draggable: true,
