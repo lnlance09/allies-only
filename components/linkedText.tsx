@@ -1,24 +1,9 @@
-import * as linkify from "linkifyjs"
-import { baseUrl } from "@options/config"
-import hashtag from "linkifyjs/plugins/hashtag"
 import Linkify from "linkifyjs/react"
 import PropTypes from "prop-types"
 import React from "react"
 
 const LinkedText: React.FC = ({ text }: { text: string }) => {
-	hashtag(linkify)
-
-	return (
-		<Linkify
-			options={{
-				formatHref: {
-					// hashtag: (val) => `${baseUrl}explore/memes?q=${val.substr(1)}`
-				}
-			}}
-		>
-			{text}
-		</Linkify>
-	)
+	return <Linkify options={{ target: "_blank" }}>{text}</Linkify>
 }
 
 LinkedText.propTypes = {

@@ -1,6 +1,5 @@
 import {
 	GET_DEPARTMENT,
-	SET_DEPARTMENT_FETCH_ERROR,
 	RESET_DEPARTMENT_TO_INITIAL,
 	SEARCH_DEPARTMENTS,
 	SET_DEPARTMENT_CREATE_ERROR,
@@ -42,7 +41,7 @@ export interface UpdateDepartmentPayload {
 }
 
 /* Reducers */
-interface CreateDepartmentAction {
+export interface CreateDepartmentAction {
 	payload: {
 		error: boolean,
 		msg: string
@@ -50,7 +49,7 @@ interface CreateDepartmentAction {
 	type: typeof SET_DEPARTMENT_CREATE_ERROR;
 }
 
-interface GetDepartmentAction {
+export interface GetDepartmentAction {
 	payload: {
 		department: Department,
 		error: boolean,
@@ -59,11 +58,11 @@ interface GetDepartmentAction {
 	type: typeof GET_DEPARTMENT;
 }
 
-interface ResetDepartmentAction {
+export interface ResetDepartmentAction {
 	type: typeof RESET_DEPARTMENT_TO_INITIAL;
 }
 
-interface SearchDepartmentsAction {
+export interface SearchDepartmentsAction {
 	payload: {
 		departments: Department[],
 		error: boolean,
@@ -74,7 +73,7 @@ interface SearchDepartmentsAction {
 	type: typeof SEARCH_DEPARTMENTS;
 }
 
-interface SetDepartmentErrorAction {
+export interface SetDepartmentErrorAction {
 	payload: {
 		error: boolean,
 		msg: string
@@ -82,7 +81,7 @@ interface SetDepartmentErrorAction {
 	type: typeof SET_DEPARTMENT_FETCH_ERROR;
 }
 
-interface UpdateDepartmentAction {
+export interface UpdateDepartmentAction {
 	payload: {
 		department: Department,
 		error: boolean,

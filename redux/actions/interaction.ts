@@ -4,12 +4,10 @@ import { getConfig } from "@options/toast"
 import {
 	CreateInteractionPayload,
 	GetInteractionAction,
-	Interaction,
 	ResetInteractionAction,
 	SearchInteractionsAction,
 	SetVideoAction,
 	SetVideoPayload,
-	UpdateViewsPayload,
 	UploadVideoPayload
 } from "@interfaces/interaction"
 import { GetItemPayload, PaginationPayload } from "@interfaces/options"
@@ -174,9 +172,10 @@ export const updateViews = ({ id }: UpdateViewsPayload): void => () => {
 		})
 }
 
-export const uploadVideo = ({ callback = () => null, file }: UploadVideoPayload): Interaction => (
-	dispatch: AppDispatch
-) => {
+export const uploadVideo = ({
+	callback = () => null,
+	file
+}: UploadVideoPayload): UploadVideoAction => (dispatch: AppDispatch) => {
 	const formData = new FormData()
 	formData.set("file", file)
 

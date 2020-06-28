@@ -10,6 +10,20 @@ import {
 } from "@redux/constants"
 import { User } from "./user"
 
+export interface Authentication {
+	bearer: string;
+	data: User;
+	inverted: boolean;
+	login: boolean;
+	loginError: boolean;
+	loginErrorMsg: string;
+	registerError: boolean;
+	registerErrorMsg: string;
+	verify: boolean;
+	verifyError: boolean;
+	verifyErrorMsg: string;
+}
+
 /* Actions */
 export interface ChangePasswordPayload {
 	bearer: string;
@@ -18,9 +32,9 @@ export interface ChangePasswordPayload {
 	password: string;
 }
 
-export interface LoginPayload {
-	email: string;
-	password: string;
+export class LoginPayload {
+	email: string
+	password: string
 }
 
 export interface RegistrationPayload {
@@ -37,7 +51,7 @@ export interface VerificationPayload {
 }
 
 /* Reducers */
-interface ChangePasswordAction {
+export interface ChangePasswordAction {
 	payload: {
 		error: boolean,
 		msg: string
@@ -45,15 +59,11 @@ interface ChangePasswordAction {
 	type: typeof CHANGE_PASSWORD;
 }
 
-interface LogoutAction {
+export interface LogoutAction {
 	type: typeof LOGOUT;
 }
 
-interface ResetPasswordAction {
-	type: typeof RESET_PASSWORD;
-}
-
-interface LoginErrorAction {
+export interface LoginErrorAction {
 	payload: {
 		error: boolean,
 		msg: string
@@ -61,7 +71,7 @@ interface LoginErrorAction {
 	type: typeof SET_LOGIN_ERROR;
 }
 
-interface RegistrationErrorAction {
+export interface RegistrationErrorAction {
 	payload: {
 		error: boolean,
 		msg: string
@@ -69,7 +79,11 @@ interface RegistrationErrorAction {
 	type: typeof SET_REGISTER_ERROR;
 }
 
-interface SetUserDataAction {
+export interface ResetPasswordAction {
+	type: typeof RESET_PASSWORD;
+}
+
+export interface SetUserDataAction {
 	payload: {
 		token: string,
 		user: User
@@ -77,7 +91,7 @@ interface SetUserDataAction {
 	type: typeof SET_USER_DATA;
 }
 
-interface VerificationErrorAction {
+export interface VerificationErrorAction {
 	payload: {
 		error: boolean,
 		msg: string
@@ -85,7 +99,7 @@ interface VerificationErrorAction {
 	type: typeof SET_VERIFICATION_ERROR;
 }
 
-interface VerifyEmailAction {
+export interface VerifyEmailAction {
 	payload: {
 		error: boolean,
 		msg: string,
@@ -93,3 +107,13 @@ interface VerifyEmailAction {
 	};
 	type: typeof VERIFY_EMAIL;
 }
+
+export type AuthenticationActionTypes =
+	| ChangePasswordAction
+	| LoginErrorAction
+	| LogoutAction
+	| ResetPasswordAction
+	| RegistrationErrorAction
+	| SetUserDataAction
+	| VerificationErrorAction
+	| VerifyEmailAction

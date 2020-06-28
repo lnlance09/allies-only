@@ -107,7 +107,7 @@ const Autocomplete: React.FC = ({ category, disabled, placeholder, width }) => {
 		setLoading(false)
 	}
 
-	const onClick = (e, data) => {
+	const onClick = (e: React.SyntheticEvent<EventTarget>, data) => {
 		const { slug, type, username } = data.result
 		let link = `/${username}`
 		if (type === "officer") {

@@ -13,6 +13,11 @@ module.exports = withPlugins([[withFonts], [withImages]], {
 			config.resolve.plugins = [new TsconfigPathsPlugin({ configFile: "tsconfig.json" })]
 		}
 
+		config.plugins = config.plugins.filter((plugin) => {
+			if (plugin.constructor.name === "ForkTsCheckerWebpackPlugin") return false
+			return true
+		})
+
 		config.resolve.extensions.push(".ts", ".tsx")
 		return config
 	}

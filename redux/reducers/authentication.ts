@@ -1,12 +1,13 @@
 import * as constants from "../constants"
+import { InitialPageState } from "@interfaces/options"
+import { AuthenticationActionTypes } from "@interfaces/authentication"
 
-const initial = () => ({
+const initial: InitialPageState = () => ({
 	data: {},
-	passwordError: false,
 	verify: false
 })
 
-const authentication = (state = initial(), action) => {
+const authentication = (state = initial(), action: AuthenticationActionTypes): InitialPageState => {
 	const { payload } = action
 
 	switch (action.type) {

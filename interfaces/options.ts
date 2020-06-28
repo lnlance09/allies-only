@@ -1,3 +1,4 @@
+import { Authentication } from "./authentication"
 import { Department } from "./department"
 import { Interaction } from "./interaction"
 import { Officer } from "./officer"
@@ -7,7 +8,7 @@ export interface DropdownOptionsPayload {
 	departmentId?: number;
 	forAutocomplete: number;
 	forOptions: number;
-	id: string;
+	id?: string;
 	q: string;
 }
 
@@ -61,6 +62,7 @@ export interface MultipleItemsPage extends Results {
 }
 
 export interface InitialPageState {
+	authentication?: Authentication;
 	department?: IndividualItemPage;
 	departments?: MultipleItemsPage;
 	interaction?: IndividualItemPage;

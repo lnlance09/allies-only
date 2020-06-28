@@ -1,9 +1,7 @@
 import {
 	GET_INTERACTION,
-	SET_INTERACTION_FETCH_ERROR,
 	RESET_INTERACTION_TO_INITIAL,
 	SEARCH_INTERACTIONS,
-	SET_INTERACTION_CREATE_ERROR,
 	SET_INTERACTION_FETCH_ERROR,
 	SET_VIDEO,
 	UPLOAD_VIDEO,
@@ -45,7 +43,7 @@ export interface SetVideoPayload {
 }
 
 /* Reducers */
-interface GetInteractionAction {
+export interface GetInteractionAction {
 	payload: {
 		error: boolean,
 		msg: string,
@@ -54,11 +52,11 @@ interface GetInteractionAction {
 	type: typeof GET_INTERACTION;
 }
 
-interface ResetInteractionAction {
+export interface ResetInteractionAction {
 	type: typeof RESET_INTERACTION_TO_INITIAL;
 }
 
-interface SearchInteractionsAction {
+export interface SearchInteractionsAction {
 	payload: {
 		error: boolean,
 		hasMore: boolean,
@@ -69,15 +67,39 @@ interface SearchInteractionsAction {
 	type: typeof SEARCH_INTERACTIONS;
 }
 
-interface SetVideoAction {
+export interface SetInteractionErrorAction {
+	type: typeof SET_INTERACTION_FETCH_ERROR;
+}
+
+export interface SetVideoAction {
 	payload: SetVideoPayload;
 	type: typeof SET_VIDEO;
 }
 
+export interface UpdateInteractionAction {
+	payload: {
+		error: boolean,
+		msg: string
+	};
+	type: typeof UPDATE_INTERACTION;
+}
+
+export interface UploadVideoAction {
+	payload: {
+		error: boolean,
+		msg?: string,
+		thumbnail: string,
+		video: string
+	};
+	type: typeof UPLOAD_VIDEO;
+}
+
 export type InteractionActionTypes =
-	| CreateInteractionAction
+	| CreateInteractionPayload
 	| GetInteractionAction
 	| ResetInteractionAction
 	| SearchInteractionsAction
+	| SetInteractionErrorAction
 	| SetVideoAction
 	| UpdateInteractionAction
+	| UploadVideoAction

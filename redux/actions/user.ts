@@ -1,8 +1,18 @@
 import * as constants from "../constants"
-import { changeProfilePicPayload, getUserPayload, searchUsersPayload } from "@interfaces/user"
+import {
+	ChangeProfilePicAction,
+	ChangeProfilePicPayload,
+	GetUserAction,
+	GetUserPayload,
+	SetUserErrorAction
+} from "@interfaces/user"
+import { PaginationPayload } from "@interfaces/options"
 import axios from "axios"
 
-export const changeProfilePic = ({ bearer, file }: changeProfilePicPayload): void => (dispatch) => {
+export const changeProfilePic = ({
+	bearer,
+	file
+}: ChangeProfilePicPayload): ChangeProfilePicAction => (dispatch) => {
 	const formData = new FormData()
 	formData.set("file", file)
 
@@ -26,9 +36,10 @@ export const changeProfilePic = ({ bearer, file }: changeProfilePicPayload): voi
 		})
 }
 
-export const getUser = ({ callback = () => null, username }: getUserPayload): void => (
-	dispatch
-) => {
+export const getUser = ({
+	callback = () => null,
+	username
+}: GetUserPayload): GetUserAction | SetUserErrorAction => (dispatch) => {
 	axios
 		.get(`/api/user/${username}`)
 		.then(async (response) => {
@@ -49,7 +60,7 @@ export const getUser = ({ callback = () => null, username }: getUserPayload): vo
 		})
 }
 
-export const searchUsers = ({ page = 0, q = null }: searchUsersPayload): void => (dispatch) => {
+export const searchUsers = ({ page = 0, q = "" }: PaginationPayload): void => (dispatch) => {
 	axios
 		.get("/api/user/search", {
 			params: {

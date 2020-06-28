@@ -112,13 +112,15 @@ const Officer: React.FunctionComponent = ({
 		setDepartment(value)
 	}
 
-	const seoTitle = error ? "Not found" : name
-	const seoDescription = error
-		? "Become an ally in the fight against police brutality and corruption"
-		: `${name}'s interactions with the police on AlliesOnly`
+	const seoTitle = createMode
+		? "Add an officer"
+		: `${officer.data.firstName} ${officer.data.lastName}`
+	const seoDescription = officer.error
+		? "Keep tabs on police officers and their interactions with citizens in their jurisdiction"
+		: `${officer.data.firstName} ${officer.data.lastName}'s interactions with citizens`
 	const seoImage = {
 		height: 500,
-		src: img,
+		src: "/public/images/logos/logo.png",
 		width: 500
 	}
 
@@ -128,16 +130,9 @@ const Officer: React.FunctionComponent = ({
 				activeItem="officers"
 				containerClassName="officersPage"
 				seo={{
-					description:
-						"Keep tabs on police officers and their interactions with citizens in their jurisdiction",
-					image: {
-						height: 500,
-						src: "/public/images/logos/logo.png",
-						width: 500
-					},
-					title: createMode
-						? "Add an officer"
-						: `${officer.data.firstName} ${officer.data.lastName}`,
+					description: seoDescription,
+					image: seoImage,
+					title: seoTitle,
 					url: `officers/${slug}`
 				}}
 				showFooter={false}

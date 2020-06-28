@@ -43,7 +43,7 @@ export interface updateOfficerPayload {
 }
 
 /* Reducers */
-interface CreateOfficerAction {
+export interface CreateOfficerAction {
 	payload: {
 		error: boolean,
 		msg: string
@@ -51,7 +51,7 @@ interface CreateOfficerAction {
 	type: typeof SET_OFFICER_CREATE_ERROR;
 }
 
-interface GetOfficerAction {
+export interface GetOfficerAction {
 	payload: {
 		error: boolean,
 		msg: string,
@@ -60,11 +60,11 @@ interface GetOfficerAction {
 	type: typeof GET_OFFICER;
 }
 
-interface ResetOfficerAction {
+export interface ResetOfficerAction {
 	type: typeof RESET_OFFICER_TO_INITIAL;
 }
 
-interface SearchOfficersAction {
+export interface SearchOfficersAction {
 	payload: {
 		error: boolean,
 		hasMore: boolean,
@@ -75,7 +75,7 @@ interface SearchOfficersAction {
 	type: typeof SEARCH_OFFICERS;
 }
 
-interface SetOfficerErrorAction {
+export interface SetOfficerErrorAction {
 	payload: {
 		error: boolean,
 		msg: string
@@ -83,7 +83,7 @@ interface SetOfficerErrorAction {
 	type: typeof SET_OFFICER_FETCH_ERROR;
 }
 
-interface UpdateOfficerImgAction {
+export interface UpdateOfficerImgAction {
 	payload: {
 		error: boolean,
 		img: string,

@@ -18,6 +18,7 @@ import {
 } from "@interfaces/authentication"
 import { AppDispatch } from "@store/index"
 import axios from "axios"
+import React from "react"
 import Router from "next/router"
 
 const toastConfig = getConfig()
@@ -69,7 +70,7 @@ export const resetPasswordProps = (): ResetPasswordAction => (dispatch: AppDispa
 export const submitLoginForm = ({
 	email,
 	password
-}: LoginPayload): SetUserDataAction | LoginErrorAction => (dispatch: AppDispatch) => {
+}: LoginPayload): SetUserDataAction | LoginErrorAction => (dispatch) => {
 	axios
 		.post("/api/user/login", {
 			email,

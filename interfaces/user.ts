@@ -1,11 +1,4 @@
-import {
-	CHANGE_PROFILE_PIC,
-	GET_USER,
-	SEARCH_USERS,
-	SET_USER_FETCH_ERROR,
-	SET_USER_INTERACTIONS_FETCH_ERROR,
-	UPDATE_USER
-} from "@redux/constants"
+import { CHANGE_PROFILE_PIC, GET_USER, SEARCH_USERS, SET_USER_FETCH_ERROR } from "@redux/constants"
 import { Results } from "./results"
 import { Interaction } from "./interaction"
 
@@ -36,7 +29,7 @@ export interface GetUserPayload {
 }
 
 /* Reducers */
-interface GetUserAction {
+export interface GetUserAction {
 	payload: {
 		department: Department,
 		error: boolean,
@@ -45,15 +38,32 @@ interface GetUserAction {
 	type: typeof GET_USER;
 }
 
-interface SearchUsersAction {
+export interface ChangeProfilePicAction {
 	payload: {
-		departments: Department[],
+		error: boolean,
+		img?: string,
+		msg: string
+	};
+	type: typeof CHANGE_PROFILE_PIC;
+}
+
+export interface SearchUsersAction {
+	payload: {
 		error: boolean,
 		hasMore: boolean,
 		msg: string,
-		page: number
+		page: number,
+		users: User[]
 	};
 	type: typeof SEARCH_USERS;
 }
 
-export type UserActionTypes = GetUserAction | SearchUsersAction
+export interface SetUserErrorAction {
+	type: typeof SET_USER_FETCH_ERROR;
+}
+
+export type UserActionTypes =
+	| ChangeProfilePicAction
+	| GetUserAction
+	| SearchUsersAction
+	| SetUserErrorAction

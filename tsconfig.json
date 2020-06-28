@@ -9,7 +9,7 @@
     "allowJs": true,
     "declaration": false,
     "skipLibCheck": true,
-    "strict": true,
+    "strict": false,
     "strictNullChecks": true,
     "noImplicitAny": true,
     "noImplicitReturns": true,
