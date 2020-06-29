@@ -7,7 +7,7 @@ import { AppProps } from "next/app"
 import { Provider } from "react-redux"
 import { ThemeProvider } from "@redux/ThemeProvider"
 import React from "react"
-import store from "@store/index"
+import store, { wrapper } from "@store/index"
 
 const App = ({ Component, pageProps }: AppProps): JSX.Element => {
 	return (
@@ -32,4 +32,4 @@ App.getInitialProps = async (appContext) => {
 }
 */
 
-export default App
+export default wrapper.withRedux(App)
