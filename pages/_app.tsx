@@ -1,6 +1,8 @@
 import "semantic-ui-css/semantic.min.css"
 import "react-toastify/dist/ReactToastify.css"
 import "@style/style.scss"
+import "core-js/stable"
+import "regenerator-runtime/runtime"
 import { AppProps } from "next/app"
 import { Provider } from "react-redux"
 import { ThemeProvider } from "@redux/ThemeProvider"
