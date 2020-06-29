@@ -11,7 +11,7 @@ import NumberFormat from "react-number-format"
 import PropTypes from "prop-types"
 import React, { Fragment, useEffect, useState } from "react"
 import Router from "next/router"
-import store from "@store"
+import store from "@store/index"
 
 const Sidebar: React.FC = ({
 	activeItem,

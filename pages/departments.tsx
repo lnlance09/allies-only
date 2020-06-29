@@ -11,7 +11,7 @@ import DefaultLayout from "@layouts/default"
 import PropTypes from "prop-types"
 import React, { useEffect, useState } from "react"
 import SearchResults from "@components/searchResults"
-import store from "@store"
+import store from "@store/index"
 
 const Departments: React.FunctionComponent = ({ departments, inverted, searchDepartments }) => {
 	const router = useRouter()
