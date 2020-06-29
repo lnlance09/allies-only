@@ -9,7 +9,7 @@ import { ThemeProvider } from "@redux/ThemeProvider"
 import React from "react"
 import store from "@store/index"
 
-const App = ({ Component, pageProps }) => {
+const App = ({ Component, pageProps }: AppProps): JSX.Element => {
 	return (
 		<Provider store={store}>
 			<ThemeProvider>
