@@ -5,7 +5,11 @@
   "proxy": "192.168.1.229:8888",
   "scripts": {
     "dev": "node server.js",
+    "dev:test": "NODE_ENV=test node server.js",
+    "dev:prod": "NODE_ENV=production node server.js",
     "build": "next build",
+    "build:test": "NODE_ENV=test next build",
+    "build:prod": "NODE_ENV=production next build",
     "start": "next start",
     "lint": "eslint '*/**/*.{js,ts,tsx}' --fix . && echo 'Lint complete.'",
     "prettify": "prettier --config ./.prettierrc --write '{components,lib,pages,redux,store,utils}/**/*.tsx'"

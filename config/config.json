@@ -4,23 +4,23 @@
     "password": "secret",
     "database": "police",
     "host": "localhost",
-    "dialect": "mysql",
-    "operatorsAliases": false
+    "dialect": "mysql"
   },
   "test": {
-    "username": "root",
-    "password": "secret",
+    "username": "admin",
+    "password": "2Z>2:Z8t{56eHoq",
     "database": "police",
-    "host": "localhost",
+    "host": "police-test.cni5l9jtlymn.us-west-2.rds.amazonaws.com",
     "dialect": "mysql",
-    "operatorsAliases": false
+    "dialectOptions": {
+      "ssl": "Amazon RDS"
+    }
   },
   "production": {
     "username": "root",
     "password": "secret",
     "database": "police",
     "host": "localhost",
-    "dialect": "mysql",
-    "operatorsAliases": false
+    "dialect": "mysql"
   }
 }

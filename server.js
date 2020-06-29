@@ -25,6 +25,7 @@ app.prepare().then(() => {
 	server.use(bodyParser.urlencoded({ extended: false }))
 	db.sequelize.sync()
 
+	// Contact
 	server.post("/api/contact/send", contact.send)
 
 	// Departments
@@ -32,8 +33,6 @@ app.prepare().then(() => {
 	server.get("/api/department/search", departments.findAll)
 	server.get("/api/department/:id", departments.findOne)
 	server.post("/api/department/:id/update", departments.update)
-
-	server.get("/api/location/search", locations.findAll)
 
 	// Interactions
 	server.post("/api/interaction/create", interactions.create)
@@ -43,6 +42,9 @@ app.prepare().then(() => {
 	server.post("/api/interaction/:id/update", interactions.update)
 	server.post("/api/interaction/:id/updateViews", interactions.updateViews)
 	server.post("/api/interaction/uploadVideo", interactions.uploadVideo)
+
+	// Locations
+	server.get("/api/location/search", locations.findAll)
 
 	// Officers
 	server.post("/api/officer/create", officers.create)
@@ -60,6 +62,7 @@ app.prepare().then(() => {
 	server.post("/api/user/verify", users.verify)
 	server.get("/api/user/:username", users.findOne)
 
+	// Sitemap
 	server.get("/sitemap.xml", sitemap.sitemap)
 
 	server.all("*", (req, res) => {
