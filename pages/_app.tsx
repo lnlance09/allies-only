@@ -4,7 +4,7 @@ import "@style/style.scss"
 import "core-js/stable"
 import "regenerator-runtime/runtime"
 import { AppProps } from "next/app"
-import { Provider } from "react-redux"
+import { Provider, connect } from "react-redux"
 import { ThemeProvider } from "@redux/ThemeProvider"
 import React from "react"
 import { useStore } from "@store/index"
@@ -35,3 +35,5 @@ App.getInitialProps = async (appContext) => {
 */
 
 export default App
+
+// export default connect()(App)
