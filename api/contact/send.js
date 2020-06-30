@@ -1,5 +1,5 @@
 /* eslint-disable */
-const Mail = require("/utils/mailFunctions.ts")
+const Mail = require("../../utils/mailFunctions.ts")
 
 module.exports = async (req, res) => {
 	const { msg } = req.body
