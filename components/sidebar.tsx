@@ -11,7 +11,7 @@ import NumberFormat from "react-number-format"
 import PropTypes from "prop-types"
 import React, { Fragment, useEffect, useState } from "react"
 import Router from "next/router"
-import store from "@store/index"
+import { useStore } from "@store/index"
 
 const Sidebar: React.FC = ({
 	activeItem,
@@ -24,6 +24,7 @@ const Sidebar: React.FC = ({
 	inverted: boolean,
 	logout: void
 }) => {
+	const store = useStore()
 	const router = useRouter()
 
 	const [allyCount, setAllyCount] = useState(null)
