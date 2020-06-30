@@ -4,13 +4,13 @@
   "private": true,
   "proxy": "192.168.1.229:8888",
   "scripts": {
-    "dev": "node server.js",
+    "dev": "cross-env node server.js",
     "dev:test": "NODE_ENV=test node server.js",
     "dev:prod": "NODE_ENV=production node server.js",
     "build": "next build",
     "build:test": "NODE_ENV=test next build",
     "build:prod": "NODE_ENV=production next build",
-    "start": "next start",
+    "start": "cross-env NODE_ENV=test node server.js",
     "lint": "eslint '*/**/*.{js,ts,tsx}' --fix . && echo 'Lint complete.'",
     "prettify": "prettier --config ./.prettierrc --write '{components,lib,pages,redux,store,utils}/**/*.tsx'"
   },
@@ -27,6 +27,7 @@
     "babel-polyfill": "^6.26.0",
     "body-parser": "^1.19.0",
     "core-js": "^3.6.5",
+    "cross-env": "^7.0.2",
     "easyimage": "^3.1.1",
     "express": "^4.17.1",
     "express-fileupload": "^1.1.7-alpha.3",

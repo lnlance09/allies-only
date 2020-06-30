@@ -4,7 +4,7 @@ import DefaultLayout from "@layouts/default"
 import PropTypes from "prop-types"
 import React from "react"
 
-const About: React.FunctionComponent = ({ inverted }) => {
+const About: React.FC = ({ inverted }) => {
 	return (
 		<DefaultLayout
 			activeItem={null}
@@ -36,6 +36,21 @@ const About: React.FunctionComponent = ({ inverted }) => {
 			</Container>
 		</DefaultLayout>
 	)
+}
+
+export async function getStaticProps() {
+	// Call an external API endpoint to get posts.
+	// You can use any data fetching library
+	// const res = await fetch("https://.../posts")
+	// const posts = await res.json()
+
+	// By returning { props: posts }, the Blog component
+	// will receive `posts` as a prop at build time
+	return {
+		props: {
+			inverted: true
+		}
+	}
 }
 
 About.propTypes = {

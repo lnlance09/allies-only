@@ -17,10 +17,13 @@
     }
   },
   "production": {
-    "username": "root",
-    "password": "secret",
+    "username": "admin",
+    "password": "2Z>2:Z8t{56eHoq",
     "database": "police",
-    "host": "localhost",
-    "dialect": "mysql"
+    "host": "police-test.cni5l9jtlymn.us-west-2.rds.amazonaws.com",
+    "dialect": "mysql",
+    "dialectOptions": {
+      "ssl": "Amazon RDS"
+    }
   }
 }
