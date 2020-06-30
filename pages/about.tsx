@@ -42,4 +42,4 @@ About.propTypes = {
 	inverted: PropTypes.bool
 }
 
-export default withTheme("dark")(About)
+export default About
