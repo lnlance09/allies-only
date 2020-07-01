@@ -2,7 +2,6 @@
 const Auth = require("../utils/authFunctions.js")
 const Aws = require("../utils/awsFunctions.js")
 const db = require("../models/index.js")
-const axios = require("axios")
 const ffmpeg = require("fluent-ffmpeg")
 const fs = require("fs")
 const isJSON = require("is-json")
