@@ -1,11 +1,10 @@
 /* eslint-disable */
 const withPlugins = require("next-compose-plugins")
-const withFonts = require("next-fonts")
 const withImages = require("next-images")
 const TsconfigPathsPlugin = require("tsconfig-paths-webpack-plugin")
 /* eslint-enable */
 
-module.exports = withPlugins([[withFonts], [withImages]], {
+module.exports = withPlugins([[withImages]], {
 	webpack: (config) => {
 		if (config.resolve.plugins) {
 			config.resolve.plugins.push(new TsconfigPathsPlugin({ configFile: "tsconfig.json" }))
@@ -18,7 +17,7 @@ module.exports = withPlugins([[withFonts], [withImages]], {
 			return true
 		})
 
-		config.resolve.extensions.push(".ts", ".tsx")
+		config.resolve.extensions.push(".js", ".ts", ".tsx")
 		return config
 	}
 })
