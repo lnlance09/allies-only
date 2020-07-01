@@ -5,7 +5,7 @@ const path = require("path")
 const Sequelize = require("sequelize")
 /* eslint-enable */
 const basename = path.basename(__filename)
-const env = process.env.NODE_ENV || "development"
+const env = process.env.NODE_ENV || "test"
 /* eslint-disable */
 const config = require(__dirname + "/../config/config.json")[env]
 /* eslint-enable */
