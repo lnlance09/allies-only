@@ -27,7 +27,7 @@ fs.readdirSync(__dirname)
 		db[model.name] = model
 	})
 
-const model = sequelize["import"](path.join(__dirname, "department.js"))
+const model = sequelize["import"](__dirname + "/../models/department.js")
 db[model.name] = model
 
 Object.keys(db).forEach((modelName) => {
