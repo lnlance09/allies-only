@@ -18,6 +18,7 @@ if (config.use_env_variable) {
 	sequelize = new Sequelize(config.database, config.username, config.password, config)
 }
 
+/*
 fs.readdirSync(__dirname)
 	.filter((file) => {
 		return file.indexOf(".") !== 0 && file !== basename && file.slice(-3) === ".js"
@@ -26,8 +27,8 @@ fs.readdirSync(__dirname)
 		const model = sequelize["import"](`${__dirname}/../models/${file}`)
 		db[model.name] = model
 	})
+*/
 
-/*
 const departmentModel = sequelize["import"](`${__dirname}/../models/department.js`)
 db[departmentModel.name] = departmentModel
 
@@ -45,7 +46,6 @@ db[officerInteractionModel.name] = officerInteractionModel
 
 const userModel = sequelize["import"](`${__dirname}/../models/user.js`)
 db[userModel.name] = userModel
-*/
 
 Object.keys(db).forEach((modelName) => {
 	if (db[modelName].associate) {
