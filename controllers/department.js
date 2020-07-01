@@ -1,6 +1,5 @@
 /* eslint-disable */
 const Auth = require("../utils/authFunctions.js")
-const Aws = require("../utils/awsFunctions.js")
 const db = require("../models/index.js")
 const slugify = require("slugify")
 const UsaStates = require("usa-states").UsaStates
@@ -179,7 +178,8 @@ exports.findAll = (req, res) => {
 
 	const offset = isNaN(page) ? 0 : page * limit
 
-	console.log("db", db)
+	console.log("db", db.department)
+
 	Department.findAll({
 		attributes,
 		group: ["id"],
