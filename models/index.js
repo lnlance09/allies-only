@@ -27,6 +27,8 @@ fs.readdirSync(__dirname)
 		db[model.name] = model
 	})
 
+db.department = sequelize["import"]("./department.js")
+
 Object.keys(db).forEach((modelName) => {
 	if (db[modelName].associate) {
 		db[modelName].associate(db)
