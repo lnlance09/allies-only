@@ -43,7 +43,7 @@ module.exports = {
 			Key: fileName
 		}
 
-		s3.upload(params, function (err, data) {
+		s3.upload(params, (err, data) => {
 			if (err) {
 				throw err
 			}
