@@ -1,9 +1,7 @@
 import jwt from "jsonwebtoken"
-import { User } from "@interfaces/user"
-
 const secret = "mysuperdupersecret"
 
-export const parseJwt = (): User => {
+export const parseJwt = () => {
 	const token = localStorage.getItem("jwtToken")
 	const decoded = jwt.verify(token, secret, (err, decoded) => {
 		if (err) {
@@ -14,7 +12,7 @@ export const parseJwt = (): User => {
 	return decoded
 }
 
-export const setToken = (data: User): string => {
+export const setToken = (data) => {
 	const token = jwt.sign({ data }, secret, {
 		expiresIn: 60 * 60 * 336
 	})
