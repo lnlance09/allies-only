@@ -2,7 +2,6 @@
 const Auth = require("../utils/authFunctions.js")
 const Aws = require("../utils/awsFunctions.js")
 const db = require("../models/index.js")
-const axios = require("axios")
 const slugify = require("slugify")
 const UsaStates = require("usa-states").UsaStates
 const validator = require("validator")
@@ -180,6 +179,7 @@ exports.findAll = (req, res) => {
 
 	const offset = isNaN(page) ? 0 : page * limit
 
+	console.log("db", db)
 	Department.findAll({
 		attributes,
 		group: ["id"],
