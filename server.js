@@ -8,7 +8,7 @@ const contact = require("./controllers/contact.js")
 const departments = require("./controllers/department.js")
 const locations = require("./controllers/location.js")
 const interactions = require("./controllers/interaction.js")
-const officers = require("./controllers/officer.ts")
+const officers = require("./controllers/officer.js")
 const sitemap = require("./controllers/sitemap.js")
 const users = require("./controllers/user.js")
 /* eslint-enable */
