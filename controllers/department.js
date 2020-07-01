@@ -178,8 +178,6 @@ exports.findAll = (req, res) => {
 
 	const offset = isNaN(page) ? 0 : page * limit
 
-	console.log("db", db.department)
-
 	Department.findAll({
 		attributes,
 		group: ["id"],
