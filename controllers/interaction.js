@@ -1,7 +1,7 @@
 /* eslint-disable */
-const Auth = require("../utils/authFunctions.ts")
-const Aws = require("../utils/awsFunctions.ts")
-const db = require("../models/index.ts")
+const Auth = require("../utils/authFunctions.js")
+const Aws = require("../utils/awsFunctions.js")
+const db = require("../models/index.js")
 const axios = require("axios")
 const ffmpeg = require("fluent-ffmpeg")
 const fs = require("fs")

@@ -1,5 +1,5 @@
 /* eslint-disable */
-const db = require("../models/index.ts")
+const db = require("../models/index.js")
 const { SitemapStream, streamToPromise } = require("sitemap")
 const { createGzip } = require("zlib")
 /* eslint-enable */

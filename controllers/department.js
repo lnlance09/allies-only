@@ -1,7 +1,7 @@
 /* eslint-disable */
-const Auth = require("../utils/authFunctions.ts")
-const Aws = require("../utils/awsFunctions.ts")
-const db = require("../models/index.ts")
+const Auth = require("../utils/authFunctions.js")
+const Aws = require("../utils/awsFunctions.js")
+const db = require("../models/index.js")
 const axios = require("axios")
 const slugify = require("slugify")
 const UsaStates = require("usa-states").UsaStates

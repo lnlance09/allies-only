@@ -1,5 +1,5 @@
 /* eslint-disable */
-const db = require("../models/index.ts")
+const db = require("../models/index.js")
 /* eslint-enable */
 const Location = db.location
 const Op = db.Sequelize.Op
