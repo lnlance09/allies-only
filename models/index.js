@@ -20,10 +20,10 @@ if (config.use_env_variable) {
 
 fs.readdirSync(__dirname)
 	.filter((file) => {
-		return file.indexOf(".") !== 0 && file !== basename && file.slice(-3) === ".js"
+		return file !== basename && file.slice(-3) === ".js"
 	})
 	.forEach((file) => {
-		const model = sequelize["import"](`${__dirname}/../models${file}`)
+		const model = sequelize["import"](`${__dirname}/../models/${path.basename(file)}`)
 		db[model.name] = model
 	})
 
