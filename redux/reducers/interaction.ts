@@ -3,7 +3,7 @@ import { s3BaseUrl } from "@options/config"
 import { InitialPageState } from "@interfaces/options"
 import { InteractionActionTypes } from "@interfaces/interaction"
 
-const initial: InitialPageState = () => ({
+export const initial: InitialPageState = {
 	interaction: {
 		data: {
 			department: {},
@@ -22,9 +22,9 @@ const initial: InitialPageState = () => ({
 		loading: true,
 		results: []
 	}
-})
+}
 
-const interaction = (state = initial(), action: InteractionActionTypes): InitialPageState => {
+const interaction = (state = initial, action: InteractionActionTypes): InitialPageState => {
 	const { payload } = action
 
 	switch (action.type) {
@@ -52,7 +52,7 @@ const interaction = (state = initial(), action: InteractionActionTypes): Initial
 			}
 
 		case constants.RESET_INTERACTION_TO_INITIAL:
-			return initial()
+			return initial
 
 		case constants.SEARCH_INTERACTIONS:
 			let interactionResults = payload.interactions

@@ -24,6 +24,8 @@ import {
 	TextArea
 } from "semantic-ui-react"
 import { RootState } from "@store/reducer"
+import { GetServerSideProps } from "next"
+import { initial } from "@reducers/interaction"
 import { InitialPageState } from "@interfaces/options"
 import { Provider, connect } from "react-redux"
 import { fetchDepartments } from "@options/departments"
@@ -33,6 +35,8 @@ import { useRouter } from "next/router"
 import { parseJwt } from "@utils/tokenFunctions"
 import { withTheme } from "@redux/ThemeProvider"
 import { compose } from "redux"
+import { baseUrl } from "@options/config"
+import axios from "axios"
 import DefaultLayout from "@layouts/default"
 import DefaultPic from "@public/images/avatar/officer.png"
 import Dropzone from "react-dropzone"
@@ -45,6 +49,59 @@ import ReactPlayer from "react-player"
 import SearchResults from "@components/searchResults"
 import store from "@store"
 import VideoInput from "@components/videoInput"
+
+export const getServerSideProps: GetServerSideProps = async ({ params }) => {
+	let { interaction, interactions } = initial
+
+	if (typeof params === "undefined") {
+		return {
+			props: {
+				interaction,
+				interactions
+			}
+		}
+	}
+
+	if (params.slug === "create") {
+		return {
+			props: {
+				interaction,
+				interactions
+			}
+		}
+	}
+
+	const data = await axios.get(`${baseUrl}api/interaction/${params.slug}`)
+	if (data.data.error) {
+		interaction.data = {
+			officers: {}
+		}
+		interaction.error = true
+		interaction.errorMsg = data.data.msg
+	} else {
+		interaction.data = data.data.interaction
+		interaction.error = false
+		interaction.errorMsg = ""
+
+		const interactionsData = await axios.get(`${baseUrl}api/interaction/search`, {
+			params: {
+				exclude: [data.data.interaction.id]
+			}
+		})
+		const _interactions = interactionsData.data
+		interactions = _interactions
+		interactions.results = _interactions.interactions
+	}
+
+	interaction.loading = false
+
+	return {
+		props: {
+			interaction,
+			interactions
+		}
+	}
+}
 
 const Interaction: React.FunctionComponent = ({
 	createInteraction,

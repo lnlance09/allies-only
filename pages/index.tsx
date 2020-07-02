@@ -4,14 +4,34 @@ import { Provider, connect } from "react-redux"
 import { withTheme } from "@redux/ThemeProvider"
 import { compose } from "redux"
 import { RootState } from "@store/reducer"
+import { GetServerSideProps } from "next"
+import { initial } from "@reducers/interaction"
 import { InitialPageState } from "@interfaces/options"
+import { baseUrl } from "@options/config"
+import axios from "axios"
 import DefaultLayout from "@layouts/default"
 import PropTypes from "prop-types"
 import React, { useEffect } from "react"
 import SearchResults from "@components/searchResults"
-import store from "@store"
+import store from "@store/index"
 
-const Home: React.FunctionComponent = ({ interactions, inverted, searchInteractions }) => {
+export const getServerSideProps: GetServerSideProps = async () => {
+	const data = await axios.get(`${baseUrl}api/interaction/search`)
+
+	const interactions = initial.interactions
+	interactions.hasMore = data.data.hasMore
+	interactions.loading = false
+	interactions.page = data.data.page
+	interactions.results = data.data.interactions
+
+	return {
+		props: {
+			interactions
+		}
+	}
+}
+
+const Home: React.FC = ({ interactions, inverted, searchInteractions }) => {
 	useEffect(() => {
 		searchInteractions({ page: 0 })
 	}, [])

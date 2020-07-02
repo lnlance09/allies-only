@@ -88,14 +88,14 @@ const SearchResults: React.FunctionComponent = ({
 						>
 							<Image
 								onError={(i) => (i.target.src = DefaultPic)}
-								src={result.img}
+								src={result.img === null ? DefaultPic : result.img}
 								wrapped={false}
 							/>
 							<Card.Content>
 								<Card.Header>{result.title}</Card.Header>
 								<Card.Meta>
 									<Moment date={result.createdAt} fromNow /> •{" "}
-									<Link href={`/departments/${result.departmentId}`}>
+									<Link href={`/departments/${result.departmentSlug}`}>
 										<a>{result.departmentName}</a>
 									</Link>
 								</Card.Meta>

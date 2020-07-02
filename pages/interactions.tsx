@@ -1,19 +1,43 @@
 import { searchInteractions } from "@actions/interaction"
 import { Button, Container, Divider, Header } from "semantic-ui-react"
 import { RootState } from "@store/reducer"
+import { GetServerSideProps } from "next"
+import { initial } from "@reducers/interaction"
 import { InitialPageState } from "@interfaces/options"
 import { DebounceInput } from "react-debounce-input"
 import { Provider, connect } from "react-redux"
 import { useRouter } from "next/router"
 import { withTheme } from "@redux/ThemeProvider"
 import { compose } from "redux"
+import { baseUrl } from "@options/config"
+import axios from "axios"
 import DefaultLayout from "@layouts/default"
 import PropTypes from "prop-types"
 import React, { useEffect, useState } from "react"
 import SearchResults from "@components/searchResults"
-import store from "@store"
+import store from "@store/index"
 
-const Interactions: React.FunctionComponent = ({ interactions, inverted, searchInteractions }) => {
+export const getServerSideProps: GetServerSideProps = async ({ req }) => {
+	const data = await axios.get(`${baseUrl}api/interaction/search`, {
+		params: {
+			q: req.query.q
+		}
+	})
+
+	const interactions = initial.interactions
+	interactions.hasMore = data.data.hasMore
+	interactions.loading = false
+	interactions.page = data.data.page
+	interactions.results = data.data.interactions
+
+	return {
+		props: {
+			interactions
+		}
+	}
+}
+
+const Interactions: React.FC = ({ interactions, inverted, searchInteractions }) => {
 	const router = useRouter()
 	const { q } = router.query
 

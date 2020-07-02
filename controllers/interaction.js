@@ -212,7 +212,7 @@ exports.findAll = (req, res) => {
 			})
 		})
 		.catch((err) => {
-			return res.status(500).send({
+			return res.status(200).send({
 				error: true,
 				msg: err.message || "An error occurred"
 			})
@@ -289,7 +289,7 @@ exports.findOne = (req, res) => {
 	})
 		.then((interactions) => {
 			if (interactions.length === 0) {
-				return res.status(404).send({
+				return res.status(200).send({
 					error: true,
 					msg: "That interaction does not exist"
 				})
@@ -342,7 +342,7 @@ exports.findOne = (req, res) => {
 			})
 		})
 		.catch((err) => {
-			return res.status(500).send({
+			return res.status(200).send({
 				error: true,
 				msg: err.message || "An error occurred"
 			})
