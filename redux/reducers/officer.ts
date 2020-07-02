@@ -3,7 +3,7 @@ import { s3BaseUrl } from "@options/config"
 import { InitialPageState } from "@interfaces/options"
 import { OfficerActionTypes } from "@interfaces/officer"
 
-const initial: InitialPageState = () => ({
+export const initial: InitialPageState = {
 	officer: {
 		data: {},
 		error: false,
@@ -24,9 +24,9 @@ const initial: InitialPageState = () => ({
 		loading: true,
 		results: []
 	}
-})
+}
 
-const officer = (state = initial(), action: OfficerActionTypes): InitialPageState => {
+const officer = (state = initial, action: OfficerActionTypes): InitialPageState => {
 	const { payload } = action
 
 	switch (action.type) {

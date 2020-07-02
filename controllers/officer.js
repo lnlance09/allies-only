@@ -244,7 +244,7 @@ exports.findAll = async (req, res) => {
 			})
 		})
 		.catch((err) => {
-			return res.status(500).send({
+			return res.status(200).send({
 				error: true,
 				msg: err.message || "An error occurred"
 			})
@@ -293,7 +293,7 @@ exports.findOne = async (req, res) => {
 	})
 		.then((officers) => {
 			if (officers.length === 0) {
-				return res.status(404).send({
+				return res.status(200).send({
 					error: true,
 					msg: "That meme does not exist"
 				})
@@ -301,7 +301,7 @@ exports.findOne = async (req, res) => {
 
 			const officer = officers[0]
 			if (officer.id === null) {
-				return res.status(404).send({
+				return res.status(200).send({
 					error: true,
 					msg: "That officer does not exist"
 				})
@@ -313,7 +313,7 @@ exports.findOne = async (req, res) => {
 			})
 		})
 		.catch((err) => {
-			return res.status(500).send({
+			return res.status(200).send({
 				error: true,
 				msg: err.message || "An error occurred"
 			})

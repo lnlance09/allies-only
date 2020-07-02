@@ -64,7 +64,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
 
 		const officersData = await axios.get(`${baseUrl}api/officer/search`, {
 			params: {
-				departmentId: params.slug
+				departmentId: data.data.department.id
 			}
 		})
 		const officers = officersData.data
@@ -73,7 +73,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
 
 		const interactionsData = await axios.get(`${baseUrl}api/interaction/search`, {
 			params: {
-				departmentId: params.slug
+				departmentId: data.data.department.id
 			}
 		})
 		const interactions = interactionsData.data
@@ -166,13 +166,19 @@ const Department: React.FC = ({
 				seo={{
 					description: createMode
 						? "Add a new police department"
+						: department.error
+						? "Not found"
 						: `Keep tabs on the ${department.data.name} and their interactions with citizens in their jurisdiction`,
 					image: {
 						height: 500,
 						src: "/public/images/logos/logo.png",
 						width: 500
 					},
-					title: createMode ? "Add a department" : department.data.name,
+					title: createMode
+						? "Add a department"
+						: department.error
+						? "Not found"
+						: department.data.name,
 					url: `departments/${slug}`
 				}}
 				showFooter={false}

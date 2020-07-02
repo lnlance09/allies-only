@@ -14,6 +14,8 @@ import {
 	Loader
 } from "semantic-ui-react"
 import { RootState } from "@store/reducer"
+import { GetServerSideProps } from "next"
+import { initial } from "@reducers/officer"
 import { InitialPageState } from "@interfaces/options"
 import { formatPlural } from "@utils/textFunctions"
 import { parseJwt } from "@utils/tokenFunctions"
@@ -22,6 +24,8 @@ import { fetchDepartments } from "@options/departments"
 import { useRouter } from "next/router"
 import { withTheme } from "@redux/ThemeProvider"
 import { compose } from "redux"
+import { baseUrl } from "@options/config"
+import axios from "axios"
 import DefaultLayout from "@layouts/default"
 import DefaultPic from "@public/images/avatar/officer.png"
 import ImageUpload from "@components/imageUpload"
@@ -29,7 +33,55 @@ import Link from "next/link"
 import PropTypes from "prop-types"
 import React, { useEffect, useState, Fragment } from "react"
 import SearchResults from "@components/searchResults"
-import store from "@store"
+import store from "@store/index"
+
+export const getServerSideProps: GetServerSideProps = async ({ params }) => {
+	const officer = initial
+
+	if (typeof params === "undefined") {
+		return {
+			props: {
+				officer
+			}
+		}
+	}
+
+	if (params.slug === "create") {
+		return {
+			props: {
+				officer
+			}
+		}
+	}
+
+	const data = await axios.get(`${baseUrl}api/officer/${params.slug}`)
+	if (data.data.error) {
+		officer.data = {}
+		officer.error = true
+		officer.errorMsg = data.data.msg
+	} else {
+		officer.data = data.data.officer
+		officer.error = false
+		officer.errorMsg = ""
+
+		const interactionsData = await axios.get(`${baseUrl}api/interaction/search`, {
+			params: {
+				officerId: data.data.officer.id
+			}
+		})
+		const interactions = interactionsData.data
+		officer.interactions = interactions
+		officer.interactions.results = interactions.interactions
+	}
+
+	officer.loading = false
+
+	return {
+		props: {
+			officer
+		}
+	}
+}
 
 const Officer: React.FunctionComponent = ({
 	createOfficer,
@@ -42,10 +94,8 @@ const Officer: React.FunctionComponent = ({
 	const router = useRouter()
 	const { departmentId, slug } = router.query
 
-	const { departmentName, departmentSlug, id, img } = officer.data
-
 	const [bearer, setBearer] = useState(null)
-	const [createMode, setCreateMode] = useState(null)
+	const [createMode, setCreateMode] = useState(slug === "create")
 	const [department, setDepartment] = useState("")
 	const [departmentOptions, setDepartmentOptions] = useState([])
 	const [firstName, setFirstName] = useState("")
@@ -114,14 +164,27 @@ const Officer: React.FunctionComponent = ({
 
 	const seoTitle = createMode
 		? "Add an officer"
+		: officer.error
+		? "Not found"
 		: `${officer.data.firstName} ${officer.data.lastName}`
-	const seoDescription = officer.error
+	const seoDescription = createMode
 		? "Keep tabs on police officers and their interactions with citizens in their jurisdiction"
+		: officer.error
+		? "Not found"
 		: `${officer.data.firstName} ${officer.data.lastName}'s interactions with citizens`
-	const seoImage = {
+
+	let seoImage = {
 		height: 500,
 		src: "/public/images/logos/logo.png",
 		width: 500
+	}
+
+	if (!createMode && !officer.error) {
+		seoImage = {
+			height: 500,
+			src: officer.data.img === null ? "/public/images/logos/logo.png" : officer.data.img,
+			width: 500
+		}
 	}
 
 	return (
@@ -229,7 +292,11 @@ const Officer: React.FunctionComponent = ({
 														}
 														fluid
 														id={officer.data.id}
-														img={img === null ? DefaultPic : img}
+														img={
+															officer.data.img === null
+																? DefaultPic
+																: officer.data.img
+														}
 														inverted={inverted}
 													/>
 												</Grid.Column>
@@ -241,9 +308,14 @@ const Officer: React.FunctionComponent = ({
 																{officer.data.lastName}
 																<Header.Subheader>
 																	<Link
-																		href={`/departments/${departmentSlug}`}
+																		href={`/departments/${officer.data.departmentSlug}`}
 																	>
-																		<a>{departmentName}</a>
+																		<a>
+																			{
+																				officer.data
+																					.departmentName
+																			}
+																		</a>
 																	</Link>
 																</Header.Subheader>
 															</Header>
@@ -257,7 +329,7 @@ const Officer: React.FunctionComponent = ({
 																	inverted={inverted}
 																	onClick={() =>
 																		router.push(
-																			`/interactions/create?departmentId=${officer.data.departmentId}&officerId=${id}`
+																			`/interactions/create?departmentId=${officer.data.departmentId}&officerId=${officer.data.id}`
 																		)
 																	}
 																/>
