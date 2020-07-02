@@ -24,50 +24,38 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
 		}
 	})
 
-	const initialDepartments = initial.initialDepartments
-	initialDepartments.hasMore = data.data.hasMore
-	initialDepartments.loading = false
-	initialDepartments.page = data.data.page
-	initialDepartments.results = data.data.departments
+	const departments = initial.departments
+	departments.hasMore = data.data.hasMore
+	departments.loading = false
+	departments.page = data.data.page
+	departments.results = data.data.departments
 
 	return {
 		props: {
-			initialDepartments
+			departments
 		}
 	}
 }
 
-const Departments: React.FC = ({
-	departments,
-	initialDepartments,
-	inverted,
-	searchDepartments
-}) => {
+const Departments: React.FunctionComponent = ({ departments, inverted, searchDepartments }) => {
 	const router = useRouter()
 	const { q } = router.query
 
 	const [searchVal, setSearchVal] = useState(q)
-	const [mounted, setMounted] = useState(false)
 
 	useEffect(() => {
 		searchDepartments({ q })
 		setSearchVal(q)
 	}, [q])
 
-	const loadMore = (page: number, q: string) => {
+	const loadMore = (page, q) => {
 		return searchDepartments({ page, q })
 	}
 
 	const searchForResults = (e) => {
-		setMounted(true)
 		const q = e.target.value
 		setSearchVal(q)
 		searchDepartments({ page: 0, q })
-	}
-
-	let results = initialDepartments
-	if (mounted) {
-		results = departments
 	}
 
 	return (
@@ -127,13 +115,13 @@ const Departments: React.FC = ({
 					<Divider inverted={inverted} section />
 
 					<SearchResults
-						hasMore={results.hasMore}
+						hasMore={departments.hasMore}
 						inverted={inverted}
-						loading={results.loading}
+						loading={departments.loading}
 						loadMore={({ page, q }) => loadMore(page, q)}
-						page={results.page}
+						page={departments.page}
 						q={searchVal}
-						results={results.results}
+						results={departments.results}
 						type="departments"
 					/>
 				</Container>
@@ -160,35 +148,12 @@ Departments.propTypes = {
 			])
 		)
 	}),
-	initialDepartments: PropTypes.shape({
-		hasMore: PropTypes.bool,
-		loading: PropTypes.bool,
-		page: PropTypes.number,
-		results: PropTypes.arrayOf(
-			PropTypes.oneOfType([
-				PropTypes.bool,
-				PropTypes.shape({
-					city: PropTypes.string,
-					county: PropTypes.string,
-					name: PropTypes.string,
-					state: PropTypes.string,
-					type: PropTypes.number
-				})
-			])
-		)
-	}),
 	inverted: PropTypes.bool,
 	searchDepartments: PropTypes.func
 }
 
 Departments.defaultProps = {
 	departments: {
-		hasMore: false,
-		loading: true,
-		page: 0,
-		results: [false, false, false, false, false, false]
-	},
-	initialDepartments: {
 		hasMore: false,
 		loading: true,
 		page: 0,

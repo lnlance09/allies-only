@@ -29,33 +29,6 @@ export const initial: InitialPageState = {
 		hasMore: false,
 		loading: true,
 		results: []
-	},
-	initialDepartment: {
-		data: {},
-		error: false,
-		errorMsg: "",
-		interactions: {
-			error: false,
-			errorMsg: "",
-			hasMore: false,
-			loading: true,
-			results: []
-		},
-		loading: true,
-		officers: {
-			error: false,
-			errorMsg: "",
-			hasMore: false,
-			loading: true,
-			results: []
-		}
-	},
-	initialDepartments: {
-		error: false,
-		errorMsg: "",
-		hasMore: false,
-		loading: true,
-		results: []
 	}
 }
 

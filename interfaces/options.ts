@@ -27,8 +27,6 @@ export interface PaginationPayload {
 }
 
 export interface DropdownOption {
-	departmentId?: number;
-	departmentName?: string;
 	key: string;
 	text: string;
 	value: number;
