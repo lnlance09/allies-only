@@ -15,6 +15,8 @@ import {
 	Loader
 } from "semantic-ui-react"
 import { RootState } from "@store/reducer"
+import { GetServerSideProps } from "next"
+import { initial } from "@reducers/department"
 import { InitialPageState } from "@interfaces/options"
 import { formatPlural } from "@utils/textFunctions"
 import { Provider, connect } from "react-redux"
@@ -22,12 +24,71 @@ import { fetchCities } from "@options/cities"
 import { useRouter } from "next/router"
 import { withTheme } from "@redux/ThemeProvider"
 import { compose } from "redux"
+import { baseUrl } from "@options/config"
+import axios from "axios"
 import DefaultLayout from "@layouts/default"
 import MapBox from "@components/mapBox"
 import PropTypes from "prop-types"
 import React, { useEffect, useState, Fragment } from "react"
 import SearchResults from "@components/searchResults"
 import store from "@store/index"
+
+export const getServerSideProps: GetServerSideProps = async ({ params }) => {
+	const department = initial
+
+	if (typeof params === "undefined") {
+		return {
+			props: {
+				department
+			}
+		}
+	}
+
+	if (params.slug === "create") {
+		return {
+			props: {
+				department
+			}
+		}
+	}
+
+	const data = await axios.get(`${baseUrl}api/department/${params.slug}`)
+	if (data.data.error) {
+		department.data = {}
+		department.error = true
+		department.errorMsg = data.data.msg
+	} else {
+		department.data = data.data.department
+		department.error = false
+		department.errorMsg = ""
+
+		const officersData = await axios.get(`${baseUrl}api/officer/search`, {
+			params: {
+				departmentId: params.slug
+			}
+		})
+		const officers = officersData.data
+		department.officers = officers
+		department.officers.results = officers.officers
+
+		const interactionsData = await axios.get(`${baseUrl}api/interaction/search`, {
+			params: {
+				departmentId: params.slug
+			}
+		})
+		const interactions = interactionsData.data
+		department.interactions = interactions
+		department.interactions.results = interactions.interactions
+	}
+
+	department.loading = false
+
+	return {
+		props: {
+			department
+		}
+	}
+}
 
 const Department: React.FC = ({
 	createDepartment,
@@ -42,7 +103,7 @@ const Department: React.FC = ({
 
 	const [activeItem, setActiveItem] = useState("officers")
 	const [city, setCity] = useState("")
-	const [createMode, setCreateMode] = useState(false)
+	const [createMode, setCreateMode] = useState(slug === "create")
 	const [formLoading, setFormLoading] = useState(false)
 	const [locationOptions, setLocationOptions] = useState([])
 	const [name, setName] = useState("")

@@ -11,7 +11,7 @@ import NumberFormat from "react-number-format"
 import PropTypes from "prop-types"
 import React, { Fragment, useEffect, useState } from "react"
 import Router from "next/router"
-import store, { useStore } from "@store/index"
+import store from "@store/index"
 
 const Sidebar: React.FC = ({
 	activeItem,
@@ -24,7 +24,6 @@ const Sidebar: React.FC = ({
 	inverted: boolean,
 	logout: void
 }) => {
-	// const store = useStore()
 	const router = useRouter()
 
 	const [allyCount, setAllyCount] = useState(null)
@@ -200,7 +199,7 @@ const Sidebar: React.FC = ({
 					<List.Item>© 2020, Allies Only</List.Item>
 				</List>
 
-				{allyCount !== null && !authenticated ? (
+				{allyCount !== null && !authenticated && (
 					<div style={{ textAlign: "center" }}>
 						<Statistic inverted={inverted}>
 							<Statistic.Value>
@@ -213,7 +212,7 @@ const Sidebar: React.FC = ({
 							<Statistic.Label>Allies</Statistic.Label>
 						</Statistic>
 					</div>
-				) : null}
+				)}
 			</div>
 		</Provider>
 	)

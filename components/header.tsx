@@ -119,7 +119,7 @@ const PageHeader: React.FC = ({ basicHeader, loading }) => {
 					</Menu.Item>
 					<Menu.Item as="a" onClick={() => router.push("/departments")}>
 						<Icon name="building" size="small" />
-						Department
+						Departments
 					</Menu.Item>
 					<Menu.Item as="a" onClick={() => router.push("/interactions/create")}>
 						<Icon name="plus" size="small" />

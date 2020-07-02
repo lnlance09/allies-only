@@ -2,7 +2,7 @@ import * as constants from "../constants"
 import { InitialPageState } from "@interfaces/options"
 import { DepartmentActionTypes } from "@interfaces/department"
 
-const initial: InitialPageState = () => ({
+export const initial: InitialPageState = {
 	department: {
 		data: {},
 		error: false,
@@ -30,9 +30,9 @@ const initial: InitialPageState = () => ({
 		loading: true,
 		results: []
 	}
-})
+}
 
-const department = (state = initial(), action: DepartmentActionTypes): InitialPageState => {
+const department = (state = initial, action: DepartmentActionTypes): InitialPageState => {
 	const { payload } = action
 
 	switch (action.type) {
@@ -50,7 +50,7 @@ const department = (state = initial(), action: DepartmentActionTypes): InitialPa
 			}
 
 		case constants.RESET_DEPARTMENT_TO_INITIAL:
-			return initial()
+			return initial
 
 		case constants.SEARCH_DEPARTMENTS:
 			let departmentResults = payload.departments

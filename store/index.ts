@@ -28,6 +28,8 @@ const store = createStore(
 )
 export default store
 
+export type AppDispatch = typeof store.dispatch
+
 // Make store
 const makeStore = () =>
 	createStore(reducer, initialState, compose(applyMiddleware(...middleware, logger)))
@@ -57,5 +59,3 @@ export const useStore = (initialState) => {
 	const store = useMemo(() => initializeStore(initialState), [initialState])
 	return store
 }
-
-export type AppDispatch = typeof store.dispatch

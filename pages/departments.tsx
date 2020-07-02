@@ -1,17 +1,41 @@
 import { searchDepartments } from "@actions/department"
 import { Button, Container, Divider, Form, Header } from "semantic-ui-react"
 import { RootState } from "@store/reducer"
+import { GetServerSideProps } from "next"
+import { initial } from "@reducers/department"
 import { InitialPageState } from "@interfaces/options"
 import { DebounceInput } from "react-debounce-input"
 import { Provider, connect } from "react-redux"
 import { useRouter } from "next/router"
 import { withTheme } from "@redux/ThemeProvider"
 import { compose } from "redux"
+import { baseUrl } from "@options/config"
+import axios from "axios"
 import DefaultLayout from "@layouts/default"
 import PropTypes from "prop-types"
 import React, { useEffect, useState } from "react"
 import SearchResults from "@components/searchResults"
 import store from "@store/index"
+
+export const getServerSideProps: GetServerSideProps = async ({ req }) => {
+	const data = await axios.get(`${baseUrl}api/department/search`, {
+		params: {
+			q: req.query.q
+		}
+	})
+
+	const departments = initial.departments
+	departments.hasMore = data.data.hasMore
+	departments.loading = false
+	departments.page = data.data.page
+	departments.results = data.data.departments
+
+	return {
+		props: {
+			departments
+		}
+	}
+}
 
 const Departments: React.FunctionComponent = ({ departments, inverted, searchDepartments }) => {
 	const router = useRouter()

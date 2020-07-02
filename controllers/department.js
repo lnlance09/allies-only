@@ -18,7 +18,7 @@ exports.create = async (req, res) => {
 		return res.status(422).send({ error: true, msg: "You must provide a name" })
 	}
 
-	if (!validator.isAlpha(name)) {
+	if (!validator.isAlpha(name.split(" ").join(""))) {
 		return res
 			.status(401)
 			.send({ error: true, msg: "Department names can only contain letters" })
@@ -200,7 +200,7 @@ exports.findAll = (req, res) => {
 			})
 		})
 		.catch((err) => {
-			return res.status(500).send({
+			return res.status(200).send({
 				error: true,
 				msg: err.message || "An error occurred"
 			})
@@ -256,7 +256,7 @@ exports.findOne = (req, res) => {
 		.then(async (data) => {
 			console.log("data", data)
 			if (data.length === 0) {
-				return res.status(404).send({
+				return res.status(200).send({
 					error: true,
 					msg: "That department does not exist"
 				})
@@ -264,7 +264,7 @@ exports.findOne = (req, res) => {
 
 			const department = data[0]
 			if (department.id === null) {
-				return res.status(404).send({
+				return res.status(200).send({
 					error: true,
 					msg: "That department does not exist"
 				})
@@ -315,7 +315,7 @@ exports.findOne = (req, res) => {
 			})
 		})
 		.catch((err) => {
-			return res.status(500).send({
+			return res.status(200).send({
 				error: true,
 				msg: err.message || "An error occurred"
 			})
