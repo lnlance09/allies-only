@@ -91,7 +91,10 @@ exports.findAll = (req, res) => {
 	const { forAutocomplete, forOptions, id, page, q } = req.query
 
 	let limit = 20
-	let order = [[db.Sequelize.col("interactionCount"), "DESC"]]
+	let order = [
+		[db.Sequelize.col("interactionCount"), "DESC"],
+		[db.Sequelize.col("name"), "ASC"]
+	]
 	let where = {
 		name: {
 			[Op.like]: `%${q}%`

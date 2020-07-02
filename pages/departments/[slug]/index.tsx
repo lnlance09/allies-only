@@ -34,12 +34,12 @@ import SearchResults from "@components/searchResults"
 import store from "@store/index"
 
 export const getServerSideProps: GetServerSideProps = async ({ params }) => {
-	const department = initial
+	const initialDepartment = initial
 
 	if (typeof params === "undefined") {
 		return {
 			props: {
-				department
+				initialDepartment
 			}
 		}
 	}
@@ -47,20 +47,20 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
 	if (params.slug === "create") {
 		return {
 			props: {
-				department
+				initialDepartment
 			}
 		}
 	}
 
 	const data = await axios.get(`${baseUrl}api/department/${params.slug}`)
 	if (data.data.error) {
-		department.data = {}
-		department.error = true
-		department.errorMsg = data.data.msg
+		initialDepartment.data = {}
+		initialDepartment.error = true
+		initialDepartment.errorMsg = data.data.msg
 	} else {
-		department.data = data.data.department
-		department.error = false
-		department.errorMsg = ""
+		initialDepartment.data = data.data.department
+		initialDepartment.error = false
+		initialDepartment.errorMsg = ""
 
 		const officersData = await axios.get(`${baseUrl}api/officer/search`, {
 			params: {
@@ -68,8 +68,8 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
 			}
 		})
 		const officers = officersData.data
-		department.officers = officers
-		department.officers.results = officers.officers
+		initialDepartment.officers = officers
+		initialDepartment.officers.results = officers.officers
 
 		const interactionsData = await axios.get(`${baseUrl}api/interaction/search`, {
 			params: {
@@ -77,15 +77,15 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
 			}
 		})
 		const interactions = interactionsData.data
-		department.interactions = interactions
-		department.interactions.results = interactions.interactions
+		initialDepartment.interactions = interactions
+		initialDepartment.interactions.results = interactions.interactions
 	}
 
-	department.loading = false
+	initialDepartment.loading = false
 
 	return {
 		props: {
-			department
+			initialDepartment
 		}
 	}
 }
@@ -94,6 +94,7 @@ const Department: React.FC = ({
 	createDepartment,
 	department,
 	getDepartment,
+	initialDepartment,
 	inverted,
 	searchInteractions,
 	searchOfficers
@@ -106,6 +107,7 @@ const Department: React.FC = ({
 	const [createMode, setCreateMode] = useState(slug === "create")
 	const [formLoading, setFormLoading] = useState(false)
 	const [locationOptions, setLocationOptions] = useState([])
+	const [mounted, setMounted] = useState(false)
 	const [name, setName] = useState("")
 
 	useEffect(() => {
@@ -143,6 +145,8 @@ const Department: React.FC = ({
 	}
 
 	const loadMore = (page: number, departmentId: number) => {
+		setMounted(true)
+
 		if (activeItem === "officers") {
 			return searchOfficers({ departmentId, page })
 		}
@@ -154,9 +158,9 @@ const Department: React.FC = ({
 		setCity(value)
 	}
 
-	let results = department.officers
+	let results = mounted ? department.officers : initialDepartment.officers
 	if (activeItem === "interactions") {
-		results = department.interactions
+		results = mounted ? department.interactions : initialDepartment.interactions
 	}
 
 	return (
@@ -166,9 +170,9 @@ const Department: React.FC = ({
 				seo={{
 					description: createMode
 						? "Add a new police department"
-						: department.error
+						: initialDepartment.error
 						? "Not found"
-						: `Keep tabs on the ${department.data.name} and their interactions with citizens in their jurisdiction`,
+						: `Keep tabs on the ${initialDepartment.data.name} and their interactions with citizens in their jurisdiction`,
 					image: {
 						height: 500,
 						src: "/public/images/logos/logo.png",
@@ -176,9 +180,9 @@ const Department: React.FC = ({
 					},
 					title: createMode
 						? "Add a department"
-						: department.error
+						: initialDepartment.error
 						? "Not found"
-						: department.data.name,
+						: initialDepartment.data.name,
 					url: `departments/${slug}`
 				}}
 				showFooter={false}
@@ -231,7 +235,7 @@ const Department: React.FC = ({
 
 				{!createMode && (
 					<Fragment>
-						{department.error ? (
+						{initialDepartment.error ? (
 							<Container className="errorMsgContainer" textAlign="center">
 								<Header as="h1" inverted={inverted}>
 									This department does not exist
@@ -246,7 +250,7 @@ const Department: React.FC = ({
 							</Container>
 						) : (
 							<Container>
-								{department.loading ? (
+								{initialDepartment.loading ? (
 									<Container textAlign="center">
 										<Dimmer active className="pageDimmer">
 											<Loader active size="huge">
@@ -260,30 +264,41 @@ const Department: React.FC = ({
 											<Grid.Row>
 												<Grid.Column className="mapColumn" width={4}>
 													<MapBox
-														lat={parseFloat(department.data.lat, 10)}
-														lng={parseFloat(department.data.lon, 10)}
-														zoom={department.data.type === 1 ? 4 : 9}
+														lat={parseFloat(
+															initialDepartment.data.lat,
+															10
+														)}
+														lng={parseFloat(
+															initialDepartment.data.lon,
+															10
+														)}
+														zoom={
+															initialDepartment.data.type === 1
+																? 4
+																: 9
+														}
 													/>
 												</Grid.Column>
 												<Grid.Column width={12}>
 													<Header as="h1" inverted={inverted}>
-														{department.data.name}
+														{initialDepartment.data.name}
 														<Header.Subheader>
-															{department.data.type === 1 && (
+															{initialDepartment.data.type === 1 && (
 																<Fragment>
-																	{department.data.state}
+																	{initialDepartment.data.state}
 																</Fragment>
 															)}
-															{department.data.type === 2 && (
+															{initialDepartment.data.type === 2 && (
 																<Fragment>
-																	{department.data.city},{" "}
-																	{department.data.state}
+																	{initialDepartment.data.city},{" "}
+																	{initialDepartment.data.state}
 																</Fragment>
 															)}
-															{department.data.type === 3 && (
+															{initialDepartment.data.type === 3 && (
 																<Fragment>
-																	{department.data.county} County,{" "}
-																	{department.data.state}
+																	{initialDepartment.data.county}{" "}
+																	County,{" "}
+																	{initialDepartment.data.state}
 																</Fragment>
 															)}
 														</Header.Subheader>
@@ -298,7 +313,7 @@ const Department: React.FC = ({
 															inverted={inverted}
 															onClick={() =>
 																router.push(
-																	`/interactions/create?departmentId=${department.data.id}`
+																	`/interactions/create?departmentId=${initialDepartment.data.id}`
 																)
 															}
 														/>
@@ -310,7 +325,7 @@ const Department: React.FC = ({
 															inverted={inverted}
 															onClick={() =>
 																router.push(
-																	`/officers/create?departmentId=${department.data.id}`
+																	`/officers/create?departmentId=${initialDepartment.data.id}`
 																)
 															}
 															style={{ marginLeft: "7px" }}
@@ -329,9 +344,14 @@ const Department: React.FC = ({
 																setActiveItem("officers")
 															}
 														>
-															<b>{department.data.officerCount}</b>{" "}
+															<b>
+																{
+																	initialDepartment.data
+																		.officerCount
+																}
+															</b>{" "}
 															{formatPlural(
-																department.data.officerCount,
+																initialDepartment.data.officerCount,
 																"officer"
 															)}
 														</List.Item>
@@ -342,10 +362,14 @@ const Department: React.FC = ({
 															}
 														>
 															<b>
-																{department.data.interactionCount}
+																{
+																	initialDepartment.data
+																		.interactionCount
+																}
 															</b>{" "}
 															{formatPlural(
-																department.data.interactionCount,
+																initialDepartment.data
+																	.interactionCount,
 																"interaction"
 															)}
 														</List.Item>
@@ -355,9 +379,9 @@ const Department: React.FC = ({
 										</Grid>
 										<Divider section />
 
-										{!department.error && !department.loading ? (
+										{!initialDepartment.error && !initialDepartment.loading && (
 											<SearchResults
-												departmentId={department.data.id}
+												departmentId={initialDepartment.data.id}
 												hasMore={results.hasMore}
 												inverted={inverted}
 												loading={results.loading}
@@ -368,7 +392,7 @@ const Department: React.FC = ({
 												results={results.results}
 												type={activeItem}
 											/>
-										) : null}
+										)}
 									</Fragment>
 								)}
 							</Container>
@@ -407,7 +431,7 @@ Department.propTypes = {
 					createdAt: PropTypes.string,
 					description: PropTypes.string,
 					officer: PropTypes.shape({
-						name: PropTypes.name
+						name: PropTypes.string
 					})
 				})
 			)
@@ -429,6 +453,52 @@ Department.propTypes = {
 		})
 	}),
 	getDepartment: PropTypes.func,
+	initialDepartment: PropTypes.shape({
+		data: PropTypes.shape({
+			city: PropTypes.string,
+			county: PropTypes.string,
+			id: PropTypes.number,
+			interactionCount: PropTypes.number,
+			lat: PropTypes.string,
+			lon: PropTypes.string,
+			name: PropTypes.string,
+			officerCount: PropTypes.number,
+			state: PropTypes.string,
+			type: PropTypes.number
+		}),
+		error: PropTypes.bool,
+		errorMsg: PropTypes.string,
+		interactions: PropTypes.shape({
+			error: PropTypes.bool,
+			errorMsg: PropTypes.string,
+			hasMore: PropTypes.bool,
+			loading: PropTypes.bool,
+			results: PropTypes.arrayOf(
+				PropTypes.shape({
+					createdAt: PropTypes.string,
+					description: PropTypes.string,
+					officer: PropTypes.shape({
+						name: PropTypes.string
+					})
+				})
+			)
+		}),
+		loading: PropTypes.bool,
+		officers: PropTypes.shape({
+			error: PropTypes.bool,
+			errorMsg: PropTypes.string,
+			hasMore: PropTypes.bool,
+			loading: PropTypes.bool,
+			page: PropTypes.number,
+			results: PropTypes.arrayOf(
+				PropTypes.shape({
+					img: PropTypes.string,
+					name: PropTypes.string,
+					position: PropTypes.string
+				})
+			)
+		})
+	}),
 	inverted: PropTypes.bool,
 	searchInteractions: PropTypes.func,
 	searchOfficers: PropTypes.func
@@ -457,6 +527,26 @@ Department.defaultProps = {
 		}
 	},
 	getDepartment,
+	initialDepartment: {
+		data: {},
+		error: false,
+		errorMsg: "",
+		interactions: {
+			error: false,
+			errorMsg: "",
+			hasMore: false,
+			loading: true,
+			results: []
+		},
+		loading: true,
+		officers: {
+			error: false,
+			errorMsg: "",
+			hasMore: false,
+			loading: true,
+			results: []
+		}
+	},
 	searchInteractions,
 	searchOfficers
 }
