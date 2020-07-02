@@ -1,19 +1,43 @@
 import { searchUsers } from "@actions/user"
 import { Container, Divider, Header } from "semantic-ui-react"
 import { RootState } from "@store/reducer"
+import { GetServerSideProps } from "next"
+import { initial } from "@reducers/user"
 import { InitialPageState } from "@interfaces/options"
 import { DebounceInput } from "react-debounce-input"
 import { Provider, connect } from "react-redux"
 import { useRouter } from "next/router"
 import { withTheme } from "@redux/ThemeProvider"
 import { compose } from "redux"
+import { baseUrl } from "@options/config"
+import axios from "axios"
 import DefaultLayout from "@layouts/default"
 import PropTypes from "prop-types"
 import React, { useEffect, useState } from "react"
 import SearchResults from "@components/searchResults"
 import store from "@store"
 
-const Allies: React.FunctionComponent = ({ inverted, searchUsers, users }) => {
+export const getServerSideProps: GetServerSideProps = async ({ req }) => {
+	const data = await axios.get(`${baseUrl}api/user/search`, {
+		params: {
+			q: req.query.q
+		}
+	})
+
+	const users = initial.users
+	users.hasMore = data.data.hasMore
+	users.loading = false
+	users.page = data.data.page
+	users.results = data.data.users
+
+	return {
+		props: {
+			users
+		}
+	}
+}
+
+const Allies: React.FC = ({ inverted, searchUsers, users }) => {
 	const router = useRouter()
 	const { q } = router.query
 

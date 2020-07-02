@@ -11,6 +11,8 @@ import {
 	Placeholder
 } from "semantic-ui-react"
 import { RootState } from "@store/reducer"
+import { GetServerSideProps } from "next"
+import { initial } from "@reducers/user"
 import { InitialPageState } from "@interfaces/options"
 import { s3BaseUrl } from "@options/config"
 import { parseJwt } from "@utils/tokenFunctions"
@@ -18,6 +20,8 @@ import { useRouter } from "next/router"
 import { Provider, connect } from "react-redux"
 import { withTheme } from "@redux/ThemeProvider"
 import { compose } from "redux"
+import { baseUrl } from "@options/config"
+import axios from "axios"
 import DefaultLayout from "@layouts/default"
 import DefaultPic from "@public/images/avatar/large/joe.jpg"
 import ImageUpload from "@components/imageUpload"
@@ -25,7 +29,59 @@ import Moment from "react-moment"
 import PropTypes from "prop-types"
 import React, { Fragment, useEffect, useState } from "react"
 import SearchResults from "@components/searchResults"
-import store from "@store"
+import store from "@store/index"
+
+export const getServerSideProps: GetServerSideProps = async ({ params }) => {
+	let user = initial.user
+
+	if (typeof params === "undefined") {
+		return {
+			props: {
+				error: true,
+				errorMsg: "This ally does not exist",
+				user
+			}
+		}
+	}
+
+	let error = false
+	let errorMsg = ""
+
+	const data = await axios.get(`${baseUrl}api/user/${params.username}`)
+	if (data.data.error) {
+		error = true
+		errorMsg = data.data.msg
+	} else {
+		user = data.data.user
+		error = false
+		errorMsg = ""
+
+		const interactionsData = await axios.get(`${baseUrl}api/interaction/search`, {
+			params: {
+				userId: data.data.user.id
+			}
+		})
+		const interactions = interactionsData.data
+		user.interactions = interactions
+		user.interactions.results = interactions.interactions
+	}
+
+	console.log({
+		error,
+		errorMsg,
+		loading: false,
+		user
+	})
+
+	return {
+		props: {
+			error,
+			errorMsg,
+			loading: false,
+			user
+		}
+	}
+}
 
 const User: React.FunctionComponent = ({
 	changeProfilePic,

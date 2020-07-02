@@ -2,7 +2,7 @@ import * as constants from "../constants"
 import { InitialPageState } from "@interfaces/options"
 import { UserActionTypes } from "@interfaces/user"
 
-const initial: InitialPageState = () => ({
+export const initial: InitialPageState = {
 	error: false,
 	errorMsg: "",
 	loading: true,
@@ -22,9 +22,9 @@ const initial: InitialPageState = () => ({
 		loading: true,
 		results: []
 	}
-})
+}
 
-const user = (state = initial(), action: UserActionTypes): InitialPageState => {
+const user = (state = initial, action: UserActionTypes): InitialPageState => {
 	const { payload } = action
 
 	switch (action.type) {

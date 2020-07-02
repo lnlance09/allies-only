@@ -309,7 +309,7 @@ exports.findAll = async (req, res) => {
 			})
 		})
 		.catch((err) => {
-			return res.status(500).send({
+			return res.status(200).send({
 				error: true,
 				msg: err.message || "Some error occurred"
 			})
@@ -348,13 +348,13 @@ exports.findOne = async (req, res) => {
 				})
 			}
 
-			return res.status(401).send({
+			return res.status(200).send({
 				error: true,
 				msg: "That user does not exist"
 			})
 		})
 		.catch((err) => {
-			return res.status(500).send({
+			return res.status(200).send({
 				error: true,
 				msg: err.message || "Some error occurred"
 			})
