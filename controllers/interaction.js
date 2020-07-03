@@ -670,6 +670,11 @@ exports.uploadVideo = async (req, res) => {
 
 	if (ext === ".mov") {
 		ext = ".mp4"
+		await ffmpeg(fs.createReadStream(`uploads/${fileId}.mov`))
+			.audioCodec("libfaac")
+			.videoCodec("libx264")
+			.format("mp4")
+			.save(`uploads/${fileId}${ext}`)
 	}
 
 	const video = file.data
