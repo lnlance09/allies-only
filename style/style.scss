@@ -39,10 +39,10 @@ body {
 }
 
 .segment.inverted {
-	background: $invertedBackgroundColor !important;
+	background: lighten($invertedBackgroundColor, 4%) !important;
 
 	&.uploadSegment, &.lighter {
-		background: lighten($invertedBackgroundColor, 3%) !important;
+		// background: lighten($invertedBackgroundColor, 3%) !important;
 	}
 }
 
