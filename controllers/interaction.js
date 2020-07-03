@@ -656,7 +656,7 @@ exports.uploadVideo = async (req, res) => {
 	const extensions = [".avi", ".flv", ".m4v", ".mp4", ".mkv", ".webm"]
 
 	if (!extensions.includes(ext)) {
-		return res.status(401).send({ error: true, msg: "That video format is not allowed" })
+		return res.status(401).send({ error: true, msg: "That is not a video file" })
 	}
 
 	const video = file.data
@@ -675,10 +675,10 @@ exports.uploadVideo = async (req, res) => {
 			folder: "thumbnails",
 			timemarks: [02]
 		})
-		.on("error", () => {
+		.on("error", (err) => {
 			return res.status(500).send({
 				error: true,
-				msg: "There was en error creating the thumbnail"
+				msg: err.message
 			})
 		})
 		.on("end", async () => {
@@ -686,7 +686,7 @@ exports.uploadVideo = async (req, res) => {
 				if (err) {
 					return res.status(500).send({
 						error: true,
-						msg: "There was en error creating the thumbnail"
+						msg: err.message
 					})
 				}
 
