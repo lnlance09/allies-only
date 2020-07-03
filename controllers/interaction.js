@@ -366,7 +366,6 @@ exports.saveVideo = async (req, res) => {
 	if (type === "instagram") {
 		try {
 			const video = await save(id, "uploads").then((res) => {
-				console.log("res", res)
 				return res
 			})
 
@@ -409,7 +408,10 @@ exports.saveVideo = async (req, res) => {
 
 			await fs.readFile(video.file, async (err, data) => {
 				if (err) {
-					throw err
+					return res.status(500).send({
+						error: true,
+						msg: err.message
+					})
 				}
 
 				await Aws.uploadToS3(data, filePath, false, "video/mp4")
