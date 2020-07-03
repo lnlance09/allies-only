@@ -662,7 +662,6 @@ exports.uploadVideo = async (req, res) => {
 	const video = file.data
 	const timestamp = new Date().getTime()
 	const fileId = `${randomize("aa", 24)}-${timestamp}`
-	const fileName = `interactions/${fileId}${ext}`
 	await fs.writeFile(`uploads/${fileId}${ext}`, video, () => null)
 
 	if (ext === ".mov") {
@@ -672,8 +671,27 @@ exports.uploadVideo = async (req, res) => {
 			.videoCodec("libx264")
 			.format("mp4")
 			.save(`uploads/${fileId}${ext}`)
+			.on("error", (err) => {
+				return res.status(500).send({
+					error: true,
+					msg: err.message | "There was en error creating the thumbnail"
+				})
+			})
+			.on("end", async () => {
+				await fs.readFile(`thumbnails/${fileId}.png`, async (err, data) => {
+					if (err) {
+						return res.status(500).send({
+							error: true,
+							msg: err.message
+						})
+					}
+
+					console.log("convert", data)
+				})
+			})
 	}
 
+	const fileName = `interactions/${fileId}${ext}`
 	await Aws.uploadToS3(video, fileName, false, "video/mp4")
 
 	await ffmpeg()
