@@ -32,7 +32,7 @@ import SearchResults from "@components/searchResults"
 import store from "@store/index"
 
 export const getServerSideProps: GetServerSideProps = async ({ params }) => {
-	let initialUser = initial.initialUser
+	const initialUser = initial.initialUser
 
 	if (typeof params === "undefined") {
 		return {
@@ -97,7 +97,6 @@ const User: React.FC = ({
 	}
 
 	const imgSrc = img === null || img === "" ? DefaultPic : `${s3BaseUrl}${img}`
-
 	const ProfilePic = () => {
 		if (currentUser.id === id) {
 			return (
@@ -115,13 +114,14 @@ const User: React.FC = ({
 		return <Image onError={(i) => (i.target.src = DefaultPic)} rounded src={imgSrc} />
 	}
 
+	const _img = initialUser.data.img
 	const seoTitle = initialUser.error ? "Not found" : initialUser.data.name
-	const seoDescription = initialUser.data.error
+	const seoDescription = initialUser.error
 		? "Become an ally in the fight against police brutality and corruption"
 		: `${initialUser.data.name}'s interactions with the police on AlliesOnly`
 	const seoImage = {
 		height: 500,
-		src: initialUser.data.img,
+		src: _img === null || _img === "" ? `${s3BaseUrl}logos/logo.png` : `${s3BaseUrl}${_img}`,
 		width: 500
 	}
 

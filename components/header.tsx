@@ -100,6 +100,7 @@ const PageHeader: React.FC = ({ basicHeader, loading }) => {
 					direction="bottom"
 					icon="labeled"
 					inverted
+					onHide={() => setSidebarVisible(false)}
 					size="massive"
 					style={{ textAlign: "left" }}
 					vertical

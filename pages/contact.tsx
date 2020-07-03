@@ -2,6 +2,7 @@ import { Button, Container, Form, Header, TextArea } from "semantic-ui-react"
 import { withTheme } from "@redux/ThemeProvider"
 import { toast } from "react-toastify"
 import { getConfig } from "@options/toast"
+import { s3BaseUrl } from "@options/config"
 import axios from "axios"
 import DefaultLayout from "@layouts/default"
 import PropTypes from "prop-types"
@@ -35,7 +36,7 @@ const Contact: React.FC = ({ inverted }) => {
 				description: "Contact Us",
 				image: {
 					height: 500,
-					src: "/public/images/logos/logo.png",
+					src: `${s3BaseUrl}logos/logo.png`,
 					width: 500
 				},
 				title: "Contact",

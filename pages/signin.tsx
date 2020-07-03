@@ -1,6 +1,7 @@
 import { parseJwt } from "@utils/tokenFunctions"
 import { withTheme } from "@redux/ThemeProvider"
 import { useRouter } from "next/router"
+import { s3BaseUrl } from "@options/config"
 import Authentication from "@components/authentication"
 import DefaultLayout from "@layouts/default"
 import PropTypes from "prop-types"
@@ -28,10 +29,10 @@ const SignIn: React.FC = ({ inverted }) => {
 			containerClassName="signInPage"
 			isText
 			seo={{
-				description: "Sign in or sign up with Brandy to start creating memes",
+				description: "Sign in or sign up with Allies Only",
 				image: {
 					height: 512,
-					src: "/public/images/logos/default-logo.png",
+					src: `${s3BaseUrl}logos/logo.png`,
 					width: 512
 				},
 				title: "Sign In",

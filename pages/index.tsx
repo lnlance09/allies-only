@@ -3,6 +3,7 @@ import { Container, Header } from "semantic-ui-react"
 import { Provider, connect } from "react-redux"
 import { withTheme } from "@redux/ThemeProvider"
 import { compose } from "redux"
+import { s3BaseUrl } from "@options/config"
 import { RootState } from "@store/reducer"
 import { InitialPageState } from "@interfaces/options"
 import DefaultLayout from "@layouts/default"
@@ -30,7 +31,7 @@ const Home: React.FC = ({ interactions, inverted, searchInteractions }) => {
 						"Become an ally in the fight against police brutality and corruption",
 					image: {
 						height: 500,
-						src: "/public/images/logos/logo.png",
+						src: `${s3BaseUrl}logos/logo.png`,
 						width: 500
 					},
 					title: "Home",

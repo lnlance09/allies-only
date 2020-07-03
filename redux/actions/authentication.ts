@@ -18,7 +18,6 @@ import {
 } from "@interfaces/authentication"
 import { AppDispatch } from "@store/index"
 import axios from "axios"
-import React from "react"
 import Router from "next/router"
 
 const toastConfig = getConfig()

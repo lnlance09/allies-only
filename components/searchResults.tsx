@@ -3,7 +3,6 @@ import { formatPlural } from "@utils/textFunctions"
 import { s3BaseUrl } from "@options/config"
 import AllyPic from "@public/images/avatar/large/joe.jpg"
 import DefaultPic from "@public/images/placeholders/placeholder-dark.jpg"
-import Link from "next/link"
 import Moment from "react-moment"
 import OfficerPic from "@public/images/avatar/officer.png"
 import PropTypes from "prop-types"
@@ -95,9 +94,7 @@ const SearchResults: React.FC = ({
 								<Card.Header>{result.title}</Card.Header>
 								<Card.Meta>
 									<Moment date={result.createdAt} fromNow /> •{" "}
-									<Link href={`/departments/${result.departmentSlug}`}>
-										<a>{result.departmentName}</a>
-									</Link>
+									<span>{result.departmentName}</span>
 								</Card.Meta>
 								<Card.Description className="interactionDescription">
 									{result.description}

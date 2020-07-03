@@ -538,18 +538,25 @@ exports.update = async (req, res) => {
 
 	if (isJSON(officer)) {
 		const officers = JSON.parse(officer)
-		officers.map((o) => {
+		await officers.map(async (o) => {
 			if (isNaN(o.value)) {
 				const names = o.value.split(" ")
-				const firstName = names[0]
-				const lastName = names[names.length - 1]
+				if (names.length !== 2) {
+					return res.status(401).send({
+						error: true,
+						msg: "Officers must have first and last names"
+					})
+				}
 
-				Officer.create({
+				const firstName = names[0]
+				const lastName = names[1]
+
+				await Officer.create({
 					createdBy: authenticated ? user.data.id : 1,
 					departmentId: department,
 					firstName,
 					lastName
-				}).then((data) => {
+				}).then(async (data) => {
 					const officer = data.dataValues
 					const slug = slugify(`${firstName} ${lastName} ${officer.id}`, {
 						lower: true,
@@ -557,22 +564,22 @@ exports.update = async (req, res) => {
 						strict: true
 					})
 
-					Officer.update(
+					await Officer.update(
 						{
 							slug
 						},
 						{
 							where: { id: officer.id }
 						}
-					).then(() => {
-						OfficerInteraction.create({
+					).then(async () => {
+						await OfficerInteraction.create({
 							interactionId: id,
 							officerId: officer.id
 						})
 					})
 				})
 			} else {
-				OfficerInteraction.create({
+				await OfficerInteraction.create({
 					interactionId: id,
 					officerId: o.value
 				})

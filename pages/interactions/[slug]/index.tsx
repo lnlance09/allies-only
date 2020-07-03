@@ -26,7 +26,7 @@ import {
 import { RootState } from "@store/reducer"
 import { GetServerSideProps } from "next"
 import { initial } from "@reducers/interaction"
-import { DropdownOption, DropdownOptionsPayload, InitialPageState } from "@interfaces/options"
+import { DropdownOption, InitialPageState } from "@interfaces/options"
 import { Provider, connect } from "react-redux"
 import { fetchDepartments } from "@options/departments"
 import { fetchOfficers } from "@options/officers"
@@ -322,7 +322,7 @@ const Interaction: React.FC = ({
 
 	const officerField = (
 		<Dropdown
-			allowAdditions
+			allowAdditions={false}
 			closeOnChange
 			fluid
 			multiple
@@ -342,20 +342,29 @@ const Interaction: React.FC = ({
 
 	const hasOfficers = interaction.data.officers.length > 0
 
-	let seoTitle = "Add an Ineraction"
-	let seoDescription = "Help document police brutality"
-	const seoImage = {
-		height: 500,
-		src: `${s3BaseUrl}logos/logo.png`,
-		width: 500
+	let seo = {
+		description: "Help document police brutality",
+		image: {
+			height: 500,
+			src: `${s3BaseUrl}logos/logo.png`,
+			width: 500
+		},
+		title: "Add an Ineraction"
 	}
+
 	if (!createMode) {
-		seoTitle = initialInteraction.data.title
-		seoDescription =
-			typeof initialInteraction.data.description === "undefined" ||
-			initialInteraction.data.description === ""
-				? `This is an interaction between a civilian and the ${initialInteraction.data.department.name}`
-				: initialInteraction.data.description
+		seo = {
+			description:
+				initialInteraction.data.description === ""
+					? `This is an interaction between a civilian and the ${initialInteraction.data.department.name}`
+					: initialInteraction.data.description,
+			title: initialInteraction.data.title,
+			video: {
+				height: 500,
+				src: initialInteraction.data.video,
+				width: 500
+			}
+		}
 	}
 
 	return (
@@ -364,12 +373,7 @@ const Interaction: React.FC = ({
 				activeItem={slug === "create" ? "addInteraction" : "interactions"}
 				containerClassName="interactionsPage"
 				loading={loading}
-				seo={{
-					description: seoDescription,
-					image: seoImage,
-					title: seoTitle,
-					url: `interactions/${slug}`
-				}}
+				seo={seo}
 				showFooter={false}
 			>
 				{createMode && (
@@ -414,48 +418,53 @@ const Interaction: React.FC = ({
 								</div>
 							)}
 
-							<Divider horizontal inverted={inverted}>
-								<Header as="h2" inverted={inverted}>
-									OR
-								</Header>
-							</Divider>
+							<div id="optionalInteractionUpload">
+								<Divider horizontal inverted={inverted}>
+									<Header as="h2" inverted={inverted}>
+										OR
+									</Header>
+								</Divider>
 
-							<VideoInput
-								onPasteInstagram={({
-									thumbnail,
-									video
-								}: {
-									thumbnail: string,
-									video: string
-								}) => setVideo({ thumbnail, video })}
-								onPasteYouTube={({
-									thumbnail,
-									video
-								}: {
-									thumbnail: string,
-									video: string
-								}) => setVideo({ thumbnail, video })}
-								setLoading={setLoading}
-							/>
+								<VideoInput
+									onPasteInstagram={({
+										thumbnail,
+										video
+									}: {
+										thumbnail: string,
+										video: string
+									}) => setVideo({ thumbnail, video })}
+									onPasteYouTube={({
+										thumbnail,
+										video
+									}: {
+										thumbnail: string,
+										video: string
+									}) => setVideo({ thumbnail, video })}
+									setLoading={setLoading}
+								/>
+							</div>
 						</Segment>
 
-						<Form
-							error={interaction.error}
-							inverted={inverted}
-							size="big"
-							style={{ marginTop: "24px" }}
-						>
-							<Form.Field>{titleField}</Form.Field>
-							<Form.Field>{descriptionField}</Form.Field>
-							<Form.Field>{departmentField}</Form.Field>
-							<Form.Field>{officerField}</Form.Field>
-						</Form>
+						{interaction.data.video !== null && (
+							<Form
+								error={interaction.error}
+								inverted={inverted}
+								size="big"
+								style={{ marginTop: "24px" }}
+							>
+								<Form.Field>{titleField}</Form.Field>
+								<Form.Field>{descriptionField}</Form.Field>
+								<Form.Field>{departmentField}</Form.Field>
+								<Form.Field>{officerField}</Form.Field>
+							</Form>
+						)}
 
 						<Divider inverted={inverted} section />
 
 						<Button
 							color="yellow"
 							content="Add"
+							disabled={interaction.data.video === null}
 							fluid
 							inverted={inverted}
 							loading={formLoading}
@@ -594,7 +603,7 @@ const Interaction: React.FC = ({
 										<Segment
 											className="lighter"
 											inverted={inverted}
-											size={hasOfficers ? "medium" : "big"}
+											size={hasOfficers ? "large" : "big"}
 										>
 											{hasOfficers ? (
 												<Fragment>
@@ -720,6 +729,41 @@ const Interaction: React.FC = ({
 Interaction.propTypes = {
 	createInteraction: PropTypes.func,
 	getInteraction: PropTypes.func,
+	initialInteraction: PropTypes.shape({
+		data: PropTypes.shape({
+			createdAt: PropTypes.string,
+			department: PropTypes.shape({
+				id: PropTypes.number,
+				name: PropTypes.string,
+				slug: PropTypes.string
+			}),
+			description: PropTypes.string,
+			id: PropTypes.number,
+			officers: PropTypes.arrayOf(
+				PropTypes.shape({
+					departmentName: PropTypes.string,
+					firstName: PropTypes.string,
+					id: PropTypes.number,
+					img: PropTypes.string,
+					lastName: PropTypes.string,
+					slug: PropTypes.string
+				})
+			),
+			thumbnail: PropTypes.string,
+			title: PropTypes.string,
+			user: PropTypes.shape({
+				id: PropTypes.number,
+				img: PropTypes.string,
+				name: PropTypes.string,
+				username: PropTypes.string
+			}),
+			video: PropTypes.string,
+			views: PropTypes.number
+		}),
+		error: PropTypes.bool,
+		errorMsg: PropTypes.string,
+		loading: PropTypes.bool
+	}),
 	interaction: PropTypes.shape({
 		data: PropTypes.shape({
 			createdAt: PropTypes.string,

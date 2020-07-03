@@ -8,6 +8,7 @@ import {
 	SearchInteractionsAction,
 	SetVideoAction,
 	SetVideoPayload,
+	UploadVideoAction,
 	UploadVideoPayload
 } from "@interfaces/interaction"
 import { GetItemPayload, PaginationPayload } from "@interfaces/options"

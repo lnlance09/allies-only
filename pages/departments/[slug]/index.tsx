@@ -24,7 +24,7 @@ import { fetchCities } from "@options/cities"
 import { useRouter } from "next/router"
 import { withTheme } from "@redux/ThemeProvider"
 import { compose } from "redux"
-import { baseUrl } from "@options/config"
+import { baseUrl, s3BaseUrl } from "@options/config"
 import axios from "axios"
 import DefaultLayout from "@layouts/default"
 import MapBox from "@components/mapBox"
@@ -154,7 +154,7 @@ const Department: React.FC = ({
 						: `Keep tabs on the ${initialDepartment.data.name} and their interactions with citizens in their jurisdiction`,
 					image: {
 						height: 500,
-						src: "/public/images/logos/logo.png",
+						src: `${s3BaseUrl}logos/logo.png`,
 						width: 500
 					},
 					title: createMode

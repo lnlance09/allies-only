@@ -8,7 +8,7 @@ import PropTypes from "prop-types"
 import React, { Fragment } from "react"
 import Sidebar from "@components/sidebar"
 
-const DefaultLayout: React.FunctionComponent = ({
+const DefaultLayout: React.FC = ({
 	activeItem,
 	basicHeader,
 	children,
@@ -21,7 +21,7 @@ const DefaultLayout: React.FunctionComponent = ({
 	textAlign,
 	useGrid
 }) => {
-	const { description, image, title, url } = seo
+	const { description, image, title, url, video } = seo
 	const fullUrl = `${baseUrl}${url}`
 
 	return (
@@ -32,9 +32,21 @@ const DefaultLayout: React.FunctionComponent = ({
 
 				<meta property="fb:app_id" content="498572440350555" />
 				<meta property="og:description" content={description} />
-				<meta property="og:image" content={image.src} />
-				<meta property="og:image:height" content={image.height} />
-				<meta property="og:image:width" content={image.width} />
+
+				{typeof video !== "undefined" ? (
+					<Fragment>
+						<meta property="og:video" content={video.src} />
+						<meta property="og:video:height" content={video.height} />
+						<meta property="og:video:width" content={video.width} />
+					</Fragment>
+				) : (
+					<Fragment>
+						<meta property="og:image" content={image.src} />
+						<meta property="og:image:height" content={image.height} />
+						<meta property="og:image:width" content={image.width} />
+					</Fragment>
+				)}
+
 				<meta property="og:site_name" content="Allies Only" />
 				<meta property="og:title" content={`${title} - ${siteName}`} />
 				<meta property="og:type" content="website" />
@@ -45,7 +57,12 @@ const DefaultLayout: React.FunctionComponent = ({
 				<meta name="twitter:creator" content="@onlyallies" />
 				<meta name="twitter:title" content={`${title} - ${siteName}`} />
 				<meta name="twitter:description" content={description} />
-				<meta name="twitter:image" content={image.src} />
+
+				{typeof video !== "undefined" ? (
+					<meta name="twitter:player" content={video.src} />
+				) : (
+					<meta name="twitter:image" content={image.src} />
+				)}
 
 				<meta name="description" content={description} />
 				<meta
@@ -109,7 +126,12 @@ DefaultLayout.propTypes = {
 			width: PropTypes.number
 		}),
 		title: PropTypes.string,
-		url: PropTypes.string
+		url: PropTypes.string,
+		video: PropTypes.shape({
+			height: PropTypes.number,
+			src: PropTypes.string,
+			width: PropTypes.number
+		})
 	}),
 	showFooter: PropTypes.bool,
 	textAlign: PropTypes.string,

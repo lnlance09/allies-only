@@ -41,7 +41,7 @@ body {
 .segment.inverted {
 	background: $invertedBackgroundColor !important;
 
-	&.authSegment, &.uploadSegment, &.lighter {
+	&.uploadSegment, &.lighter {
 		background: lighten($invertedBackgroundColor, 3%) !important;
 	}
 }
@@ -241,10 +241,20 @@ body {
 			display: none !important;
 		}
 	}
+
+	#optionalInteractionUpload {
+		display: none;
+	}
 }
 
 .mapboxgl-map {
 	border-radius: 4px !important;
+}
+
+.aboutSection {
+	.list {
+		color: $white !important;
+	}
 }
 
 .contactUsButton {

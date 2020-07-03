@@ -7,6 +7,7 @@ import { Provider, connect } from "react-redux"
 import { useRouter } from "next/router"
 import { withTheme } from "@redux/ThemeProvider"
 import { compose } from "redux"
+import { s3BaseUrl } from "@options/config"
 import DefaultLayout from "@layouts/default"
 import PropTypes from "prop-types"
 import React, { useEffect, useState } from "react"
@@ -43,7 +44,7 @@ const Officers: React.FC = ({ inverted, officers, searchOfficers }) => {
 					description: "Browse officers and view their interactions with citizens",
 					image: {
 						height: 500,
-						src: "/public/images/logos/logo.png",
+						src: `${s3BaseUrl}logos/logo.png`,
 						width: 500
 					},
 					title: "Police Officers",

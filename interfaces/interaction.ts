@@ -42,6 +42,11 @@ export interface SetVideoPayload {
 	video: string;
 }
 
+export interface UploadVideoPayload {
+	callback?: void;
+	file: string;
+}
+
 /* Reducers */
 export interface GetInteractionAction {
 	payload: {
