@@ -394,7 +394,7 @@ exports.updateImg = async (req, res) => {
 			if (err) {
 				return res.status(500).send({
 					error: true,
-					msg: "There was an error"
+					msg: err.message
 				})
 			}
 		})
@@ -405,9 +405,12 @@ exports.updateImg = async (req, res) => {
 			height: 250
 		})
 
-		await fs.readFile(thumbnailInfo.path, async (err, data) => {
+		fs.readFile(thumbnailInfo.path, async (err, data) => {
 			if (err) {
-				throw err
+				return res.status(500).send({
+					error: true,
+					msg: err.message
+				})
 			}
 
 			const filePath = `officers/${fileName}`
@@ -436,21 +439,21 @@ exports.updateImg = async (req, res) => {
 					} catch (err) {
 						return res.status(500).send({
 							error: true,
-							msg: "There was an error"
+							msg: err.message
 						})
 					}
 				})
-				.catch(() => {
+				.catch((err) => {
 					return res.status(500).send({
 						error: true,
-						msg: "There was an error"
+						msg: err.message
 					})
 				})
 		})
 	} catch (err) {
 		return res.status(500).send({
 			error: true,
-			msg: "There was an error"
+			msg: err.message
 		})
 	}
 }
