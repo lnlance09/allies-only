@@ -652,11 +652,15 @@ exports.uploadVideo = async (req, res) => {
 	}
 
 	const { file } = req.files
-	const ext = path.extname(file.name).toLowerCase()
+	let ext = path.extname(file.name).toLowerCase()
 	const extensions = [".avi", ".flv", ".m4v", ".mp4", ".mkv", ".mov", ".webm"]
 
 	if (!extensions.includes(ext)) {
 		return res.status(401).send({ error: true, msg: "That video format is not allowed" })
+	}
+
+	if (ext === ".mov") {
+		ext = ".mp4"
 	}
 
 	const video = file.data
