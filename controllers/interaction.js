@@ -659,6 +659,12 @@ exports.uploadVideo = async (req, res) => {
 		return res.status(401).send({ error: true, msg: "That video format is not allowed" })
 	}
 
+	const video = file.data
+	const timestamp = new Date().getTime()
+	const fileId = `${randomize("aa", 24)}-${timestamp}`
+	const fileName = `interactions/${fileId}${ext}`
+	await fs.writeFile(`uploads/${fileId}${ext}`, video, () => null)
+
 	if (ext === ".mov") {
 		ext = ".mp4"
 		await ffmpeg(fs.createReadStream(`uploads/${fileId}.mov`))
@@ -668,13 +674,7 @@ exports.uploadVideo = async (req, res) => {
 			.save(`uploads/${fileId}${ext}`)
 	}
 
-	const video = file.data
-	const timestamp = new Date().getTime()
-	const fileId = `${randomize("aa", 24)}-${timestamp}`
-	const fileName = `interactions/${fileId}${ext}`
 	await Aws.uploadToS3(video, fileName, false, "video/mp4")
-
-	await fs.writeFile(`uploads/${fileId}${ext}`, video, () => null)
 
 	await ffmpeg()
 		.input(fs.createReadStream(`uploads/${fileId}${ext}`))
