@@ -652,7 +652,7 @@ exports.uploadVideo = async (req, res) => {
 	}
 
 	const { file } = req.files
-	const ext = path.extname(file.name)
+	const ext = path.extname(file.name).toLowerCase()
 	const extensions = [".avi", ".flv", ".m4v", ".mp4", ".mkv", ".mov", ".webm"]
 
 	if (!extensions.includes(ext)) {
