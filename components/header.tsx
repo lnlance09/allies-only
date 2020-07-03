@@ -60,7 +60,7 @@ const PageHeader: React.FC = ({ basicHeader, loading }) => {
 					{basicHeader ? (
 						<Image className="logo" onClick={() => router.push("/")} src={Logo} />
 					) : (
-						<Menu fitted="vertically" fixed="top" fluid inverted>
+						<Menu borderless fitted="vertically" fixed="top" fluid inverted>
 							<Container>
 								<Menu.Item position="left">
 									<Image
