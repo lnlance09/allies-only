@@ -365,9 +365,16 @@ exports.saveVideo = async (req, res) => {
 
 	if (type === "instagram") {
 		try {
-			const video = await save(id, "uploads").then((res) => {
-				return res
-			})
+			const video = await save(id, "uploads")
+				.then((res) => {
+					return res
+				})
+				.catch((err) => {
+					return res.status(500).send({
+						error: true,
+						msg: err.message || "An error occurred"
+					})
+				})
 
 			if (video.label !== "video") {
 				await fs.unlinkSync(video.file)
