@@ -4,6 +4,17 @@ import { InitialPageState } from "@interfaces/options"
 import { InteractionActionTypes } from "@interfaces/interaction"
 
 export const initial: InitialPageState = {
+	initialInteraction: {
+		data: {
+			department: {},
+			officers: [],
+			user: {},
+			video: null
+		},
+		error: false,
+		errorMsg: "",
+		loading: true
+	},
 	interaction: {
 		data: {
 			department: {},

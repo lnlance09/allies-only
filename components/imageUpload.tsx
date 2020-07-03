@@ -4,7 +4,7 @@ import ImagePic from "@public/images/placeholders/placeholder-dark.jpg"
 import PropTypes from "prop-types"
 import React, { useState } from "react"
 
-const ImageUpload: React.FunctionComponent = ({
+const ImageUpload: React.FC = ({
 	bearer,
 	callback,
 	fluid,

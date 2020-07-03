@@ -2,12 +2,12 @@ import * as constants from "../constants"
 import { InitialPageState } from "@interfaces/options"
 import { AuthenticationActionTypes } from "@interfaces/authentication"
 
-const initial: InitialPageState = () => ({
+const initial: InitialPageState = {
 	data: {},
 	verify: false
-})
+}
 
-const authentication = (state = initial(), action: AuthenticationActionTypes): InitialPageState => {
+const authentication = (state = initial, action: AuthenticationActionTypes): InitialPageState => {
 	const { payload } = action
 
 	switch (action.type) {
@@ -20,7 +20,7 @@ const authentication = (state = initial(), action: AuthenticationActionTypes): I
 			}
 
 		case constants.LOGOUT:
-			return initial()
+			return initial
 
 		case constants.RESET_PASSWORD:
 			return {

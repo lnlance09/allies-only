@@ -3,17 +3,23 @@ import { InitialPageState } from "@interfaces/options"
 import { UserActionTypes } from "@interfaces/user"
 
 export const initial: InitialPageState = {
-	error: false,
-	errorMsg: "",
-	loading: true,
+	initialUser: {
+		data: {},
+		error: false,
+		errorMsg: "",
+		loading: true
+	},
 	user: {
-		img: "",
+		data: {},
+		error: false,
+		errorMsg: "",
 		interactions: {
 			hasMore: true,
 			loading: true,
 			page: 0,
 			results: []
-		}
+		},
+		loading: true
 	},
 	users: {
 		error: false,
@@ -33,24 +39,29 @@ const user = (state = initial, action: UserActionTypes): InitialPageState => {
 				...state,
 				user: {
 					...state.user,
-					img: payload.img
+					data: {
+						...state.user.data,
+						img: payload.img
+					}
 				}
 			}
 
 		case constants.GET_USER:
 			return {
 				...state,
-				error: false,
-				loading: false,
 				user: {
 					...state.user,
-					createdAt: payload.user.createdAt,
-					id: payload.user.id,
-					img: payload.user.img,
-					interactionCount: payload.user.interactionCount,
-					name: payload.user.name,
-					status: payload.user.race,
-					username: payload.user.username
+					data: {
+						createdAt: payload.user.createdAt,
+						id: payload.user.id,
+						img: payload.user.img,
+						interactionCount: payload.user.interactionCount,
+						name: payload.user.name,
+						status: payload.user.race,
+						username: payload.user.username
+					},
+					error: false,
+					loading: false
 				}
 			}
 
@@ -90,21 +101,7 @@ const user = (state = initial, action: UserActionTypes): InitialPageState => {
 			}
 
 		case constants.SET_USER_FETCH_ERROR:
-			return {
-				...state,
-				error: true,
-				errorMsg: "This user does not exist",
-				loading: false,
-				user: {
-					img: "",
-					interactions: {
-						hasMore: true,
-						loading: true,
-						page: 0,
-						results: [false, false, false, false, false, false]
-					}
-				}
-			}
+			return initial
 
 		default:
 			return state

@@ -1,43 +1,19 @@
 import { searchOfficers } from "@actions/officer"
 import { Button, Container, Divider, Header } from "semantic-ui-react"
 import { RootState } from "@store/reducer"
-import { GetServerSideProps } from "next"
-import { initial } from "@reducers/officer"
 import { InitialPageState } from "@interfaces/options"
 import { DebounceInput } from "react-debounce-input"
 import { Provider, connect } from "react-redux"
 import { useRouter } from "next/router"
 import { withTheme } from "@redux/ThemeProvider"
 import { compose } from "redux"
-import { baseUrl } from "@options/config"
-import axios from "axios"
 import DefaultLayout from "@layouts/default"
 import PropTypes from "prop-types"
 import React, { useEffect, useState } from "react"
 import SearchResults from "@components/searchResults"
 import store from "@store"
 
-export const getServerSideProps: GetServerSideProps = async ({ req }) => {
-	const data = await axios.get(`${baseUrl}api/officer/search`, {
-		params: {
-			q: req.query.q
-		}
-	})
-
-	const officers = initial.officers
-	officers.hasMore = data.data.hasMore
-	officers.loading = false
-	officers.page = data.data.page
-	officers.results = data.data.officers
-
-	return {
-		props: {
-			officers
-		}
-	}
-}
-
-const Officers: React.FunctionComponent = ({ inverted, officers, searchOfficers }) => {
+const Officers: React.FC = ({ inverted, officers, searchOfficers }) => {
 	const router = useRouter()
 	const { q } = router.query
 

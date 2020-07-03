@@ -32,77 +32,55 @@ import SearchResults from "@components/searchResults"
 import store from "@store/index"
 
 export const getServerSideProps: GetServerSideProps = async ({ params }) => {
-	let user = initial.user
+	let initialUser = initial.initialUser
 
 	if (typeof params === "undefined") {
 		return {
 			props: {
-				error: true,
-				errorMsg: "This ally does not exist",
-				user
+				initialUser
 			}
 		}
 	}
 
-	let error = false
-	let errorMsg = ""
-
 	const data = await axios.get(`${baseUrl}api/user/${params.username}`)
 	if (data.data.error) {
-		error = true
-		errorMsg = data.data.msg
+		initialUser.data = {}
+		initialUser.error = true
+		initialUser.errorMsg = data.data.msg
 	} else {
-		user = data.data.user
-		error = false
-		errorMsg = ""
-
-		const interactionsData = await axios.get(`${baseUrl}api/interaction/search`, {
-			params: {
-				userId: data.data.user.id
-			}
-		})
-		const interactions = interactionsData.data
-		user.interactions = interactions
-		user.interactions.results = interactions.interactions
+		initialUser.data = data.data.user
+		initialUser.error = false
+		initialUser.errorMsg = ""
 	}
 
-	console.log({
-		error,
-		errorMsg,
-		loading: false,
-		user
-	})
+	initialUser.loading = false
 
 	return {
 		props: {
-			error,
-			errorMsg,
-			loading: false,
-			user
+			initialUser
 		}
 	}
 }
 
-const User: React.FunctionComponent = ({
+const User: React.FC = ({
 	changeProfilePic,
-	error,
 	getUser,
+	initialUser,
 	inverted,
-	loading,
 	searchInteractions,
 	user
 }) => {
 	const router = useRouter()
 	const username = router.asPath.substr(1)
 
-	const { createdAt, id, img, interactionCount, interactions, name } = user
+	const { createdAt, id, img, interactionCount, name } = user.data
 
 	const [bearer, setBearer] = useState(null)
 	const [currentUser, setCurrentUser] = useState({})
 
 	useEffect(() => {
 		if (typeof username !== "undefined") {
-			getUser({ callback: (userId) => searchInteractions({ userId }), username })
+			getUser({ callback: (userId: number) => searchInteractions({ userId }), username })
 		}
 	}, [getUser, username])
 
@@ -114,7 +92,7 @@ const User: React.FunctionComponent = ({
 		}
 	}, [bearer])
 
-	const loadMore = (page, userId) => {
+	const loadMore = (page: number, userId: number) => {
 		return searchInteractions({ userId, page })
 	}
 
@@ -125,7 +103,7 @@ const User: React.FunctionComponent = ({
 			return (
 				<ImageUpload
 					bearer={bearer}
-					callback={(bearer, file) => changeProfilePic({ bearer, file })}
+					callback={(bearer: string, file: string) => changeProfilePic({ bearer, file })}
 					fluid
 					id={id}
 					img={imgSrc === null ? DefaultPic : imgSrc}
@@ -137,13 +115,13 @@ const User: React.FunctionComponent = ({
 		return <Image onError={(i) => (i.target.src = DefaultPic)} rounded src={imgSrc} />
 	}
 
-	const seoTitle = error ? "Not found" : name
-	const seoDescription = error
+	const seoTitle = initialUser.error ? "Not found" : initialUser.data.name
+	const seoDescription = initialUser.data.error
 		? "Become an ally in the fight against police brutality and corruption"
-		: `${name}'s interactions with the police on AlliesOnly`
+		: `${initialUser.data.name}'s interactions with the police on AlliesOnly`
 	const seoImage = {
 		height: 500,
-		src: img,
+		src: initialUser.data.img,
 		width: 500
 	}
 
@@ -160,7 +138,7 @@ const User: React.FunctionComponent = ({
 				}}
 				showFooter={false}
 			>
-				{error ? (
+				{initialUser.error ? (
 					<Container className="errorMsgContainer" textAlign="center">
 						<Header as="h1" inverted={inverted}>
 							This user does not exist
@@ -178,7 +156,7 @@ const User: React.FunctionComponent = ({
 						<Grid>
 							<Grid.Row>
 								<Grid.Column width={5}>
-									{loading ? (
+									{user.loading ? (
 										<Placeholder inverted={inverted}>
 											<Placeholder.Image square />
 										</Placeholder>
@@ -187,7 +165,7 @@ const User: React.FunctionComponent = ({
 									)}
 								</Grid.Column>
 								<Grid.Column width={11}>
-									{!loading && (
+									{!user.loading && (
 										<Fragment>
 											<Header as="h1" inverted={inverted}>
 												{name}
@@ -206,19 +184,19 @@ const User: React.FunctionComponent = ({
 
 						<Divider section />
 
-						{!error && !loading ? (
+						{!user.error && !user.loading && (
 							<SearchResults
-								hasMore={interactions.hasMore}
+								hasMore={user.interactions.hasMore}
 								inverted={inverted}
 								justImages
-								loading={interactions.loading}
+								loading={user.interactions.loading}
 								loadMore={({ page, userId }) => loadMore(page, userId)}
-								page={interactions.page}
-								results={interactions.results}
+								page={user.interactions.page}
+								results={user.interactions.results}
 								type="interactions"
 								userId={id}
 							/>
-						) : null}
+						)}
 					</Container>
 				)}
 			</DefaultLayout>
@@ -228,17 +206,35 @@ const User: React.FunctionComponent = ({
 
 User.propTypes = {
 	changeProfilePic: PropTypes.func,
-	error: PropTypes.bool,
-	errorMsg: PropTypes.string,
 	getUser: PropTypes.func,
+	initialUser: PropTypes.shape({
+		data: PropTypes.shape({
+			createdAt: PropTypes.string,
+			id: PropTypes.number,
+			img: PropTypes.string,
+			interactionCount: PropTypes.number,
+			name: PropTypes.string,
+			status: PropTypes.number,
+			username: PropTypes.string
+		}),
+		error: PropTypes.bool,
+		errorMsg: PropTypes.string,
+		loading: PropTypes.bool
+	}),
 	inverted: PropTypes.bool,
-	loading: PropTypes.bool,
 	searchInteractions: PropTypes.func,
 	user: PropTypes.shape({
-		createdAt: PropTypes.string,
-		id: PropTypes.number,
-		img: PropTypes.string,
-		interactionCount: PropTypes.number,
+		data: PropTypes.shape({
+			createdAt: PropTypes.string,
+			id: PropTypes.number,
+			img: PropTypes.string,
+			interactionCount: PropTypes.number,
+			name: PropTypes.string,
+			status: PropTypes.number,
+			username: PropTypes.string
+		}),
+		error: PropTypes.bool,
+		errorMsg: PropTypes.string,
 		interactions: PropTypes.shape({
 			hasMore: PropTypes.bool,
 			loading: PropTypes.bool,
@@ -255,9 +251,7 @@ User.propTypes = {
 				])
 			)
 		}),
-		name: PropTypes.string,
-		status: PropTypes.number,
-		username: PropTypes.string
+		loading: PropTypes.bool
 	})
 }
 

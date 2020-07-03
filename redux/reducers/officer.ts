@@ -4,6 +4,12 @@ import { InitialPageState } from "@interfaces/options"
 import { OfficerActionTypes } from "@interfaces/officer"
 
 export const initial: InitialPageState = {
+	initialOfficer: {
+		data: {},
+		error: false,
+		errorMsg: "",
+		loading: true
+	},
 	officer: {
 		data: {},
 		error: false,

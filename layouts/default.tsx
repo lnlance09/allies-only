@@ -48,15 +48,18 @@ const DefaultLayout: React.FunctionComponent = ({
 				<meta name="twitter:image" content={image.src} />
 
 				<meta name="description" content={description} />
-				<meta name="keywords" content="" />
+				<meta
+					name="keywords"
+					content="police interactions, body cam, unarmed, shootings, civil rights, black lives matter"
+				/>
 				<meta name="title" content={`${title} - ${siteName}`} />
 
 				<link rel="canonical" href={fullUrl} />
 				<link rel="home" href={baseUrl} />
 
-				<link rel="icon" href="/favicon.ico" />
-				<link rel="shortcut icon" href="/favicon.ico" />
-				<link rel="apple-touch-icon" sizes="128x128" href="/favicon.ico" />
+				<link rel="icon" href={`${baseUrl}favicon.ico`} />
+				<link rel="shortcut icon" href={`${baseUrl}favicon.ico`} />
+				<link rel="apple-touch-icon" sizes="128x128" href={`${baseUrl}favicon.ico`} />
 
 				<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDArCL_59nenZmhsD8v2NsbpuJzi9VRucg&libraries=places"></script>
 

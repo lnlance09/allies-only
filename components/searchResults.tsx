@@ -10,7 +10,7 @@ import PropTypes from "prop-types"
 import React, { useState } from "react"
 import Router from "next/router"
 
-const SearchResults: React.FunctionComponent = ({
+const SearchResults: React.FC = ({
 	departmentId,
 	hasMore,
 	inverted,

@@ -39,7 +39,9 @@ body {
 }
 
 .segment.inverted {
-	&:not(.authSegment) {
+	background: $invertedBackgroundColor !important;
+
+	&.authSegment, &.uploadSegment, &.lighter {
 		background: lighten($invertedBackgroundColor, 3%) !important;
 	}
 }

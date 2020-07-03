@@ -29,6 +29,12 @@ export const initial: InitialPageState = {
 		hasMore: false,
 		loading: true,
 		results: []
+	},
+	initialDepartment: {
+		data: {},
+		error: false,
+		errorMsg: "",
+		loading: true
 	}
 }
 

@@ -26,7 +26,7 @@ import {
 import { RootState } from "@store/reducer"
 import { GetServerSideProps } from "next"
 import { initial } from "@reducers/interaction"
-import { InitialPageState } from "@interfaces/options"
+import { DropdownOption, DropdownOptionsPayload, InitialPageState } from "@interfaces/options"
 import { Provider, connect } from "react-redux"
 import { fetchDepartments } from "@options/departments"
 import { fetchOfficers } from "@options/officers"
@@ -51,13 +51,12 @@ import store from "@store"
 import VideoInput from "@components/videoInput"
 
 export const getServerSideProps: GetServerSideProps = async ({ params }) => {
-	let { interaction, interactions } = initial
+	const initialInteraction = initial.initialInteraction
 
 	if (typeof params === "undefined") {
 		return {
 			props: {
-				interaction,
-				interactions
+				initialInteraction
 			}
 		}
 	}
@@ -65,47 +64,40 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
 	if (params.slug === "create") {
 		return {
 			props: {
-				interaction,
-				interactions
+				initialInteraction
 			}
 		}
 	}
 
 	const data = await axios.get(`${baseUrl}api/interaction/${params.slug}`)
 	if (data.data.error) {
-		interaction.data = {
-			officers: {}
+		initialInteraction.data = {
+			department: {},
+			officers: [],
+			user: {},
+			video: null
 		}
-		interaction.error = true
-		interaction.errorMsg = data.data.msg
+		initialInteraction.error = true
+		initialInteraction.errorMsg = data.data.msg
 	} else {
-		interaction.data = data.data.interaction
-		interaction.error = false
-		interaction.errorMsg = ""
-
-		const interactionsData = await axios.get(`${baseUrl}api/interaction/search`, {
-			params: {
-				exclude: [data.data.interaction.id]
-			}
-		})
-		const _interactions = interactionsData.data
-		interactions = _interactions
-		interactions.results = _interactions.interactions
+		initialInteraction.data = data.data.interaction
+		initialInteraction.error = false
+		initialInteraction.errorMsg = ""
 	}
 
-	interaction.loading = false
+	initialInteraction.loading = false
 
 	return {
 		props: {
-			interaction,
-			interactions
+			initialInteraction
 		}
 	}
 }
 
-const Interaction: React.FunctionComponent = ({
+const Interaction: React.FC = ({
 	createInteraction,
 	getInteraction,
+	initialInteraction,
 	interaction,
 	interactions,
 	inverted,
@@ -119,7 +111,7 @@ const Interaction: React.FunctionComponent = ({
 	const { departmentId, officerId, slug } = router.query
 
 	const [bearer, setBearer] = useState(null)
-	const [createMode, setCreateMode] = useState(false)
+	const [createMode, setCreateMode] = useState(slug === "create")
 	const [department, setDepartment] = useState("")
 	const [departmentOptions, setDepartmentOptions] = useState([])
 	const [description, setDescription] = useState(
@@ -139,9 +131,9 @@ const Interaction: React.FunctionComponent = ({
 			if (slug === "create") {
 				setCreateMode(true)
 
-				let departmentOptions = []
+				let departmentOptions: DropdownOption[] = []
 				if (typeof departmentId !== "undefined") {
-					departmentOptions = await fetchDepartments({ id: departmentId })
+					departmentOptions = await fetchDepartments({ id: parseInt(departmentId, 10) })
 					setDepartmentOptions(departmentOptions)
 					setDepartment(parseInt(departmentId, 10))
 				} else {
@@ -149,7 +141,9 @@ const Interaction: React.FunctionComponent = ({
 					setDepartmentOptions(departmentOptions)
 				}
 
-				const officerOptions = await fetchOfficers({ departentId: departmentId })
+				const officerOptions = await fetchOfficers({
+					departmentId: parseInt(departmentId, 10)
+				})
 				setOfficerOptions(officerOptions)
 
 				if (typeof officerId !== "undefined") {
@@ -164,7 +158,7 @@ const Interaction: React.FunctionComponent = ({
 			if (typeof slug !== "undefined" && slug !== "create") {
 				setCreateMode(false)
 				await getInteraction({
-					callback: async (departmentId, description, officers) => {
+					callback: async (departmentId: number, description, officers) => {
 						updateViews({ id: slug })
 						setDescription(description)
 						setDepartment(departmentId)
@@ -223,7 +217,7 @@ const Interaction: React.FunctionComponent = ({
 		setDepartmentOptions(departmentOptions)
 	}
 
-	const loadMore = (exclude, page) => {
+	const loadMore = (exclude: number[], page: number) => {
 		return searchInteractions({ exclude, page })
 	}
 
@@ -352,13 +346,16 @@ const Interaction: React.FunctionComponent = ({
 	let seoDescription = "Help document police brutality"
 	const seoImage = {
 		height: 500,
-		src: "/public/images/logos/logo.png",
+		src: `${s3BaseUrl}logos/logo.png`,
 		width: 500
 	}
 	if (!createMode) {
-		seoTitle = typeof interaction.data.title === "undefined" ? "" : interaction.data.title
+		seoTitle = initialInteraction.data.title
 		seoDescription =
-			typeof interaction.data.description === "undefined" ? "" : interaction.data.description
+			typeof initialInteraction.data.description === "undefined" ||
+			initialInteraction.data.description === ""
+				? `This is an interaction between a civilian and the ${initialInteraction.data.department.name}`
+				: initialInteraction.data.description
 	}
 
 	return (
@@ -381,7 +378,7 @@ const Interaction: React.FunctionComponent = ({
 							Add an interaction
 						</Header>
 
-						<Segment inverted={inverted}>
+						<Segment className="uploadSegment" inverted={inverted}>
 							{interaction.data.video === null ? (
 								<Segment basic inverted={inverted} padded="very" placeholder>
 									<Header as="h1" icon size="huge">
@@ -424,12 +421,20 @@ const Interaction: React.FunctionComponent = ({
 							</Divider>
 
 							<VideoInput
-								onPasteInstagram={({ thumbnail, video }) =>
-									setVideo({ thumbnail, video })
-								}
-								onPasteYouTube={({ thumbnail, video }) =>
-									setVideo({ thumbnail, video })
-								}
+								onPasteInstagram={({
+									thumbnail,
+									video
+								}: {
+									thumbnail: string,
+									video: string
+								}) => setVideo({ thumbnail, video })}
+								onPasteYouTube={({
+									thumbnail,
+									video
+								}: {
+									thumbnail: string,
+									video: string
+								}) => setVideo({ thumbnail, video })}
 								setLoading={setLoading}
 							/>
 						</Segment>
@@ -462,7 +467,7 @@ const Interaction: React.FunctionComponent = ({
 
 				{!createMode && (
 					<Fragment>
-						{interaction.error ? (
+						{initialInteraction.error ? (
 							<Container className="errorMsgContainer" textAlign="center">
 								<Header as="h1" inverted={inverted}>
 									This interaction does not exist
@@ -480,23 +485,26 @@ const Interaction: React.FunctionComponent = ({
 								{interaction.loading ? (
 									<Container textAlign="center">
 										<Dimmer active className="pageDimmer">
-											<Loader active size="huge">
-												Loading
-											</Loader>
+											<Loader active size="huge" />
 										</Dimmer>
 									</Container>
 								) : (
 									<Fragment>
 										<Header as="h1" inverted={inverted}>
-											{interaction.data.title}
+											{initialInteraction.data.title}
 											<Header.Subheader>
 												Submitted{" "}
-												<Moment date={interaction.data.createdAt} fromNow />{" "}
+												<Moment
+													date={initialInteraction.data.createdAt}
+													fromNow
+												/>{" "}
 												•{" "}
-												<Link href={`/${interaction.data.user.username}`}>
-													<a>{interaction.data.user.name}</a>
+												<Link
+													href={`/${initialInteraction.data.user.username}`}
+												>
+													<a>{initialInteraction.data.user.name}</a>
 												</Link>{" "}
-												• {interaction.data.views} views
+												• {initialInteraction.data.views} views
 											</Header.Subheader>
 										</Header>
 
@@ -507,7 +515,7 @@ const Interaction: React.FunctionComponent = ({
 											onReady={(e) => console.log("e", e)}
 											playing
 											style={{ lineHeight: 0.8 }}
-											url={interaction.data.video}
+											url={initialInteraction.data.video}
 											width="100%"
 										/>
 
@@ -527,7 +535,7 @@ const Interaction: React.FunctionComponent = ({
 												/>
 											)}
 										</Header>
-										<Segment inverted={inverted} size="big">
+										<Segment className="lighter" inverted={inverted} size="big">
 											{editMode ? (
 												<Form inverted={inverted} size="big">
 													{descriptionField}
@@ -551,7 +559,7 @@ const Interaction: React.FunctionComponent = ({
 										<Header as="h2" inverted>
 											Police Department
 										</Header>
-										<Segment inverted={inverted}>
+										<Segment className="lighter" inverted={inverted}>
 											{editMode ? (
 												<Form size="big">
 													<Form.Field>{departmentField}</Form.Field>
@@ -584,6 +592,7 @@ const Interaction: React.FunctionComponent = ({
 											Officers Involved
 										</Header>
 										<Segment
+											className="lighter"
 											inverted={inverted}
 											size={hasOfficers ? "medium" : "big"}
 										>
@@ -656,7 +665,7 @@ const Interaction: React.FunctionComponent = ({
 													onClick={() =>
 														updateInteraction({
 															bearer,
-															callback: async (id) => {
+															callback: async (id: number) => {
 																await getInteraction({ id })
 																setEditMode(false)
 															},
@@ -679,20 +688,24 @@ const Interaction: React.FunctionComponent = ({
 											size="large"
 										/>
 
-										{!interaction.error && !interaction.loading ? (
+										{!interaction.error && !interaction.loading && (
 											<SearchResults
 												hasMore={interactions.hasMore}
 												inverted={inverted}
 												justImages
 												loading={interactions.loading}
-												loadMore={({ exclude, page }) =>
-													loadMore(exclude, page)
-												}
+												loadMore={({
+													exclude,
+													page
+												}: {
+													exclude: number[],
+													page: number
+												}) => loadMore(exclude, page)}
 												page={interactions.page}
 												results={interactions.results}
 												type="interactions"
 											/>
-										) : null}
+										)}
 									</Fragment>
 								)}
 							</Container>

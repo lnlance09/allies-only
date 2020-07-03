@@ -6,10 +6,11 @@ import { User } from "./user"
 
 export interface DropdownOptionsPayload {
 	departmentId?: number;
-	forAutocomplete: number;
-	forOptions: number;
-	id?: string;
-	q: string;
+	forAutocomplete?: number;
+	forOptions?: number;
+	id?: number;
+	officerId?: number;
+	q?: string;
 }
 
 export interface GetItemPayload {
@@ -27,6 +28,8 @@ export interface PaginationPayload {
 }
 
 export interface DropdownOption {
+	departmentId?: number;
+	departmentName?: string;
 	key: string;
 	text: string;
 	value: number;
@@ -46,7 +49,14 @@ export interface ToastOption {
 	draggable: boolean;
 	hideProgressBar: boolean;
 	newestOnTop: boolean;
-	position: string;
+	position:
+		| "top-right"
+		| "top-center"
+		| "top-left"
+		| "bottom-right"
+		| "bottom-center"
+		| "bottom-left"
+		| undefined;
 }
 
 export type ItemTypes = Department | Interaction | Officer | User

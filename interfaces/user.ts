@@ -1,17 +1,12 @@
 import { CHANGE_PROFILE_PIC, GET_USER, SEARCH_USERS, SET_USER_FETCH_ERROR } from "@redux/constants"
-import { Results } from "./results"
-import { Interaction } from "./interaction"
-
-interface Interactions extends Results {
-	results: Interaction[];
-}
+import { Interaction, SearchInteractionsAction } from "./interaction"
 
 export interface User {
 	createdAt?: string;
 	id: number;
 	img: string;
 	interactionCount?: number;
-	interactions?: Interactions[];
+	interactions?: Interaction[];
 	name: string;
 	status?: number;
 	username: string;
@@ -31,7 +26,6 @@ export interface GetUserPayload {
 /* Reducers */
 export interface GetUserAction {
 	payload: {
-		department: Department,
 		error: boolean,
 		msg: string
 	};
@@ -65,5 +59,6 @@ export interface SetUserErrorAction {
 export type UserActionTypes =
 	| ChangeProfilePicAction
 	| GetUserAction
+	| SearchInteractionsAction
 	| SearchUsersAction
 	| SetUserErrorAction

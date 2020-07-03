@@ -27,7 +27,7 @@ const MapBox: React.FC = ({
 		<ReactMapGL
 			mapboxApiAccessToken="pk.eyJ1IjoibG5sYW5jZTA5IiwiYSI6ImNrOGM0bXNwZDBkMDgzbW4yanExOWV3d3UifQ.-d8NKcr5Iry-6bIYpq53EA"
 			mapStyle="mapbox://styles/mapbox/streets-v9"
-			onViewportChange={(viewport) => setViewport(viewport)}
+			onViewportChange={(viewport: string) => setViewport(viewport)}
 			{...viewport}
 		/>
 	)

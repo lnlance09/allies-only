@@ -7,7 +7,7 @@ import PropTypes from "prop-types"
 import React, { useEffect, useState } from "react"
 import Router from "next/router"
 
-const SignIn: React.FunctionComponent = ({ inverted }) => {
+const SignIn: React.FC = ({ inverted }) => {
 	const router = useRouter()
 	const { type } = router.query
 

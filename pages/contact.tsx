@@ -10,7 +10,7 @@ import React, { useState } from "react"
 const toastConfig = getConfig()
 toast.configure(toastConfig)
 
-const Contact: React.FunctionComponent = ({ inverted }) => {
+const Contact: React.FC = ({ inverted }) => {
 	const [msg, setMsg] = useState("")
 
 	const sendMessage = async () => {

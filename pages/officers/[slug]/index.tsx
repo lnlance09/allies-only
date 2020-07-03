@@ -24,7 +24,7 @@ import { fetchDepartments } from "@options/departments"
 import { useRouter } from "next/router"
 import { withTheme } from "@redux/ThemeProvider"
 import { compose } from "redux"
-import { baseUrl } from "@options/config"
+import { baseUrl, s3BaseUrl } from "@options/config"
 import axios from "axios"
 import DefaultLayout from "@layouts/default"
 import DefaultPic from "@public/images/avatar/officer.png"
@@ -36,12 +36,12 @@ import SearchResults from "@components/searchResults"
 import store from "@store/index"
 
 export const getServerSideProps: GetServerSideProps = async ({ params }) => {
-	const officer = initial
+	const initialOfficer = initial.initialOfficer
 
 	if (typeof params === "undefined") {
 		return {
 			props: {
-				officer
+				initialOfficer
 			}
 		}
 	}
@@ -49,42 +49,34 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
 	if (params.slug === "create") {
 		return {
 			props: {
-				officer
+				initialOfficer
 			}
 		}
 	}
 
 	const data = await axios.get(`${baseUrl}api/officer/${params.slug}`)
 	if (data.data.error) {
-		officer.data = {}
-		officer.error = true
-		officer.errorMsg = data.data.msg
+		initialOfficer.data = {}
+		initialOfficer.error = true
+		initialOfficer.errorMsg = data.data.msg
 	} else {
-		officer.data = data.data.officer
-		officer.error = false
-		officer.errorMsg = ""
-
-		const interactionsData = await axios.get(`${baseUrl}api/interaction/search`, {
-			params: {
-				officerId: data.data.officer.id
-			}
-		})
-		const interactions = interactionsData.data
-		officer.interactions = interactions
-		officer.interactions.results = interactions.interactions
+		initialOfficer.data = data.data.officer
+		initialOfficer.error = false
+		initialOfficer.errorMsg = ""
 	}
 
-	officer.loading = false
+	initialOfficer.loading = false
 
 	return {
 		props: {
-			officer
+			initialOfficer
 		}
 	}
 }
 
-const Officer: React.FunctionComponent = ({
+const Officer: React.FC = ({
 	createOfficer,
+	initialOfficer,
 	officer,
 	getOfficer,
 	inverted,
@@ -164,25 +156,28 @@ const Officer: React.FunctionComponent = ({
 
 	const seoTitle = createMode
 		? "Add an officer"
-		: officer.error
+		: initialOfficer.error
 		? "Not found"
-		: `${officer.data.firstName} ${officer.data.lastName}`
+		: `${initialOfficer.data.firstName} ${initialOfficer.data.lastName}`
 	const seoDescription = createMode
 		? "Keep tabs on police officers and their interactions with citizens in their jurisdiction"
-		: officer.error
+		: initialOfficer.error
 		? "Not found"
-		: `${officer.data.firstName} ${officer.data.lastName}'s interactions with citizens`
+		: `${initialOfficer.data.firstName} ${initialOfficer.data.lastName}'s interactions with citizens`
 
 	let seoImage = {
 		height: 500,
-		src: "/public/images/logos/logo.png",
+		src: `${s3BaseUrl}logos/logo.png`,
 		width: 500
 	}
 
-	if (!createMode && !officer.error) {
+	if (!createMode && !initialOfficer.error) {
 		seoImage = {
 			height: 500,
-			src: officer.data.img === null ? "/public/images/logos/logo.png" : officer.data.img,
+			src:
+				initialOfficer.data.img === null
+					? `${s3BaseUrl}logos/logo.png`
+					: `${s3BaseUrl}${initialOfficer.data.img}`,
 			width: 500
 		}
 	}
@@ -257,7 +252,7 @@ const Officer: React.FunctionComponent = ({
 
 				{createMode === false && (
 					<Fragment>
-						{officer.error ? (
+						{initialOfficer.error ? (
 							<Container className="errorMsgContainer" textAlign="center">
 								<Header as="h1" inverted={inverted}>
 									This officer does not exist
@@ -275,9 +270,7 @@ const Officer: React.FunctionComponent = ({
 								{officer.loading ? (
 									<Container textAlign="center">
 										<Dimmer active className="pageDimmer">
-											<Loader active size="huge">
-												Loading
-											</Loader>
+											<Loader active size="huge" />
 										</Dimmer>
 									</Container>
 								) : (
@@ -301,18 +294,18 @@ const Officer: React.FunctionComponent = ({
 													/>
 												</Grid.Column>
 												<Grid.Column width={11}>
-													{!officer.loading && (
+													{!initialOfficer.loading && (
 														<Fragment>
 															<Header as="h1" inverted={inverted}>
-																{officer.data.firstName}{" "}
-																{officer.data.lastName}
+																{initialOfficer.data.firstName}{" "}
+																{initialOfficer.data.lastName}
 																<Header.Subheader>
 																	<Link
-																		href={`/departments/${officer.data.departmentSlug}`}
+																		href={`/departments/${initialOfficer.data.departmentSlug}`}
 																	>
 																		<a>
 																			{
-																				officer.data
+																				initialOfficer.data
 																					.departmentName
 																			}
 																		</a>
@@ -329,7 +322,7 @@ const Officer: React.FunctionComponent = ({
 																	inverted={inverted}
 																	onClick={() =>
 																		router.push(
-																			`/interactions/create?departmentId=${officer.data.departmentId}&officerId=${officer.data.id}`
+																			`/interactions/create?departmentId=${initialOfficer.data.departmentId}&officerId=${initialOfficer.data.id}`
 																		)
 																	}
 																/>
@@ -343,12 +336,12 @@ const Officer: React.FunctionComponent = ({
 																<List.Item>
 																	<b>
 																		{
-																			officer.data
+																			initialOfficer.data
 																				.interactionCount
 																		}
 																	</b>{" "}
 																	{formatPlural(
-																		officer.data
+																		initialOfficer.data
 																			.interactionCount,
 																		"interaction"
 																	)}
@@ -388,6 +381,23 @@ const Officer: React.FunctionComponent = ({
 Officer.propTypes = {
 	createOfficer: PropTypes.func,
 	getOfficer: PropTypes.func,
+	initialOfficer: PropTypes.shape({
+		data: PropTypes.shape({
+			createdAt: PropTypes.string,
+			departmentId: PropTypes.number,
+			departmentName: PropTypes.string,
+			departmentSlug: PropTypes.string,
+			firstName: PropTypes.string,
+			id: PropTypes.number,
+			img: PropTypes.string,
+			interactionCount: PropTypes.number,
+			lastName: PropTypes.string,
+			position: PropTypes.string
+		}),
+		error: PropTypes.bool,
+		errorMsg: PropTypes.string,
+		loading: PropTypes.bool
+	}),
 	inverted: PropTypes.bool,
 	officer: PropTypes.shape({
 		data: PropTypes.shape({
@@ -428,6 +438,12 @@ Officer.propTypes = {
 
 Officer.defaultProps = {
 	createOfficer,
+	initialOfficer: {
+		data: {},
+		error: false,
+		errorMsg: "",
+		loading: true
+	},
 	officer: {
 		data: {},
 		error: false,

@@ -1,13 +1,14 @@
 import { Form, Icon, Input, Segment } from "semantic-ui-react"
 import { toast } from "react-toastify"
 import { getConfig } from "@options/toast"
+import { ToastOption } from "@interfaces/options"
 import axios from "axios"
 import parse from "url-parse"
 import PropTypes from "prop-types"
 import queryString from "query-string"
 import React, { useState } from "react"
 
-const toastConfig = getConfig()
+const toastConfig: ToastOption = getConfig()
 toast.configure(toastConfig)
 
 const VideoInput: React.FunctionComponent = ({ onPasteInstagram, onPasteYouTube, setLoading }) => {
@@ -56,6 +57,7 @@ const VideoInput: React.FunctionComponent = ({ onPasteInstagram, onPasteYouTube,
 		}
 
 		setLoading(false)
+		return null
 	}
 
 	const _onPasteYouTube = async (e) => {
@@ -81,6 +83,7 @@ const VideoInput: React.FunctionComponent = ({ onPasteInstagram, onPasteYouTube,
 		}
 
 		setLoading(false)
+		return null
 	}
 
 	const fetchVideo = async (id: string, type: string) => {
