@@ -36,7 +36,7 @@ exports.changeProfilePic = async (req, res) => {
 			if (err) {
 				return res.status(500).send({
 					error: true,
-					msg: "There was an error"
+					msg: err.message
 				})
 			}
 		})
@@ -49,7 +49,11 @@ exports.changeProfilePic = async (req, res) => {
 
 		await fs.readFile(thumbnailInfo.path, async (err, data) => {
 			if (err) {
-				throw err
+				return res.status(500).send({
+					error: true,
+					msg: err.message
+				})
+				// throw err
 			}
 
 			const filePath = `users/${fileName}`
@@ -78,21 +82,21 @@ exports.changeProfilePic = async (req, res) => {
 					} catch (err) {
 						return res.status(500).send({
 							error: true,
-							msg: "There was an error"
+							msg: err.message
 						})
 					}
 				})
 				.catch(() => {
 					return res.status(500).send({
 						error: true,
-						msg: "There was an error"
+						msg: err.message
 					})
 				})
 		})
 	} catch (err) {
 		return res.status(500).send({
 			error: true,
-			msg: "There was an error"
+			msg: err.message
 		})
 	}
 }
