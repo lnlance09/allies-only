@@ -12,7 +12,7 @@ const About: React.FC = ({ inverted }) => {
 			activeItem={null}
 			containerClassName="aboutPage"
 			seo={{
-				description: "About Allies Only. How it works and what our goals are.",
+				description: "How it works and what our goals are.",
 				image: {
 					height: 500,
 					src: `${s3BaseUrl}logos/logo.png`,
