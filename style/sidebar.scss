@@ -1,5 +1,5 @@
 .pageSidebar {
-    .menu.globalSidebar {
+    .ui.inverted.menu.globalSidebar {
         background: $white;
         box-shadow: none;
         margin-top: 0;
@@ -9,25 +9,35 @@
         &.inverted {
             background: $invertedBackgroundColor;
         }
-    }
 
-    .headerMenuItem {
-        cursor: pointer;
-        font-weight: bold !important;
+        .headerMenuItem {
+            cursor: pointer;
+            font-weight: bold !important;
 
-        &.home {
-            padding-left: 0 !important;
-            padding-top: 0 !important;
+            &.home {
+                padding-left: 0 !important;
+                padding-top: 0 !important;
+            }
+
+            &.signIn {
+                margin-top: 15px;
+                padding: 0 2px !important;
+            }
+
+            &.active {
+                background: $invertedBackgroundColor !important;
+                color: $invertedYellow !important;
+            }
+
+            &:hover {
+                background: lighten($invertedBackgroundColor, 3%) !important;
+                color: $invertedYellow !important;
+
+                .icon {
+                    color: $invertedYellow;
+                }
+            }
         }
-
-        &.signIn {
-            margin-top: 15px;
-            padding: 0 2px !important;
-        }
-
-        &.active {
-            background: lighten($invertedBackgroundColor, 3%) !important;
-		}
     }
 
     .ui.list.aboutList {
