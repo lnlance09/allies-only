@@ -160,10 +160,10 @@ const Officer: React.FC = ({
 		? "Not found"
 		: `${initialOfficer.data.firstName} ${initialOfficer.data.lastName}`
 	const seoDescription = createMode
-		? "Keep tabs on police officers and their interactions with citizens in their jurisdiction"
+		? "Add a police officer so we can keep tabs on ptheir interactions with civilians"
 		: initialOfficer.error
 		? "Not found"
-		: `${initialOfficer.data.firstName} ${initialOfficer.data.lastName}'s interactions with citizens`
+		: `${initialOfficer.data.firstName} ${initialOfficer.data.lastName} is a member of the ${initialOfficer.data.departmentName}. Check out his or her interactions with civilians.`
 
 	let seoImage = {
 		height: 500,
@@ -171,7 +171,7 @@ const Officer: React.FC = ({
 		width: 500
 	}
 
-	if (!createMode && !initialOfficer.error) {
+	if (slug !== "create" && !initialOfficer.error) {
 		seoImage = {
 			height: 500,
 			src:
