@@ -41,11 +41,7 @@ const DefaultLayout: React.FC = ({
 					</Fragment>
 				) : (
 					<Fragment>
-						<meta
-							property="og:image"
-							content={image.src.replace("https://", "http://")}
-						/>
-						<meta property="og:image:secure_url" content={image.src} />
+						<meta property="og:image" content={image.src} />
 						<meta property="og:image:height" content={image.height} />
 						<meta property="og:image:width" content={image.width} />
 					</Fragment>
