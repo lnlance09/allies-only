@@ -55,7 +55,7 @@ const About: React.FC = ({ inverted }) => {
 					to criminal justice.
 				</Header>
 
-				<Image src={RodneyKingPic} />
+				<Image className="rodneyKingImg" bordered rounded src={RodneyKingPic} />
 
 				<Header as="p" inverted={inverted}>
 					For every case of an unarmed person like George Floyd being killed by the

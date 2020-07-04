@@ -18,6 +18,13 @@
         top: 53px;
         width: 100% !important;
 
+        .message.empty {
+            .header {
+                color: $white;
+                font-size: 18px;
+            }
+        }
+
         .category {
             display: block !important;
             width: 100% !important;
