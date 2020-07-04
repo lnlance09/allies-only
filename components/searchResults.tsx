@@ -93,7 +93,7 @@ const SearchResults: React.FC = ({
 							<Card.Content>
 								<Card.Header>{result.title}</Card.Header>
 								<Card.Meta>
-									<Moment date={result.createdAt} fromNow /> •{" "}
+									<Moment date={result.createdAt} fromNow />•{" "}
 									<span>{result.departmentName}</span>
 								</Card.Meta>
 								<Card.Description className="interactionDescription">
