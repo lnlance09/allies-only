@@ -25,17 +25,13 @@
             }
 
             &.active {
-                background: $invertedBackgroundColor !important;
+                background: lighten($invertedBackgroundColor, 4%) !important;
                 color: $invertedYellow !important;
             }
 
             &:hover {
                 background: lighten($invertedBackgroundColor, 3%) !important;
-                color: $invertedYellow !important;
-
-                .icon {
-                    color: $invertedYellow;
-                }
+                
             }
         }
     }
