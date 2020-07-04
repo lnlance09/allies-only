@@ -38,7 +38,7 @@ module.exports = {
 		const params = {
 			Body: body,
 			Bucket: bucketName,
-			ContentEncoding: "base64",
+			// ContentEncoding: "base64",
 			ContentType: contentType,
 			Key: fileName
 		}
