@@ -691,10 +691,7 @@ exports.uploadVideo = async (req, res) => {
 								timemarks: [02]
 							})
 							.on("error", (err) => {
-								return res.status(500).send({
-									error: true,
-									msg: err.message
-								})
+								console.log("Error", err)
 							})
 							.on("end", resolve)
 					})
