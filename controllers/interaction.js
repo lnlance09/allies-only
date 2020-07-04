@@ -690,7 +690,12 @@ exports.uploadVideo = async (req, res) => {
 								folder: "thumbnails",
 								timemarks: [02]
 							})
-							.on("error", reject)
+							.on("error", (err) => {
+								return res.status(500).send({
+									error: true,
+									msg: err.message
+								})
+							})
 							.on("end", resolve)
 					})
 
