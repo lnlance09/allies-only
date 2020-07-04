@@ -367,6 +367,8 @@ const Interaction: React.FC = ({
 		}
 	}
 
+	seo.url = `interactions/${slug}`
+
 	return (
 		<Provider store={store}>
 			<DefaultLayout
