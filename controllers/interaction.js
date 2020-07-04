@@ -364,81 +364,73 @@ exports.saveVideo = async (req, res) => {
 	}
 
 	if (type === "instagram") {
-		try {
-			const video = await save(id, "uploads").then((res) => {
-				console.log("res", res)
+		const video = await save(id, "uploads")
+			.then((res) => {
 				return res
 			})
-
-			if (video.label !== "video") {
-				await fs.unlinkSync(video.file)
+			.catch((err) => {
 				return res.status(500).send({
 					error: true,
-					msg: "Only videos from be used from Instagram",
-					video: false
+					msg: err.message || "An error occurred"
 				})
-			}
-
-			await ffmpeg()
-				.input(fs.createReadStream(video.file))
-				.screenshots({
-					count: 1,
-					filename: `${type}-${id}.png`,
-					folder: "thumbnails",
-					timemarks: [02]
-				})
-				.on("error", () => {
-					return res.status(500).send({
-						error: true,
-						msg: "There was en error creating the thumbnail"
-					})
-				})
-				.on("end", async () => {
-					await fs.readFile(`thumbnails/${type}-${id}.png`, async (err, data) => {
-						if (err) {
-							return res.status(500).send({
-								error: true,
-								msg: "There was en error creating the thumbnail"
-							})
-						}
-
-						await Aws.uploadToS3(data, `thumbnails/${type}-${id}.png`, false)
-						await fs.unlinkSync(`thumbnails/${type}-${id}.png`)
-					})
-				})
-
-			await fs.readFile(video.file, async (err, data) => {
-				if (err) {
-					throw err
-				}
-
-				await Aws.uploadToS3(data, filePath, false, "video/mp4")
-				await fs.unlinkSync(video.file)
-
-				try {
-					await waitOn({
-						resources: [`https://alliesonly.s3-us-west-2.amazonaws.com/${filePath}`]
-					})
-					return res.status(200).send({
-						error: false,
-						thumbnail: `thumbnails/${type}-${id}.png`,
-						video: filePath
-					})
-				} catch (err) {
-					return res.status(500).send({
-						error: true,
-						msg: "That link is not valid",
-						video: false
-					})
-				}
 			})
-		} catch (err) {
+
+		if (video.label !== "video") {
+			fs.unlinkSync(video.file)
 			return res.status(500).send({
 				error: true,
-				msg: "That link is not valid",
+				msg: "Only videos from be used from Instagram",
 				video: false
 			})
 		}
+
+		ffmpeg(fs.createReadStream(video.file))
+			.screenshots({
+				count: 1,
+				filename: `${type}-${id}.png`,
+				folder: "thumbnails",
+				timemarks: [02]
+			})
+			.on("error", (err) => {
+				return res.status(500).send({
+					error: true,
+					msg: err.message | "There was en error creating the thumbnail"
+				})
+			})
+			.on("end", async () => {
+				fs.readFile(`thumbnails/${type}-${id}.png`, async (err, data) => {
+					if (err) {
+						return res.status(500).send({
+							error: true,
+							msg: err.message | "There was en error creating the thumbnail"
+						})
+					}
+
+					await Aws.uploadToS3(data, `thumbnails/${type}-${id}.png`, false)
+
+					fs.unlinkSync(`thumbnails/${type}-${id}.png`)
+					fs.readFile(video.file, async (err, data) => {
+						if (err) {
+							return res.status(500).send({
+								error: true,
+								msg: err.message
+							})
+						}
+
+						await Aws.uploadToS3(data, filePath, false, "video/mp4")
+						fs.unlinkSync(video.file)
+
+						await waitOn({
+							resources: [`https://alliesonly.s3-us-west-2.amazonaws.com/${filePath}`]
+						})
+						return res.status(200).send({
+							error: false,
+							thumbnail: `thumbnails/${type}-${id}.png`,
+							video: filePath
+						})
+					})
+				})
+			})
 	}
 
 	if (type === "youtube") {
@@ -468,28 +460,31 @@ exports.saveVideo = async (req, res) => {
 		video.pipe(fs.createWriteStream(`uploads/${fileName}`))
 
 		video.on("end", async () => {
-			await fs.readFile(`uploads/${fileName}`, async (err, data) => {
+			fs.readFile(`uploads/${fileName}`, async (err, data) => {
 				if (err) {
-					throw err
+					return res.status(500).send({
+						error: true,
+						msg: err.message
+					})
 				}
 
-				await ffmpeg()
-					.input(fs.createReadStream(`uploads/${fileName}`))
-					.screenshots({
-						count: 1,
-						filename: `${type}-${id}.png`,
-						folder: "thumbnails",
-						timemarks: [02]
-					})
-					.on("error", () => {
-						return res.status(500).send({
-							error: true,
-							msg: "There was en error creating the thumbnail",
-							video: false
+				await Aws.uploadToS3(data, filePath, false, "video/mp4")
+
+				const uploadThumbnail = new Promise((resolve, reject) => {
+					ffmpeg(fs.createReadStream(`uploads/${fileName}`))
+						.screenshots({
+							count: 1,
+							filename: `${type}-${id}.png`,
+							folder: "thumbnails",
+							timemarks: [02]
 						})
-					})
-					.on("end", async () => {
-						await fs.readFile(`thumbnails/${type}-${id}.png`, async (err, data) => {
+						.on("error", reject)
+						.on("end", resolve)
+				})
+
+				uploadThumbnail
+					.then(() => {
+						fs.readFile(`thumbnails/${type}-${id}.png`, async (err, data) => {
 							if (err) {
 								return res.status(500).send({
 									error: true,
@@ -498,28 +493,28 @@ exports.saveVideo = async (req, res) => {
 							}
 
 							await Aws.uploadToS3(data, `thumbnails/${type}-${id}.png`, false)
-							await fs.unlinkSync(`thumbnails/${type}-${id}.png`)
+							fs.unlinkSync(`thumbnails/${type}-${id}.png`)
+							fs.unlinkSync(`uploads/${fileName}`)
+
+							await waitOn({
+								resources: [
+									`https://alliesonly.s3-us-west-2.amazonaws.com/${filePath}`
+								]
+							})
+							return res.status(200).send({
+								error: false,
+								thumbnail: `thumbnails/${type}-${id}.png`,
+								video: filePath
+							})
 						})
 					})
-
-				await Aws.uploadToS3(data, filePath, false, "video/mp4")
-				await fs.unlinkSync(`uploads/${fileName}`)
-
-				try {
-					await waitOn({
-						resources: [`https://alliesonly.s3-us-west-2.amazonaws.com/${filePath}`]
+					.catch(() => {
+						return res.status(500).send({
+							error: true,
+							msg: "There was en error creating the thumbnail",
+							video: false
+						})
 					})
-					return res.status(200).send({
-						error: false,
-						thumbnail: `thumbnails/${type}-${id}.png`,
-						video: filePath
-					})
-				} catch (err) {
-					return res.status(500).send({
-						error: true,
-						msg: "That link is not valid"
-					})
-				}
 			})
 		})
 	}
@@ -652,90 +647,135 @@ exports.uploadVideo = async (req, res) => {
 	}
 
 	const { file } = req.files
-	let ext = path.extname(file.name).toLowerCase()
+	const _ext = path.extname(file.name).toLowerCase()
 	const extensions = [".avi", ".flv", ".m4v", ".mp4", ".mkv", ".mov", ".webm"]
 
-	if (!extensions.includes(ext)) {
-		return res.status(401).send({ error: true, msg: "That video format is not allowed" })
+	if (!extensions.includes(_ext)) {
+		return res.status(401).send({ error: true, msg: "That is not a video file" })
 	}
 
 	const video = file.data
 	const timestamp = new Date().getTime()
 	const fileId = `${randomize("aa", 24)}-${timestamp}`
-	await fs.writeFile(`uploads/${fileId}${ext}`, video, () => null)
-
-	if (ext === ".mov") {
-		ext = ".mp4"
-		await ffmpeg(fs.createReadStream(`uploads/${fileId}.mov`))
-			.audioCodec("libfaac")
-			.videoCodec("libx264")
-			.format("mp4")
-			.save(`uploads/${fileId}${ext}`)
-			.on("error", (err) => {
-				return res.status(500).send({
-					error: true,
-					msg: err.message | "There was en error creating the thumbnail"
-				})
-			})
-			.on("end", async () => {
-				await fs.readFile(`thumbnails/${fileId}.png`, async (err, data) => {
-					if (err) {
-						return res.status(500).send({
-							error: true,
-							msg: err.message
-						})
-					}
-
-					console.log("convert", data)
-				})
-			})
-	}
-
+	const ext = _ext === ".mov" ? ".mp4" : _ext
 	const fileName = `interactions/${fileId}${ext}`
-	await Aws.uploadToS3(video, fileName, false, "video/mp4")
 
-	await ffmpeg()
-		.input(fs.createReadStream(`uploads/${fileId}${ext}`))
-		.screenshots({
-			count: 1,
-			filename: `${fileId}.png`,
-			folder: "thumbnails",
-			timemarks: [02]
-		})
-		.on("error", () => {
+	fs.writeFile(`uploads/${fileId}${_ext}`, video, async (err) => {
+		if (err) {
 			return res.status(500).send({
 				error: true,
 				msg: "There was en error creating the thumbnail"
 			})
-		})
-		.on("end", async () => {
-			await fs.readFile(`thumbnails/${fileId}.png`, async (err, data) => {
-				if (err) {
+		}
+
+		if (_ext === ".mov") {
+			const convertVideo = new Promise((resolve, reject) => {
+				ffmpeg(fs.createReadStream(`uploads/${fileId}.mov`))
+					// .audioCodec("libfaac")
+					// .videoCodec("libx264")
+					.format("mp4")
+					.save(`uploads/${fileId}${ext}`)
+					.on("error", reject)
+					.on("end", resolve)
+			})
+			convertVideo
+				.then(async () => {
+					await Aws.uploadToS3(video, fileName, false, "video/mp4")
+
+					const uploadVideo = new Promise((resolve, reject) => {
+						ffmpeg(fs.createReadStream(`uploads/${fileId}.mov`))
+							.screenshots({
+								count: 1,
+								filename: `${fileId}.png`,
+								folder: "thumbnails",
+								timemarks: [02]
+							})
+							.on("error", (error) => console.log("error", error))
+							.on("end", resolve)
+					})
+
+					uploadVideo
+						.then(async () => {
+							fs.readFile(`thumbnails/${fileId}.png`, async (err, data) => {
+								if (err) {
+									return res.status(500).send({
+										error: true,
+										msg: err.message
+									})
+								}
+
+								await Aws.uploadToS3(data, `thumbnails/${fileId}.png`, false)
+								fs.unlinkSync(`thumbnails/${fileId}.png`)
+								fs.unlinkSync(`uploads/${fileId}${ext}`)
+
+								await waitOn({
+									resources: [
+										`https://alliesonly.s3-us-west-2.amazonaws.com/${fileName}`
+									]
+								})
+								return res.status(200).send({
+									error: false,
+									thumbnail: `thumbnails/${fileId}.png`,
+									video: fileName
+								})
+							})
+						})
+						.catch(() => {
+							return res.status(500).send({
+								error: true,
+								msg: "There was an error"
+							})
+						})
+				})
+				.catch(() => {
 					return res.status(500).send({
 						error: true,
-						msg: "There was en error creating the thumbnail"
+						msg: "There was an error"
 					})
-				}
-
-				await Aws.uploadToS3(data, `thumbnails/${fileId}.png`, false)
-				await fs.unlinkSync(`thumbnails/${fileId}.png`)
-				await fs.unlinkSync(`uploads/${fileId}${ext}`)
+				})
+		} else {
+			const uploadVideo = new Promise((resolve, reject) => {
+				ffmpeg(fs.createReadStream(`uploads/${fileId}${ext}`))
+					.screenshots({
+						count: 1,
+						filename: `${fileId}.png`,
+						folder: "thumbnails",
+						timemarks: [02]
+					})
+					.on("error", reject)
+					.on("end", resolve)
 			})
-		})
+			uploadVideo
+				.then(async () => {
+					fs.readFile(`thumbnails/${fileId}.png`, async (err, data) => {
+						if (err) {
+							return res.status(500).send({
+								error: true,
+								msg: err.message
+							})
+						}
 
-	try {
-		await waitOn({
-			resources: [`https://alliesonly.s3-us-west-2.amazonaws.com/${fileName}`]
-		})
-		return res.status(200).send({
-			error: false,
-			thumbnail: `thumbnails/${fileId}.png`,
-			video: fileName
-		})
-	} catch (err) {
-		return res.status(500).send({
-			error: true,
-			msg: "There was an error"
-		})
-	}
+						await Aws.uploadToS3(video, fileName, false, "video/mp4")
+						await Aws.uploadToS3(data, `thumbnails/${fileId}.png`, false)
+						fs.unlinkSync(`thumbnails/${fileId}.png`)
+						fs.unlinkSync(`uploads/${fileId}${ext}`)
+
+						await waitOn({
+							resources: [`https://alliesonly.s3-us-west-2.amazonaws.com/${fileName}`]
+						})
+						return res.status(200).send({
+							error: false,
+							thumbnail: `thumbnails/${fileId}.png`,
+							video: fileName
+						})
+					})
+				})
+				.catch(() => {
+					return res.status(500).send({
+						error: true,
+						msg: "There was an error"
+					})
+				})
+		}
+	})
 }
