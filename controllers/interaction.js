@@ -690,7 +690,7 @@ exports.uploadVideo = async (req, res) => {
 								folder: "thumbnails",
 								timemarks: [02]
 							})
-							.on("error", (error) => console.log("error", error))
+							.on("error", reject)
 							.on("end", resolve)
 					})
 
