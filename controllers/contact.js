@@ -8,12 +8,6 @@ exports.send = async (req, res) => {
 		return res.status(401).send({ error: true, msg: "You must include a message" })
 	}
 
-	const to = "lnlance09@gmail.com"
-	const subject = "Someone has contacted you"
-	const text = msg
-	const html = msg
-	Mail.sendEmail(to, subject, text, html)
-
 	try {
 		const to = "lnlance09@gmail.com"
 		const subject = "Someone has contacted you"

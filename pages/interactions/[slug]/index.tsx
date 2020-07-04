@@ -502,12 +502,11 @@ const Interaction: React.FC = ({
 										<Header as="h1" inverted={inverted}>
 											{initialInteraction.data.title}
 											<Header.Subheader>
-												Submitted{" "}
 												<Moment
 													date={initialInteraction.data.createdAt}
 													fromNow
 												/>{" "}
-												•{" "}
+												• By{" "}
 												<Link
 													href={`/${initialInteraction.data.user.username}`}
 												>
@@ -660,6 +659,24 @@ const Interaction: React.FC = ({
 														identified. Can you help us spot them?
 													</p>
 													{officerField}
+													<Divider horizontal inverted={inverted}>
+														OR
+													</Divider>
+													<p>
+														Don&apos;t see the officer you&apos;re
+														looking for? Add them.
+													</p>
+													<Button
+														color="orange"
+														content="Add an officer"
+														fluid
+														onClick={() =>
+															router.push(
+																`/officers/create?departmentId=${interaction.data.department.id}`
+															)
+														}
+														size="big"
+													/>
 												</div>
 											)}
 										</Segment>
@@ -692,9 +709,10 @@ const Interaction: React.FC = ({
 
 										<Header
 											as="h3"
+											className="moreInteractionsHeader"
 											content="More Interactions"
 											inverted={inverted}
-											size="large"
+											size="huge"
 										/>
 
 										{!interaction.error && !interaction.loading && (

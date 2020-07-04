@@ -11,10 +11,12 @@ const PageHeader: React.FC = ({ basicHeader, loading }) => {
 
 	const [authenticated, setAuthenticated] = useState(null)
 	const [sidebarVisible, setSidebarVisible] = useState(false)
+	const [user, setUser] = useState({})
 
 	useEffect(() => {
 		const userData = parseJwt()
 		if (userData) {
+			setUser(userData)
 			setAuthenticated(true)
 		} else {
 			setAuthenticated(false)
@@ -58,7 +60,12 @@ const PageHeader: React.FC = ({ basicHeader, loading }) => {
 				</Container>
 				<Container className={`mobile ${basicHeader ? "basic" : ""}`}>
 					{basicHeader ? (
-						<Image className="logo" onClick={() => router.push("/")} src={Logo} />
+						<Image
+							className="logo"
+							onClick={() => router.push("/")}
+							rounded
+							src={Logo}
+						/>
 					) : (
 						<Menu borderless fitted="vertically" fixed="top" fluid inverted>
 							<Container>
@@ -66,6 +73,7 @@ const PageHeader: React.FC = ({ basicHeader, loading }) => {
 									<Image
 										className="logo"
 										onClick={() => router.push("/")}
+										rounded
 										src={Logo}
 									/>
 								</Menu.Item>
@@ -126,6 +134,12 @@ const PageHeader: React.FC = ({ basicHeader, loading }) => {
 						<Icon name="plus" size="small" />
 						Add an interaction
 					</Menu.Item>
+					{authenticated && (
+						<Menu.Item as="a" onClick={() => router.push(`/allies/${user.username}`)}>
+							<Icon name="user" size="small" />
+							Profile
+						</Menu.Item>
+					)}
 				</Sidebar>
 			</div>
 		</div>
