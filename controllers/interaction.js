@@ -683,19 +683,15 @@ exports.uploadVideo = async (req, res) => {
 					await Aws.uploadToS3(video, fileName, false, "video/mp4")
 
 					const createScreenshot = new Promise((resolve, reject) => {
-						ffmpeg(fs.createReadStream(`uploads/${fileId}.mov`))
+						ffmpeg(`uploads/${fileId}.mov`)
 							.screenshots({
 								count: 1,
 								filename: `${fileId}.png`,
 								folder: "thumbnails",
 								timemarks: [02]
 							})
-							.on("error", (err) => {
-								return res.status(200).send({
-									error: true,
-									msg: err.message
-								})
-							})
+							.save(`thumbnails/${fileId}.png`)
+							.on("error", reject)
 							.on("end", resolve)
 					})
 
