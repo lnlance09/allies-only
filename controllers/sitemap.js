@@ -26,7 +26,7 @@ exports.sitemap = async (req, res) => {
 			.catch(() => [])
 		const interactions = await Interaction.findAll({
 			model: Interaction,
-			attributes: ["id", "slug"],
+			attributes: ["id"],
 			raw: true
 		})
 			.then((interactions) => interactions)
