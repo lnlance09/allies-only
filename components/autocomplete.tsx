@@ -138,7 +138,6 @@ const Autocomplete: React.FC = ({ category, disabled, placeholder, width }) => {
 				onResultSelect={onClick}
 				results={results}
 				resultRenderer={resultRenderer}
-				showNoResults={false}
 			/>
 		</div>
 	)
