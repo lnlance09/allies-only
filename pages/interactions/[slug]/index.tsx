@@ -390,7 +390,7 @@ const Interaction: React.FC = ({
 									</Header>
 									<Dropzone onDrop={onDrop}>
 										{({ getRootProps, getInputProps }) => (
-											<div {...getRootProps()}>
+											<div className="fileUploadWrapper" {...getRootProps()}>
 												<input
 													className="fileUploadInput"
 													{...getInputProps()}
