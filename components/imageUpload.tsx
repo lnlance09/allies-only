@@ -29,7 +29,7 @@ const ImageUpload: React.FC = ({
 				<section>
 					<div {...getRootProps()}>
 						<input {...getInputProps()} />
-						<Header inverted={inverted} size={headerSize}>
+						<Header className="imageUploadHeader" inverted={inverted} size={headerSize}>
 							{msg}
 						</Header>
 						<Button className="changePicBtn" color="yellow" icon inverted={inverted}>

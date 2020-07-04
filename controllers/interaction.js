@@ -682,7 +682,7 @@ exports.uploadVideo = async (req, res) => {
 				.then(async () => {
 					await Aws.uploadToS3(video, fileName, false, "video/mp4")
 
-					const uploadVideo = new Promise((resolve, reject) => {
+					const createScreenshot = new Promise((resolve, reject) => {
 						ffmpeg(fs.createReadStream(`uploads/${fileId}.mov`))
 							.screenshots({
 								count: 1,
@@ -694,7 +694,7 @@ exports.uploadVideo = async (req, res) => {
 							.on("end", resolve)
 					})
 
-					uploadVideo
+					createScreenshot
 						.then(async () => {
 							fs.readFile(`thumbnails/${fileId}.png`, async (err, data) => {
 								if (err) {
@@ -734,7 +734,7 @@ exports.uploadVideo = async (req, res) => {
 					})
 				})
 		} else {
-			const uploadVideo = new Promise((resolve, reject) => {
+			const createScreenshot = new Promise((resolve, reject) => {
 				ffmpeg(fs.createReadStream(`uploads/${fileId}${ext}`))
 					.screenshots({
 						count: 1,
@@ -745,7 +745,7 @@ exports.uploadVideo = async (req, res) => {
 					.on("error", reject)
 					.on("end", resolve)
 			})
-			uploadVideo
+			createScreenshot
 				.then(async () => {
 					fs.readFile(`thumbnails/${fileId}.png`, async (err, data) => {
 						if (err) {

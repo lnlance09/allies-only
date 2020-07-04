@@ -385,75 +385,61 @@ exports.updateImg = async (req, res) => {
 		return res.status(401).send({ error: true, msg: "You must include a picture" })
 	}
 
-	try {
-		const image = file.data
-		const timestamp = new Date().getTime()
-		const fileName = `${randomize("aa", 24)}-${timestamp}-${file.name}`
+	const image = file.data
+	const timestamp = new Date().getTime()
+	const fileName = `${randomize("aa", 24)}-${timestamp}-${file.name}`
 
-		await fs.writeFile(`uploads/${fileName}`, image, "buffer", (err) => {
-			if (err) {
+	fs.writeFile(`uploads/${fileName}`, image, "buffer", (err) => {
+		if (err) {
+			return res.status(500).send({
+				error: true,
+				msg: "There was an error"
+			})
+		}
+	})
+
+	const thumbnailInfo = await thumbnail({
+		src: `uploads/${fileName}`,
+		width: 250,
+		height: 250
+	})
+
+	fs.readFile(thumbnailInfo.path, async (err, data) => {
+		if (err) {
+			return res.status(500).send({
+				error: true,
+				msg: err.message
+			})
+		}
+
+		const filePath = `officers/${fileName}`
+		await Aws.uploadToS3(data, filePath, false)
+
+		Officer.update(
+			{
+				img: filePath
+			},
+			{
+				where: { id }
+			}
+		)
+			.then(async () => {
+				await waitOn({
+					resources: [`https://alliesonly.s3-us-west-2.amazonaws.com/${filePath}`]
+				})
+				fs.unlinkSync(`uploads/${fileName}`)
+
+				return res.status(200).send({
+					error: false,
+					img: filePath,
+					msg: "success"
+				})
+			})
+			.catch(() => {
 				return res.status(500).send({
 					error: true,
-					msg: err.message
+					msg: "There was an error"
 				})
-			}
-		})
-
-		const thumbnailInfo = await thumbnail({
-			src: `uploads/${fileName}`,
-			width: 250,
-			height: 250
-		})
-
-		fs.readFile(thumbnailInfo.path, async (err, data) => {
-			if (err) {
-				return res.status(500).send({
-					error: true,
-					msg: err.message
-				})
-			}
-
-			const filePath = `officers/${fileName}`
-			await Aws.uploadToS3(data, filePath, false)
-
-			Officer.update(
-				{
-					img: filePath
-				},
-				{
-					where: { id }
-				}
-			)
-				.then(async () => {
-					try {
-						await waitOn({
-							resources: [`https://alliesonly.s3-us-west-2.amazonaws.com/${filePath}`]
-						})
-						await fs.unlinkSync(`uploads/${fileName}`)
-
-						return res.status(200).send({
-							error: false,
-							img: filePath,
-							msg: "success"
-						})
-					} catch (err) {
-						return res.status(500).send({
-							error: true,
-							msg: err.message
-						})
-					}
-				})
-				.catch((err) => {
-					return res.status(500).send({
-						error: true,
-						msg: err.message
-					})
-				})
-		})
-	} catch (err) {
-		return res.status(500).send({
-			error: true,
-			msg: err.message
-		})
-	}
+			})
+	})
 }
