@@ -135,7 +135,7 @@ const PageHeader: React.FC = ({ basicHeader, loading }) => {
 						Add an interaction
 					</Menu.Item>
 					{authenticated && (
-						<Menu.Item as="a" onClick={() => router.push(`/allies/${user.username}`)}>
+						<Menu.Item as="a" onClick={() => router.push(`/${user.username}`)}>
 							<Icon name="user" size="small" />
 							Profile
 						</Menu.Item>

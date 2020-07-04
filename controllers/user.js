@@ -27,74 +27,70 @@ exports.changeProfilePic = async (req, res) => {
 		return res.status(401).send({ error: true, msg: "You must include a picture" })
 	}
 
-	try {
-		const image = file.data
-		const timestamp = new Date().getTime()
-		const fileName = `${randomize("aa", 24)}-${timestamp}-${file.name}`
+	const image = file.data
+	const timestamp = new Date().getTime()
+	const fileName = `${randomize("aa", 24)}-${timestamp}-${file.name}`
 
-		await fs.writeFile(`uploads/${fileName}`, image, "buffer", (err) => {
-			if (err) {
-				return res.status(500).send({
-					error: true,
-					msg: "There was an error"
-				})
+	fs.writeFile(`uploads/${fileName}`, image, "buffer", (err) => {
+		if (err) {
+			return res.status(500).send({
+				error: true,
+				msg: "There was an error"
+			})
+		}
+	})
+
+	const thumbnailInfo = await thumbnail({
+		src: `uploads/${fileName}`,
+		width: 250,
+		height: 250
+	})
+
+	fs.readFile(thumbnailInfo.path, async (err, data) => {
+		if (err) {
+			return res.status(500).send({
+				error: true,
+				msg: "There was an error"
+			})
+		}
+
+		const filePath = `users/${fileName}`
+		await Aws.uploadToS3(data, filePath, false)
+
+		User.update(
+			{
+				img: filePath
+			},
+			{
+				where: { id: user.data.id }
 			}
-		})
+		)
+			.then(async () => {
+				try {
+					await waitOn({
+						resources: [`https://alliesonly.s3-us-west-2.amazonaws.com/${filePath}`]
+					})
+					fs.unlinkSync(`uploads/${fileName}`)
 
-		const thumbnailInfo = await thumbnail({
-			src: `uploads/${fileName}`,
-			width: 250,
-			height: 250
-		})
-
-		await fs.readFile(thumbnailInfo.path, async (err, data) => {
-			if (err) {
-				throw err
-			}
-
-			const filePath = `users/${fileName}`
-			await Aws.uploadToS3(data, filePath, false)
-
-			User.update(
-				{
-					img: filePath
-				},
-				{
-					where: { id: user.data.id }
-				}
-			)
-				.then(async () => {
-					try {
-						await waitOn({
-							resources: [`https://alliesonly.s3-us-west-2.amazonaws.com/${filePath}`]
-						})
-						await fs.unlinkSync(`uploads/${fileName}`)
-
-						return res.status(200).send({
-							error: false,
-							img: filePath,
-							msg: "success"
-						})
-					} catch (err) {
-						return res.status(500).send({
-							error: true,
-							msg: "There was an error"
-						})
-					}
-				})
-				.catch(() => {
+					return res.status(200).send({
+						error: false,
+						img: filePath,
+						msg: "success"
+					})
+				} catch (err) {
 					return res.status(500).send({
 						error: true,
 						msg: "There was an error"
 					})
+				}
+			})
+			.catch(() => {
+				return res.status(500).send({
+					error: true,
+					msg: "There was an error"
 				})
-		})
-	} catch (err) {
-		return res.status(500).send({
-			error: true,
-			msg: "There was an error"
-		})
-	}
+			})
+	})
 }
 
 exports.count = async (req, res) => {
