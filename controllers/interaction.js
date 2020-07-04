@@ -305,6 +305,7 @@ exports.findOne = (req, res) => {
 				},
 				description: firstRow["description"],
 				id: firstRow["id"],
+				img: firstRow["img"],
 				officers: [],
 				title: firstRow["title"],
 				video: firstRow["video"],

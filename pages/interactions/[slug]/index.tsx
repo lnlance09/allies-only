@@ -358,6 +358,11 @@ const Interaction: React.FC = ({
 				initialInteraction.data.description === ""
 					? `This is an interaction between a civilian and the ${initialInteraction.data.department.name}`
 					: initialInteraction.data.description,
+			image: {
+				height: 500,
+				src: initialInteraction.data.img,
+				width: 500
+			},
 			title: initialInteraction.data.title,
 			video: {
 				height: 500,
