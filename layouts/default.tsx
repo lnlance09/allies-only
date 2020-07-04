@@ -33,13 +33,15 @@ const DefaultLayout: React.FC = ({
 				<meta property="fb:app_id" content="498572440350555" />
 				<meta property="og:description" content={description} />
 
-				{typeof video !== "undefined" ? (
+				{typeof video !== "undefined" && (
 					<Fragment>
 						<meta property="og:video" content={video.src} />
 						<meta property="og:video:height" content={video.height} />
 						<meta property="og:video:width" content={video.width} />
 					</Fragment>
-				) : (
+				)}
+
+				{typeof image !== "undefined" && (
 					<Fragment>
 						<meta property="og:image" content={image.src} />
 						<meta property="og:image:height" content={image.height} />
