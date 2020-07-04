@@ -110,6 +110,7 @@
         }
 
         .sidebar.ui.labeled.icon.menu .item {
+            background: lighten($invertedBackgroundColor, 6%) !important;
             line-height: 24px !important;
             text-align: left !important;
 
