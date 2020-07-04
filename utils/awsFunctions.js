@@ -29,7 +29,7 @@ module.exports = {
 		return exists
 	},
 	uploadToS3: async function (file, fileName, useBuffer, contentType = "image/jpeg") {
-		let body = file
+		let body = new Buffer(file, "base64")
 		if (useBuffer) {
 			const base64 = file.replace(/^data:image\/\w+;base64,/, "")
 			body = new Buffer(base64, "base64")
