@@ -118,7 +118,7 @@ const User: React.FC = ({
 	const seoTitle = initialUser.error ? "Not found" : initialUser.data.name
 	const seoDescription = initialUser.error
 		? "Become an ally in the fight against police brutality and corruption"
-		: `${initialUser.data.name}'s interactions with the police on AlliesOnly`
+		: `${initialUser.data.name}'s interactions with the police on Allies Only`
 	const seoImage = {
 		height: 500,
 		src: _img === null || _img === "" ? `${s3BaseUrl}logos/logo.png` : `${s3BaseUrl}${_img}`,

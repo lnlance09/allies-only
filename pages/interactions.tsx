@@ -41,7 +41,7 @@ const Interactions: React.FC = ({ interactions, inverted, searchInteractions }) 
 				activeItem="interactions"
 				containerClassName="interactionsPage"
 				seo={{
-					description: "View interactions between the police and citizens",
+					description: "View interactions between the police and civilians",
 					image: {
 						height: 500,
 						src: `${s3BaseUrl}logos/logo.png`,
