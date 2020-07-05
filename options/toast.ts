@@ -1,7 +1,7 @@
 import { ToastOption } from "@interfaces/options"
 
 export const getConfig = (): ToastOption => ({
-	autoClose: 2000,
+	autoClose: 3500,
 	closeOnClick: true,
 	draggable: true,
 	hideProgressBar: true,

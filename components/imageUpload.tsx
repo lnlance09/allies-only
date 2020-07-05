@@ -19,7 +19,8 @@ const ImageUpload: React.FC = ({
 
 	const onDrop = async (files) => {
 		if (files.length > 0) {
-			callback(bearer, files[0], id)
+			await callback(bearer, files[0], id)
+			setActive(false)
 		}
 	}
 
