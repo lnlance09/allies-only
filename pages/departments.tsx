@@ -42,7 +42,7 @@ const Departments: React.FC = ({ departments, inverted, searchDepartments }) => 
 				containerClassName="departmentsPage"
 				seo={{
 					description:
-						"Browse police departments and view their officers' interactions with citizens",
+						"Browse police departments and view their officers' interactions with civilians",
 					image: {
 						height: 500,
 						src: `${s3BaseUrl}logos/logo.png`,

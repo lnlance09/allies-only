@@ -29,7 +29,7 @@ const SignIn: React.FC = ({ inverted }) => {
 			containerClassName="signInPage"
 			isText
 			seo={{
-				description: "Sign in or sign up with Allies Only",
+				description: "Sign In or Sign Up with Allies Only",
 				image: {
 					height: 512,
 					src: `${s3BaseUrl}logos/logo.png`,

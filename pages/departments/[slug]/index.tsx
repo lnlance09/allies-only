@@ -151,7 +151,7 @@ const Department: React.FC = ({
 						? "Add a new police department"
 						: initialDepartment.error
 						? "Not found"
-						: `Keep tabs on the ${initialDepartment.data.name} and their interactions with citizens in their jurisdiction`,
+						: `Keep tabs on the ${initialDepartment.data.name} and their interactions with civilians in their jurisdiction`,
 					image: {
 						height: 500,
 						src: `${s3BaseUrl}logos/logo.png`,
