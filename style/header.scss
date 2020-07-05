@@ -55,7 +55,7 @@
 
     .topHeader {
         align-items: center;
-        background: lighten($invertedBackgroundColor, 2%);
+        background: lighten($invertedBackgroundColor, 3%);
         display: flex;
         justify-content: center;
         max-width: none !important;
@@ -114,7 +114,7 @@
         }
 
         .sidebar.ui.labeled.icon.menu .item {
-            background: lighten($invertedBackgroundColor, 6%) !important;
+            background: lighten($invertedBackgroundColor, 3%) !important;
             line-height: 24px !important;
             text-align: left !important;
 
