@@ -12,13 +12,12 @@
 		&.inverted {
 			.item {
 				background: lighten($invertedBackgroundColor, 4%);
-				border: solid 1px $fullBlack;
+				border: none;
 				cursor: pointer;
 				padding: 15px;
 
 				&:hover {
-					background: $invertedBackgroundColor;
-					transition: 0.3s;
+					background: lighten($invertedBackgroundColor, 3%);
 				}
 
 				@media only screen and (max-width: 767px) {

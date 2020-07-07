@@ -17,11 +17,17 @@ export const SET_DEPARTMENT_FETCH_ERROR = "department:SET_DEPARTMENT_FETCH_ERROR
 export const UPDATE_DEPARTMENT = "department:UPDATE_DEPARTMENT"
 
 // Interaction
+export const GET_COMMENTS = "interaction:GET_COMMENTS"
 export const GET_INTERACTION = "interaction:GET_INTERACTION"
+export const LIKE_COMMENT = "interaction:LIKE_COMMENT"
+export const POST_COMMENT = "interaction:POST_COMMENT"
+export const POST_COMMENT_ERROR = "interaction:POST_COMMENT_ERROR"
 export const RESET_INTERACTION_TO_INITIAL = "interaction:RESET_INTERACTION_TO_INITIAL"
 export const SEARCH_INTERACTIONS = "interaction:SEARCH_INTERACTIONS"
+export const SET_COMMENTS_FETCH_ERROR = "interaction:SET_COMMENTS_FETCH_ERROR"
 export const SET_INTERACTION_FETCH_ERROR = "interaction:SET_INTERACTION_FETCH_ERROR"
 export const SET_VIDEO = "interaction:SET_VIDEO"
+export const UNLIKE_COMMENT = "interaction:UNLIKE_COMMENT"
 export const UPLOAD_VIDEO = "interaction:UPLOAD_VIDEO"
 export const UPDATE_INTERACTION = "interaction:UPDATE_INTERACTION"
 

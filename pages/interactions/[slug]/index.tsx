@@ -1,8 +1,12 @@
 import {
 	createInteraction,
+	getComments,
 	getInteraction,
+	likeComment,
+	postComment,
 	searchInteractions,
 	setVideo,
+	unlikeComment,
 	updateInteraction,
 	updateViews,
 	uploadVideo
@@ -37,6 +41,7 @@ import { withTheme } from "@redux/ThemeProvider"
 import { compose } from "redux"
 import { baseUrl } from "@options/config"
 import axios from "axios"
+import Comments from "@components/comments"
 import DefaultLayout from "@layouts/default"
 import DefaultPic from "@public/images/avatar/officer.png"
 import Dropzone from "react-dropzone"
@@ -96,13 +101,17 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
 
 const Interaction: React.FC = ({
 	createInteraction,
+	getComments,
 	getInteraction,
 	initialInteraction,
 	interaction,
 	interactions,
 	inverted,
+	likeComment,
+	postComment,
 	searchInteractions,
 	setVideo,
+	unlikeComment,
 	updateInteraction,
 	updateViews,
 	uploadVideo
@@ -110,6 +119,7 @@ const Interaction: React.FC = ({
 	const router = useRouter()
 	const { departmentId, officerId, slug } = router.query
 
+	const [authenticated, setAuthenticated] = useState(null)
 	const [bearer, setBearer] = useState(null)
 	const [createMode, setCreateMode] = useState(slug === "create")
 	const [department, setDepartment] = useState("")
@@ -121,6 +131,7 @@ const Interaction: React.FC = ({
 	const [formLoading, setFormLoading] = useState(false)
 	const [loading, setLoading] = useState(false)
 	const [officer, setOfficer] = useState([])
+	const [officersClicked, setOfficersClicked] = useState(false)
 	const [officerOptions, setOfficerOptions] = useState([])
 	const [selectedOfficers, setSelectedOfficers] = useState([])
 	const [title, setTitle] = useState("")
@@ -160,6 +171,11 @@ const Interaction: React.FC = ({
 				await getInteraction({
 					callback: async (departmentId: number, description, officers) => {
 						updateViews({ id: slug })
+						getComments({
+							bearer: localStorage.getItem("jwtToken"),
+							interactionId: slug,
+							page: 0
+						})
 						setDescription(description)
 						setDepartment(departmentId)
 						const departmentOptions = await fetchDepartments({
@@ -192,6 +208,7 @@ const Interaction: React.FC = ({
 	useEffect(() => {
 		const userData = parseJwt()
 		if (userData) {
+			setAuthenticated(true)
 			setBearer(localStorage.getItem("jwtToken"))
 			setUser(userData)
 		}
@@ -329,6 +346,7 @@ const Interaction: React.FC = ({
 			noResultsMessage={null}
 			onAddItem={handleAddition}
 			onChange={selectOfficer}
+			onClick={() => setOfficersClicked(true)}
 			onSearchChange={changeOfficer}
 			options={officerOptions}
 			placeholder="Officers Involved (Optional)"
@@ -535,7 +553,7 @@ const Interaction: React.FC = ({
 										/>
 
 										<Header as="h2" inverted>
-											Description
+											About
 											{user.id === interaction.data.user.id && (
 												<Button
 													color={editMode ? "red" : "yellow"}
@@ -667,7 +685,7 @@ const Interaction: React.FC = ({
 													</p>
 													{officerField}
 													<Divider horizontal inverted={inverted}>
-														OR
+														<Header inverted={inverted}>OR</Header>
 													</Divider>
 													<p>
 														Don&apos;t see the officer you&apos;re
@@ -677,6 +695,7 @@ const Interaction: React.FC = ({
 														color="orange"
 														content="Add an officer"
 														fluid
+														inverted={inverted}
 														onClick={() =>
 															router.push(
 																`/officers/create?departmentId=${interaction.data.department.id}`
@@ -688,7 +707,7 @@ const Interaction: React.FC = ({
 											)}
 										</Segment>
 
-										{(editMode || !hasOfficers) && (
+										{(editMode || (!hasOfficers && officersClicked)) && (
 											<Fragment>
 												<Button
 													color="yellow"
@@ -710,9 +729,44 @@ const Interaction: React.FC = ({
 													}
 													size="big"
 												/>
-												<Divider inverted={inverted} section />
 											</Fragment>
 										)}
+
+										<Header as="h2" inverted size="huge">
+											Comments
+										</Header>
+										<Comments
+											authenticated={authenticated}
+											bearer={bearer}
+											comments={interaction.comments}
+											interactionId={interaction.data.id}
+											inverted={inverted}
+											likeComment={({ bearer, commentId, responseId }) =>
+												likeComment({ bearer, commentId, responseId })
+											}
+											loadMoreComments={({ interactionId, page }) =>
+												getComments({ interactionId, page })
+											}
+											postComment={({
+												bearer,
+												callback,
+												interactionId,
+												message,
+												responseTo
+											}) =>
+												postComment({
+													bearer,
+													callback,
+													interactionId,
+													message,
+													responseTo
+												})
+											}
+											unlikeComment={({ bearer, commentId, responseId }) =>
+												unlikeComment({ bearer, commentId, responseId })
+											}
+											userId={user.id}
+										/>
 
 										<Header
 											as="h3"
@@ -753,6 +807,7 @@ const Interaction: React.FC = ({
 
 Interaction.propTypes = {
 	createInteraction: PropTypes.func,
+	getComments: PropTypes.func,
 	getInteraction: PropTypes.func,
 	initialInteraction: PropTypes.shape({
 		data: PropTypes.shape({
@@ -790,6 +845,39 @@ Interaction.propTypes = {
 		loading: PropTypes.bool
 	}),
 	interaction: PropTypes.shape({
+		comments: PropTypes.shape({
+			error: PropTypes.bool,
+			errorMsg: PropTypes.string,
+			hasMore: PropTypes.bool,
+			loading: PropTypes.bool,
+			page: PropTypes.number,
+			results: PropTypes.arrayOf(
+				PropTypes.shape({
+					createdAt: PropTypes.string,
+					interactionId: PropTypes.number,
+					likeCount: PropTypes.number,
+					likedByMe: PropTypes.number,
+					message: PropTypes.string,
+					respones: PropTypes.arrayOf(
+						PropTypes.shape({
+							createdAt: PropTypes.string,
+							id: PropTypes.number,
+							likeCount: PropTypes.number,
+							likedByMe: PropTypes.number,
+							message: PropTypes.string,
+							userImg: PropTypes.string,
+							userName: PropTypes.string,
+							userUsername: PropTypes.string
+						})
+					),
+					responseTo: PropTypes.number,
+					updatedAt: PropTypes.string,
+					userImg: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
+					userName: PropTypes.string,
+					userUsername: PropTypes.string
+				})
+			)
+		}),
 		data: PropTypes.shape({
 			createdAt: PropTypes.string,
 			department: PropTypes.shape({
@@ -840,8 +928,11 @@ Interaction.propTypes = {
 		)
 	}),
 	inverted: PropTypes.bool,
+	likeComment: PropTypes.func,
+	postComment: PropTypes.func,
 	searchInteractions: PropTypes.func,
 	setVideo: PropTypes.func,
+	unlikeComment: PropTypes.func,
 	updateInteraction: PropTypes.func,
 	updateViews: PropTypes.func,
 	uploadVideo: PropTypes.func
@@ -849,8 +940,16 @@ Interaction.propTypes = {
 
 Interaction.defaultProps = {
 	createInteraction,
+	getComments,
 	getInteraction,
 	interaction: {
+		comments: {
+			error: false,
+			errorMsg: "",
+			hasMore: false,
+			loading: true,
+			results: []
+		},
 		data: {
 			department: {},
 			officers: [],
@@ -867,8 +966,11 @@ Interaction.defaultProps = {
 		page: 0,
 		results: [false, false, false, false, false, false]
 	},
+	likeComment,
+	postComment,
 	searchInteractions,
 	setVideo,
+	unlikeComment,
 	updateInteraction,
 	updateViews,
 	uploadVideo
@@ -882,9 +984,13 @@ const mapStateToProps = (state: RootState, ownProps: InitialPageState) => ({
 export default compose(
 	connect(mapStateToProps, {
 		createInteraction,
+		getComments,
 		getInteraction,
+		likeComment,
+		postComment,
 		searchInteractions,
 		setVideo,
+		unlikeComment,
 		updateInteraction,
 		updateViews,
 		uploadVideo

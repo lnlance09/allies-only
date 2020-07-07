@@ -59,11 +59,6 @@ const Sidebar: React.FC = ({
 						className="headerMenuItem profile"
 						onClick={() => router.push(`/${username}`)}
 					>
-						<Icon
-							color={activeItem === "profile" ? "yellow" : null}
-							inverted={inverted}
-							name="user"
-						/>
 						Profile
 					</Menu.Item>
 					<Menu.Item

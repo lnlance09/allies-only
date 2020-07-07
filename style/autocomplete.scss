@@ -8,13 +8,13 @@
         }
 
         .icon {
-            // color: $white;
+            color: $white;
         }
     }
 
     .results.transition {
         background: $invertedBackgroundColor !important;
-        border: solid 1px $fullBlack !important;
+        border: none;
         top: 53px;
         width: 100% !important;
 

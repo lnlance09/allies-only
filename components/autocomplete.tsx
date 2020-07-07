@@ -129,6 +129,7 @@ const Autocomplete: React.FC = ({ category, disabled, placeholder, width }) => {
 						fluid
 						icon="search"
 						iconPosition="left"
+						inverted
 						placeholder={placeholder}
 					/>
 				}

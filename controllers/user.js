@@ -11,6 +11,7 @@ const { thumbnail } = require("easyimage")
 const validator = require("validator")
 const waitOn = require("wait-on")
 /* eslint-enable */
+const CommentLike = db.commentLike
 const Interaction = db.interaction
 const User = db.user
 const Op = db.Sequelize.Op
@@ -105,29 +106,29 @@ exports.count = async (req, res) => {
 exports.create = async (req, res) => {
 	const { email, name, password, status, username } = req.body
 	if (typeof email === "undefined" || email === "") {
-		return res.status(401).send({ error: true, msg: "You must include your email" })
+		return res.status(401).send({ error: true, msg: "Email is empty" })
 	}
 
 	if (!validator.isEmail(email)) {
-		return res.status(401).send({ error: true, msg: "Please provide a valid email" })
+		return res.status(401).send({ error: true, msg: "Email is not valid" })
 	}
 
 	if (typeof password === "undefined" || password === "") {
-		return res.status(401).send({ error: true, msg: "You must include your password" })
+		return res.status(401).send({ error: true, msg: "You password is empty" })
 	}
 
 	if (password.length < 7) {
 		return res
 			.status(401)
-			.send({ error: true, msg: "Your password must be at least 7 characters long" })
+			.send({ error: true, msg: "Passwords must have at least 7 characters" })
 	}
 
 	if (typeof name === "undefined" || name === "") {
-		return res.status(401).send({ error: true, msg: "You must provide your name" })
+		return res.status(401).send({ error: true, msg: "Your name is empty" })
 	}
 
 	if (typeof username === "undefined" || username === "") {
-		return res.status(401).send({ error: true, msg: "You must provide a username" })
+		return res.status(401).send({ error: true, msg: "Your username is empty" })
 	}
 
 	if (!validator.isAlphanumeric(username)) {
@@ -145,7 +146,7 @@ exports.create = async (req, res) => {
 	}).then((count) => count)
 
 	if (usernameCount === 1) {
-		return res.status(401).send({ error: true, msg: "That username has been taken" })
+		return res.status(401).send({ error: true, msg: "Username is not available" })
 	}
 
 	const emailCount = await User.count({
@@ -157,9 +158,7 @@ exports.create = async (req, res) => {
 	}).then((count) => count)
 
 	if (emailCount === 1) {
-		return res
-			.status(401)
-			.send({ error: true, msg: "An account with that email already exists" })
+		return res.status(401).send({ error: true, msg: "Email is already in use" })
 	}
 
 	const verificationCode = randomize("0", 4)
@@ -357,19 +356,47 @@ exports.findOne = async (req, res) => {
 		})
 }
 
+exports.getLikedComments = async (req, res) => {
+	const { id } = req.params
+
+	if (typeof id === "undefined" || id === "") {
+		return res.status(401).send({ error: true, msg: "User ID is missing" })
+	}
+
+	CommentLike.findAll({
+		attributes: ["commentId", "responseId"],
+		raw: true,
+		where: {
+			userId: id
+		}
+	})
+		.then((likes) => {
+			return res.status(200).send({
+				error: false,
+				likes
+			})
+		})
+		.catch((err) => {
+			return res.status(500).send({
+				error: true,
+				msg: err.message || "Some error occurred"
+			})
+		})
+}
+
 exports.login = async (req, res) => {
 	const { email, password } = req.body
 
 	if (typeof email === "undefined" || email === "") {
-		return res.status(401).send({ error: true, msg: "You must include your email" })
+		return res.status(401).send({ error: true, msg: "Email is empty" })
 	}
 
 	if (!validator.isEmail(email)) {
-		return res.status(401).send({ error: true, msg: "Please provide a valid email" })
+		return res.status(401).send({ error: true, msg: "Not a valid email" })
 	}
 
 	if (typeof password === "undefined" || password === "") {
-		return res.status(401).send({ error: true, msg: "You must include your password" })
+		return res.status(401).send({ error: true, msg: "Password is empty" })
 	}
 
 	User.findAll({
@@ -405,7 +432,7 @@ exports.login = async (req, res) => {
 
 			return res.status(401).send({
 				error: true,
-				msg: "Incorrect login credentials"
+				msg: "Wrong password"
 			})
 		})
 		.catch((err) => {
@@ -425,7 +452,7 @@ exports.verify = async (req, res) => {
 	}
 
 	if (typeof code === "undefined" || code === "") {
-		return res.status(401).send({ error: true, msg: "You must provide a verification code" })
+		return res.status(401).send({ error: true, msg: "Code is empty" })
 	}
 
 	const count = await User.count({
@@ -438,7 +465,7 @@ exports.verify = async (req, res) => {
 	}).then((count) => count)
 
 	if (count === 0) {
-		return res.status(401).send({ error: true, msg: "That code is incorrect" })
+		return res.status(401).send({ error: true, msg: "Incorrect code" })
 	}
 
 	User.update(
