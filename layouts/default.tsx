@@ -1,11 +1,12 @@
 import { Container, Grid } from "semantic-ui-react"
 import { baseUrl, siteName } from "@options/config"
 import { withTheme } from "@redux/ThemeProvider"
+import Autocomplete from "@components/autocomplete"
 import Footer from "@components/footer"
 import Head from "next/head"
 import Header from "@components/header"
 import PropTypes from "prop-types"
-import React, { Fragment } from "react"
+import React, { Fragment, useState } from "react"
 import Sidebar from "@components/sidebar"
 
 const DefaultLayout: React.FC = ({
@@ -21,6 +22,8 @@ const DefaultLayout: React.FC = ({
 	textAlign,
 	useGrid
 }) => {
+	const [searchMode, setSearchMode] = useState(false)
+
 	const { description, image, title, url, video } = seo
 	const fullUrl = `${baseUrl}${url}`
 
@@ -87,27 +90,54 @@ const DefaultLayout: React.FC = ({
 				</title>
 			</Head>
 
-			<Header basicHeader={basicHeader} loading={loading} />
-
-			<Container
-				className={`mainContainer ${containerClassName} ${inverted ? "inverted" : ""}`}
-				text={isText}
-				textAlign={textAlign}
-			>
-				{useGrid ? (
-					<Grid className="mainGrid" stackable>
-						<Grid.Column className="leftColumn" width={4}>
-							<Sidebar activeItem={activeItem} inverted={inverted} />
-						</Grid.Column>
-						<Grid.Column className="rightColumn" width={12}>
-							{children}
-						</Grid.Column>
+			{searchMode ? (
+				<Container className="searchModeContainer">
+					<Grid>
+						<Grid.Row>
+							<Grid.Column width={13}>
+								<Autocomplete category mobileMode />
+							</Grid.Column>
+							<Grid.Column width={3}>
+								<span
+									className="closeSearchMode"
+									onClick={() => setSearchMode(false)}
+								>
+									Cancel
+								</span>
+							</Grid.Column>
+						</Grid.Row>
 					</Grid>
-				) : (
-					<Fragment>{children}</Fragment>
-				)}
-			</Container>
-			{showFooter && <Footer />}
+				</Container>
+			) : (
+				<Fragment>
+					<Header
+						basicHeader={basicHeader}
+						loading={loading}
+						toggleSearchMode={() => setSearchMode(true)}
+					/>
+					<Container
+						className={`mainContainer ${containerClassName} ${
+							inverted ? "inverted" : ""
+						}`}
+						text={isText}
+						textAlign={textAlign}
+					>
+						{useGrid ? (
+							<Grid className="mainGrid" stackable>
+								<Grid.Column className="leftColumn" width={4}>
+									<Sidebar activeItem={activeItem} inverted={inverted} />
+								</Grid.Column>
+								<Grid.Column className="rightColumn" width={12}>
+									{children}
+								</Grid.Column>
+							</Grid>
+						) : (
+							<Fragment>{children}</Fragment>
+						)}
+					</Container>
+					{showFooter && <Footer />}
+				</Fragment>
+			)}
 		</div>
 	)
 }

@@ -262,7 +262,7 @@ exports.findAll = async (req, res) => {
 	if (forAutocomplete === "1") {
 		attributes = ["img", "name", "username", [db.Sequelize.literal("'ally'"), "type"]]
 		include = null
-		limit = 4
+		limit = 3
 		order = [["name", "DESC"]]
 		where = {
 			[Op.or]: [
@@ -350,34 +350,6 @@ exports.findOne = async (req, res) => {
 		})
 		.catch((err) => {
 			return res.status(200).send({
-				error: true,
-				msg: err.message || "Some error occurred"
-			})
-		})
-}
-
-exports.getLikedComments = async (req, res) => {
-	const { id } = req.params
-
-	if (typeof id === "undefined" || id === "") {
-		return res.status(401).send({ error: true, msg: "User ID is missing" })
-	}
-
-	CommentLike.findAll({
-		attributes: ["commentId", "responseId"],
-		raw: true,
-		where: {
-			userId: id
-		}
-	})
-		.then((likes) => {
-			return res.status(200).send({
-				error: false,
-				likes
-			})
-		})
-		.catch((err) => {
-			return res.status(500).send({
 				error: true,
 				msg: err.message || "Some error occurred"
 			})

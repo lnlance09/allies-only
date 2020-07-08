@@ -262,9 +262,11 @@ export const unlikeComment = ({
 		.then(async (response) => {
 			const { data } = response
 			if (!data.error) {
-				toast.success("Unliked!")
 				dispatch({
-					payload: data,
+					payload: {
+						commentId,
+						responseId
+					},
 					type: constants.UNLIKE_COMMENT
 				})
 			}

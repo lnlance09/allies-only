@@ -50,6 +50,21 @@ body {
 	}
 }
 
+.searchModeContainer {
+	padding-bottom: 1em;
+	padding-top: 1em;
+
+	.thirteen.wide.column {
+		padding-right: 0;
+	}
+
+	.closeSearchMode {
+		color: $lightGrey;
+		float: right;
+		line-height: 36px;
+	}
+}
+
 .segment.inverted {
 	background: lighten($invertedBackgroundColor, 4%) !important;
 

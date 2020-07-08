@@ -173,7 +173,7 @@ exports.findAll = (req, res) => {
 		]
 		include = null
 		order = [["name", "ASC"]]
-		limit = 4
+		limit = 3
 	}
 
 	const offset = isNaN(page) ? 0 : page * limit

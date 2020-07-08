@@ -107,9 +107,10 @@ exports.create = async (req, res) => {
 }
 
 exports.findAll = (req, res) => {
-	const { departmentId, exclude, officerId, page, q, userId } = req.query
+	const { departmentId, exclude, forAutocomplete, officerId, page, q, userId } = req.query
 
-	const limit = 20
+	let limit = 20
+	let order = [["createdAt", "DESC"]]
 	let where = {
 		[Op.or]: [
 			{
@@ -124,6 +125,18 @@ exports.findAll = (req, res) => {
 			}
 		]
 	}
+	let attributes = [
+		[db.Sequelize.col("interaction.createdAt"), "createdAt"],
+		[db.Sequelize.col("interaction.description"), "description"],
+		[db.Sequelize.col("interaction.id"), "id"],
+		[db.Sequelize.col("interaction.img"), "img"],
+		[db.Sequelize.col("interaction.title"), "title"],
+		[db.Sequelize.col("interaction.video"), "video"],
+		[db.Sequelize.col("interaction.views"), "views"],
+		[db.Sequelize.col("department.name"), "departmentName"],
+		[db.Sequelize.col("department.slug"), "departmentSlug"],
+		[db.Sequelize.col("officerInteractions.officerId"), "officerId"]
+	]
 
 	const departmentWhere = {}
 	let departmentRequired = false
@@ -157,45 +170,48 @@ exports.findAll = (req, res) => {
 		where.id = { [Op.notIn]: exclude }
 	}
 
+	let include = [
+		{
+			attributes: [],
+			model: Department,
+			required: departmentRequired,
+			where: departmentWhere
+		},
+		{
+			attributes: ["officerId"],
+			model: OfficerInteraction,
+			required: officerRequired,
+			where: officerWhere
+		},
+		{
+			attributes: [],
+			model: User,
+			required: userRequired,
+			where: userWhere
+		}
+	]
+
+	if (forAutocomplete === "1") {
+		attributes = [
+			[db.Sequelize.col("interaction.id"), "id"],
+			[db.Sequelize.col("interaction.img"), "img"],
+			[db.Sequelize.col("interaction.title"), "name"],
+			[db.Sequelize.literal("'interaction'"), "type"]
+		]
+		include = null
+		order = [["views", "ASC"]]
+		limit = 3
+	}
+
 	const offset = isNaN(page) ? 0 : page * limit
 
 	Interaction.findAll({
-		attributes: [
-			[db.Sequelize.col("interaction.createdAt"), "createdAt"],
-			[db.Sequelize.col("interaction.description"), "description"],
-			[db.Sequelize.col("interaction.id"), "id"],
-			[db.Sequelize.col("interaction.img"), "img"],
-			[db.Sequelize.col("interaction.title"), "title"],
-			[db.Sequelize.col("interaction.video"), "video"],
-			[db.Sequelize.col("interaction.views"), "views"],
-			[db.Sequelize.col("department.name"), "departmentName"],
-			[db.Sequelize.col("department.slug"), "departmentSlug"],
-			[db.Sequelize.col("officerInteractions.officerId"), "officerId"]
-		],
+		attributes,
 		group: ["interaction.id"],
-		include: [
-			{
-				attributes: [],
-				model: Department,
-				required: departmentRequired,
-				where: departmentWhere
-			},
-			{
-				attributes: ["officerId"],
-				model: OfficerInteraction,
-				required: officerRequired,
-				where: officerWhere
-			},
-			{
-				attributes: [],
-				model: User,
-				required: userRequired,
-				where: userWhere
-			}
-		],
+		include,
 		limit,
 		offset,
-		order: [["createdAt", "DESC"]],
+		order,
 		raw: true,
 		required: true,
 		subQuery: false,
@@ -206,7 +222,7 @@ exports.findAll = (req, res) => {
 			return res.status(200).send({
 				error: false,
 				hasMore,
-				interactions: interactions,
+				interactions,
 				msg: "Success",
 				page: parseInt(page) + 1
 			})

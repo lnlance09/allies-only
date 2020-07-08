@@ -1,7 +1,6 @@
 /* eslint-disable */
 const Auth = require("../utils/authFunctions.js")
 const db = require("../models/index.js")
-const validator = require("validator")
 const { QueryTypes } = require("sequelize")
 /* eslint-enable */
 const Comment = db.comment
@@ -59,8 +58,11 @@ exports.create = async (req, res) => {
 		})
 			.then((data) => {
 				const comment = data.dataValues
+				comment.likeCount = 0
+				comment.likedByMe = 0
+				comment.replyCount = 0
 				comment.responses = []
-				comment.userImg = authenticated ? user.data.img : null
+				comment.userImg = authenticated ? user.data.img : ""
 				comment.userName = authenticated ? user.data.name : "Anonymous"
 				comment.userUsername = authenticated ? user.data.username : "anonymous"
 
@@ -85,8 +87,11 @@ exports.create = async (req, res) => {
 	})
 		.then((data) => {
 			const comment = data.dataValues
+			comment.likeCount = 0
+			comment.likedByMe = 0
+			comment.replyCount = 0
 			comment.responses = []
-			comment.userImg = authenticated ? user.data.img : null
+			comment.userImg = authenticated ? user.data.img : ""
 			comment.userName = authenticated ? user.data.name : "Anonymous"
 			comment.userUsername = authenticated ? user.data.username : "anonymous"
 
@@ -201,10 +206,10 @@ exports.findAll = async (req, res) => {
 							'createdAt', r.createdAt,
 							'likeCount', r.likeCount,
 							${authenticated ? ` 'likedByMe', r.likedByMe,` : ""}
-							'message', JSON_QUOTE(r.message),
-							'userImg', JSON_QUOTE(r.userImg),
-							'userName', JSON_QUOTE(r.userName),
-							'userUsername', JSON_QUOTE(r.userUsername)
+							'message', r.message,
+							'userImg', r.userImg,
+							'userName', r.userName,
+							'userUsername', r.userUsername
 						)
 					),
 				']')
@@ -348,16 +353,19 @@ exports.unlike = async (req, res) => {
 		return res.status(422).send({ error: true, msg: "You must be logged in" })
 	}
 
-	const where = {
+	let where = {
 		userId: user.data.id
 	}
 
-	if (validator.isInt(commentId)) {
+	if (typeof commentId !== "undefined" && commentId !== "") {
 		where.commentId = commentId
 	}
 
-	if (validator.isInt(responseId)) {
-		where.responseId = responseId
+	if (typeof responseId !== "undefined" && responseId !== "") {
+		where = {
+			responseId,
+			userId: user.data.id
+		}
 	}
 
 	const count = await CommentLike.count({
@@ -373,7 +381,7 @@ exports.unlike = async (req, res) => {
 		})
 	}
 
-	CommentLike.destroy(where)
+	CommentLike.destroy({ where })
 		.then(() => {
 			return res.status(200).send({
 				error: false,

@@ -70,7 +70,6 @@ app.prepare().then(() => {
 	server.get("/api/user/search", users.findAll)
 	server.post("/api/user/verify", users.verify)
 	server.get("/api/user/:username", users.findOne)
-	server.get("/api/user/:id/getLikedComments", users.getLikedComments)
 
 	// Sitemap
 	server.get("/sitemap.xml", sitemap.sitemap)

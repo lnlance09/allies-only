@@ -28,12 +28,16 @@
                     color: $lightGrey !important;
                 }
 
-                .actions .count {
-                    font-weight: bold;
-                    margin-left: 6px;
+                .actions {
+                    .count {
+                        font-weight: bold;
+                        margin-left: 6px;
+                    }
 
-                    &.liked {
-                        color: $invertedYellow;
+                    .likeThis {
+                        &:hover {
+                            color: $invertedYellow;
+                        }
                     }
                 }
             }

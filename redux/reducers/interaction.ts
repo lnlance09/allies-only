@@ -104,8 +104,10 @@ const interaction = (state = initial, action: InteractionActionTypes): InitialPa
 			if (typeof responseId !== "undefined") {
 				const response = comment.responses.find((response) => response.id === responseId)
 				response.likeCount++
+				response.likedByMe = 1
 			} else {
 				comment.likeCount++
+				comment.likedByMe = 1
 			}
 
 			return {
@@ -195,11 +197,13 @@ const interaction = (state = initial, action: InteractionActionTypes): InitialPa
 				(comment) => comment.id === _commentId
 			)
 
-			if (typeof responseId !== "undefined") {
-				const response = _comment.responses.find((response) => response.id === _responseId)
-				response.likeCount--
+			if (typeof _responseId !== "undefined") {
+				const _response = _comment.responses.find((response) => response.id === _responseId)
+				_response.likeCount--
+				_response.likedByMe = 0
 			} else {
 				_comment.likeCount--
+				_comment.likedByMe = 0
 			}
 
 			return {

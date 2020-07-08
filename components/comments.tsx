@@ -36,6 +36,103 @@ const CommentsSection: React.FC = ({
 		}
 	}
 
+	const SingleComment = (comment, commentId: number, isReply: boolean, key: string) => {
+		const { createdAt, id, likeCount, likedByMe, message, userImg } = comment
+		const username = comment.userUsername
+
+		return (
+			<Fragment>
+				<Comment.Avatar
+					as="a"
+					data-for={key}
+					data-iscapture="true"
+					data-tip={`${username}`}
+					onClick={() => router.push(`/${username}`)}
+					onError={(i) => (i.target.src = DefaultPic)}
+					size="tiny"
+					src={userImg ? `${s3BaseUrl}${userImg}` : DefaultPic}
+				/>
+				<Comment.Content>
+					<Comment.Author as="a" onClick={() => router.push(`/${username}`)}>
+						{username}
+					</Comment.Author>
+					<Comment.Metadata>
+						<div>
+							<Moment date={createdAt} fromNow />
+						</div>
+					</Comment.Metadata>
+					<Comment.Text>
+						<LinkedText text={message} />
+					</Comment.Text>
+					<Comment.Actions>
+						<Comment.Action>
+							<span
+								onClick={() => {
+									if (!authenticated) {
+										router.push("/signin?type=join")
+										return
+									}
+
+									const payload = {
+										bearer,
+										commentId: id
+									}
+
+									if (isReply) {
+										payload.commentId = commentId
+										payload.responseId = id
+									}
+
+									if (likedByMe === 1) {
+										unlikeComment(payload)
+									} else {
+										likeComment(payload)
+									}
+								}}
+							>
+								<Icon
+									color={likedByMe === 1 ? "yellow" : null}
+									inverted={inverted}
+									name="thumbs up"
+								/>{" "}
+								{likedByMe === 1 ? (
+									<span className="likeThis">Liked</span>
+								) : (
+									<span>Like</span>
+								)}
+							</span>
+							{likeCount > 0 && <span className={`count`}>{likeCount}</span>}
+						</Comment.Action>
+						<Comment.Action>
+							<span
+								onClick={() => {
+									setMessage(`@${username} `)
+									setResponseTo(commentId)
+									window.scrollTo({
+										behavior: "smooth",
+										top: blockRef.current.offsetTop
+									})
+									textAreaRef.current.focus()
+								}}
+							>
+								<Icon inverted={inverted} name="reply" /> Reply
+							</span>
+						</Comment.Action>
+					</Comment.Actions>
+				</Comment.Content>
+
+				<ReactTooltip
+					className="tooltipClass"
+					effect="solid"
+					id={key}
+					multiline={false}
+					place="left"
+					type="light"
+				/>
+			</Fragment>
+		)
+	}
+
 	return (
 		<div className="commentsSection">
 			<div ref={blockRef}>
@@ -81,227 +178,18 @@ const CommentsSection: React.FC = ({
 					<Comment.Group size="big">
 						{comments.results.map((comment, i) => (
 							<Comment key={`individualComment${i}`}>
-								<Comment.Avatar
-									as="a"
-									data-for={`individualComment${i}`}
-									data-iscapture="true"
-									data-tip={`${comment.userName}`}
-									onClick={() => router.push(`/${comment.userUsername}`)}
-									onError={(i) => (i.target.src = DefaultPic)}
-									size="tiny"
-									src={
-										comment.userImg
-											? `${s3BaseUrl}${comment.userImg}`
-											: DefaultPic
-									}
-								/>
-								<Comment.Content>
-									<Comment.Author
-										as="a"
-										onClick={() => router.push(`/${comment.userUsername}`)}
-									>
-										{comment.userUsername}
-									</Comment.Author>
-									<Comment.Metadata>
-										<div>
-											<Moment date={comment.createdAt} fromNow />
-										</div>
-									</Comment.Metadata>
-									<Comment.Text>
-										<LinkedText text={comment.message} />
-									</Comment.Text>
-									<Comment.Actions>
-										<Comment.Action>
-											<span
-												className={comment.likedByMe === 1 ? "liked" : ""}
-												onClick={() => {
-													likeComment({
-														bearer,
-														commentId: comment.id
-													})
-												}}
-											>
-												<Icon
-													color={
-														comment.likedByMe === 1 ? "yellow" : null
-													}
-													inverted={inverted}
-													name="thumbs up"
-												/>{" "}
-												{comment.likedByMe === 1 ? "Liked" : "Like"}
-											</span>
-											{comment.likeCount > 0 && (
-												<span
-													className={`count ${
-														comment.likedByMe === 1 ? "liked" : ""
-													}`}
-												>
-													{" "}
-													{comment.likeCount}
-												</span>
-											)}
-										</Comment.Action>
-										<Comment.Action>
-											<span
-												onClick={() => {
-													setMessage(`@${comment.userUsername} `)
-													setResponseTo(comment.id)
-													window.scrollTo({
-														behavior: "smooth",
-														top: blockRef.current.offsetTop
-													})
-													textAreaRef.current.focus()
-												}}
-											>
-												<Icon inverted={inverted} name="reply" /> Reply
-											</span>
-											{comment.replyCount > 0 && (
-												<span className="count">{comment.replyCount}</span>
-											)}
-										</Comment.Action>
-									</Comment.Actions>
-								</Comment.Content>
-
-								<ReactTooltip
-									className="tooltipClass"
-									effect="solid"
-									id={`individualComment${i}`}
-									multiline={false}
-									place="left"
-									type="light"
-								/>
+								{SingleComment(comment, comment.id, false, `individualComment${i}`)}
 
 								{comment.responses.length > 0 && (
 									<Comment.Group size="big">
 										{comment.responses.map((response, x) => (
 											<Comment key={`replyComment${x}`}>
-												<Comment.Avatar
-													as="a"
-													data-for={`responseComment${i}`}
-													data-iscapture="true"
-													data-tip={`${JSON.parse(response.userName)}`}
-													onClick={() =>
-														router.push(
-															`/${JSON.parse(response.userUsername)}`
-														)
-													}
-													onError={(i) => (i.target.src = DefaultPic)}
-													size="tiny"
-													src={
-														response.userImg
-															? `${s3BaseUrl}${JSON.parse(
-																	response.userImg
-															  )}`
-															: DefaultPic
-													}
-												/>
-												<Comment.Content>
-													<Comment.Author
-														as="a"
-														onClick={() =>
-															router.push(
-																`/${JSON.parse(
-																	response.userUsername
-																)}`
-															)
-														}
-													>
-														{JSON.parse(response.userUsername)}
-													</Comment.Author>
-													<Comment.Metadata>
-														<div>
-															<Moment
-																date={response.createdAt}
-																fromNow
-															/>
-														</div>
-													</Comment.Metadata>
-													<Comment.Text>
-														<LinkedText
-															text={JSON.parse(response.message)}
-														/>
-													</Comment.Text>
-													<Comment.Actions>
-														<Comment.Action>
-															<span
-																className={
-																	response.likedByMe === 1
-																		? "liked"
-																		: ""
-																}
-																onClick={() => {
-																	likeComment({
-																		bearer,
-																		commentId: comment.id,
-																		responseId: response.id
-																	})
-																}}
-															>
-																<Icon
-																	color={
-																		response.likedByMe === 1
-																			? "yellow"
-																			: null
-																	}
-																	inverted={inverted}
-																	name="thumbs up"
-																/>{" "}
-																Like
-															</span>
-															{response.likeCount > 0 && (
-																<span
-																	className={`count ${
-																		response.likedByMe === 1
-																			? "liked"
-																			: ""
-																	}`}
-																>
-																	{" "}
-																	{response.likeCount}
-																</span>
-															)}
-														</Comment.Action>
-														<Comment.Action>
-															<span
-																onClick={() => {
-																	setMessage(
-																		`@${JSON.parse(
-																			response.userUsername
-																		)} `
-																	)
-																	setResponseTo(comment.id)
-																	window.scrollTo({
-																		behavior: "smooth",
-																		top:
-																			blockRef.current
-																				.offsetTop
-																	})
-																	textAreaRef.current.focus()
-																}}
-															>
-																<Icon
-																	inverted={inverted}
-																	name="reply"
-																/>{" "}
-																Reply
-															</span>
-															{response.responseCount > 0 && (
-																<span className="count">
-																	{response.responseCount}
-																</span>
-															)}
-														</Comment.Action>
-													</Comment.Actions>
-												</Comment.Content>
-
-												<ReactTooltip
-													className="tooltipClass"
-													effect="solid"
-													id={`responseComment${i}`}
-													multiline={false}
-													place="left"
-													type="light"
-												/>
+												{SingleComment(
+													response,
+													comment.id,
+													true,
+													`replyComment${i}`
+												)}
 											</Comment>
 										))}
 									</Comment.Group>
