@@ -22,6 +22,7 @@
         }
 
         @media only screen and (max-width: 1025px) {
+            display: block !important;
             width: 120% !important;
         }
 
@@ -43,7 +44,7 @@
                 width: 100% !important;
 
                 @media only screen and (max-width: 1025px) {
-                    background: $invertedBackgroundColor !important;
+                    background: darken($invertedBackgroundColor, 2%) !important;
                 }
             }
 

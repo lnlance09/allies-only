@@ -18,7 +18,6 @@ const categoryRenderer = ({ name }: { name: string }) => {
 		<Segment basic className={`categoryItem`}>
 			<Header inverted>
 				{name}
-
 				<Link href={href}>
 					<a className="seeMoreSearchResults">view all</a>
 				</Link>
@@ -172,6 +171,8 @@ const Autocomplete: React.FC = ({ category, disabled, mobileMode, placeholder, w
 				defaultOpen={mobileMode}
 				input={
 					<Input
+						autoCapitalize="none"
+						autoCorrect="off"
 						autoFocus
 						className="autocomplete"
 						disabled={disabled}
@@ -189,6 +190,7 @@ const Autocomplete: React.FC = ({ category, disabled, mobileMode, placeholder, w
 				onResultSelect={onClick}
 				results={results}
 				resultRenderer={resultRenderer}
+				selectFirstResult
 			/>
 		</div>
 	)
