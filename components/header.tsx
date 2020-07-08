@@ -6,7 +6,7 @@ import Logo from "@public/images/logos/logo_72x72.png"
 import PropTypes from "prop-types"
 import React, { Fragment, useEffect, useState } from "react"
 
-const PageHeader: React.FC = ({ basicHeader, loading }) => {
+const PageHeader: React.FC = ({ basicHeader, loading, toggleSearchMode }) => {
 	const router = useRouter()
 
 	const [authenticated, setAuthenticated] = useState(null)
@@ -114,25 +114,13 @@ const PageHeader: React.FC = ({ basicHeader, loading }) => {
 					vertical
 					visible={sidebarVisible}
 				>
-					<Menu.Item as="a" onClick={() => router.push("/interactions")}>
-						<Icon name="film" size="small" />
-						Interactions
+					<Menu.Item as="a" onClick={() => router.push("/")}>
+						<Icon name="home" size="small" />
+						Home
 					</Menu.Item>
-					<Menu.Item as="a" onClick={() => router.push("/officers")}>
-						<Icon name="user secret" size="small" />
-						Officers
-					</Menu.Item>
-					<Menu.Item as="a" onClick={() => router.push("/allies")}>
-						<Icon name="user circle" size="small" />
-						Allies
-					</Menu.Item>
-					<Menu.Item as="a" onClick={() => router.push("/departments")}>
-						<Icon name="building" size="small" />
-						Departments
-					</Menu.Item>
-					<Menu.Item as="a" onClick={() => router.push("/interactions/create")}>
-						<Icon name="plus" size="small" />
-						Add an interaction
+					<Menu.Item as="a" onClick={() => toggleSearchMode()}>
+						<Icon name="search" size="small" />
+						Search
 					</Menu.Item>
 					{authenticated && (
 						<Menu.Item as="a" onClick={() => router.push(`/${user.username}`)}>
@@ -140,6 +128,10 @@ const PageHeader: React.FC = ({ basicHeader, loading }) => {
 							Profile
 						</Menu.Item>
 					)}
+					<Menu.Item as="a" onClick={() => router.push("/interactions/create")}>
+						<Icon name="plus" size="small" />
+						Add an interaction
+					</Menu.Item>
 				</Sidebar>
 			</div>
 		</div>
@@ -148,7 +140,8 @@ const PageHeader: React.FC = ({ basicHeader, loading }) => {
 
 PageHeader.propTypes = {
 	basicHeader: PropTypes.bool,
-	loading: PropTypes.bool
+	loading: PropTypes.bool,
+	toggleSearchMode: PropTypes.func
 }
 
 export default PageHeader

@@ -17,7 +17,7 @@ exports.send = async (req, res) => {
 
 		return res.status(200).send({
 			error: false,
-			msg: "You message has been sent"
+			msg: "Message sent!"
 		})
 	} catch (err) {
 		return res.status(500).send({

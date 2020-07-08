@@ -4,6 +4,7 @@ const next = require("next")
 const bodyParser = require("body-parser")
 const fileupload = require("express-fileupload")
 const db = require("./models/index.js")
+const comments = require("./controllers/comment.js")
 const contact = require("./controllers/contact.js")
 const departments = require("./controllers/department.js")
 const locations = require("./controllers/location.js")
@@ -24,6 +25,14 @@ app.prepare().then(() => {
 	server.use(bodyParser.json({ limit: "50mb" }))
 	server.use(bodyParser.urlencoded({ extended: true, limit: "50mb" }))
 	db.sequelize.sync()
+
+	// Comments
+	server.post("/api/comment/create", comments.create)
+	server.post("/api/comment/like", comments.like)
+	server.get("/api/comment/search", comments.findAll)
+	server.post("/api/comment/unlike", comments.unlike)
+	server.post("/api/comment/update", comments.update)
+	server.post("/api/comment/:id/delete", comments.delete)
 
 	// Contact
 	server.post("/api/contact/send", contact.send)

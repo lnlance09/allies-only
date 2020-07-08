@@ -3,6 +3,7 @@
 // Components
 @import './authentication.scss';
 @import './autocomplete.scss';
+@import './comments.scss';
 @import './footer.scss';
 @import './header.scss';
 @import './searchResults.scss';
@@ -19,6 +20,17 @@
 
 * {
 	// border-radius: 0 !important;
+}
+
+.ui.form .field.field {
+	input:-webkit-autofill, input::selection, input:active:-webkit-autofill, input:focus:-webkit-autofill {
+		background: $invertedBackgroundColor !important;
+		background-color: $invertedBackgroundColor !important;
+		border: solid 1px $white!important;
+		outline: none !important;
+		-webkit-box-shadow: 0 0 0 50px $invertedBackgroundColor inset !important;
+		-webkit-text-fill-color: $white !important;
+	}
 }
 
 body {
@@ -38,6 +50,21 @@ body {
 	}
 }
 
+.searchModeContainer {
+	padding-bottom: 1em;
+	padding-top: 1em;
+
+	.thirteen.wide.column {
+		padding-right: 0;
+	}
+
+	.closeSearchMode {
+		color: $lightGrey;
+		float: right;
+		line-height: 36px;
+	}
+}
+
 .segment.inverted {
 	background: lighten($invertedBackgroundColor, 4%) !important;
 
@@ -49,6 +76,10 @@ body {
 		@media only screen and (max-width: 767px) {
 			padding: 0 !important;
 		}
+	}
+
+	&.uploadSegment {
+		padding: 0 !important;
 	}
 }
 
@@ -147,7 +178,7 @@ body {
 	}
 }
 
-:not(.autocomplete) > input, textarea, .dropdown.selection {
+:not(.autocomplete1) > input, textarea, .dropdown.selection {
 	background-color: transparent !important;
 	border: solid 1px rgba(255,255,255,0.4) !important;
 	caret-color: $white;
@@ -214,8 +245,19 @@ body {
 }
 
 .Toastify__toast-container--bottom-left .Toastify__toast-body {
-	font-weight: bold;
+	color: $white;
+	font-size: 16px;
     text-align: center;
+}
+
+.Toastify__toast--success {
+	background: $invertedGreen;
+	border-radius: 4px;
+}
+
+.Toastify__toast--error {
+	background: $invertedRed;
+	border-radius: 4px;
 }
 
 @media only screen and (max-width: 767px) {
@@ -256,10 +298,10 @@ body {
 	.imageUploadHeader {
 		display: none;
 	}
-}
 
-.moreInteractionsHeader {
-	margin-bottom: 40px !important;
+	.moreInteractionsHeader {
+		margin-bottom: 40px !important;
+	}
 }
 
 .mapboxgl-map {

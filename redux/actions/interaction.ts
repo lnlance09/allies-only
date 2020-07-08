@@ -3,11 +3,17 @@ import { toast } from "react-toastify"
 import { getConfig } from "@options/toast"
 import {
 	CreateInteractionPayload,
+	GetCommentsAction,
+	GetCommentsPayload,
 	GetInteractionAction,
+	LikeCommentAction,
+	LikeCommentPayload,
 	ResetInteractionAction,
 	SearchInteractionsAction,
 	SetVideoAction,
 	SetVideoPayload,
+	UnlikeCommentAction,
+	UnlikeCommentPayload,
 	UploadVideoAction,
 	UploadVideoPayload
 } from "@interfaces/interaction"
@@ -57,6 +63,35 @@ export const createInteraction = ({
 		})
 }
 
+export const getComments = ({
+	bearer,
+	interactionId,
+	page
+}: GetCommentsPayload): GetCommentsAction => (dispatch: AppDispatch) => {
+	axios
+		.get("/api/comment/search", {
+			params: {
+				interactionId,
+				page
+			},
+			headers: {
+				Authorization: bearer
+			}
+		})
+		.then(async (response) => {
+			const { data } = response
+			dispatch({
+				payload: data,
+				type: constants.GET_COMMENTS
+			})
+		})
+		.catch(() => {
+			dispatch({
+				type: constants.SET_COMMENTS_FETCH_ERROR
+			})
+		})
+}
+
 export const getInteraction = ({
 	callback = () => null,
 	id
@@ -78,6 +113,81 @@ export const getInteraction = ({
 		.catch(() => {
 			dispatch({
 				type: constants.SET_INTERACTION_FETCH_ERROR
+			})
+		})
+}
+
+export const likeComment = ({
+	bearer,
+	commentId,
+	responseId
+}: LikeCommentPayload): LikeCommentAction => (dispatch: AppDispatch) => {
+	axios
+		.post(
+			"/api/comment/like",
+			{
+				commentId,
+				responseId
+			},
+			{
+				headers: {
+					Authorization: bearer
+				}
+			}
+		)
+		.then(async (response) => {
+			const { data } = response
+			if (!data.error) {
+				dispatch({
+					payload: {
+						commentId,
+						responseId
+					},
+					type: constants.LIKE_COMMENT
+				})
+			}
+		})
+		.catch(() => null)
+}
+
+export const postComment = ({
+	bearer,
+	callback = () => null,
+	interactionId,
+	message,
+	responseTo
+}: PostCommentPayload): PostCommentAction => (dispatch: AppDispatch) => {
+	axios
+		.post(
+			"/api/comment/create",
+			{
+				interactionId,
+				message,
+				responseTo
+			},
+			{
+				headers: {
+					Authorization: bearer
+				}
+			}
+		)
+		.then(async (response) => {
+			const { data } = response
+			if (!data.error) {
+				callback()
+				toast.success("Comment added!")
+
+				data.responseTo = responseTo
+
+				dispatch({
+					payload: data,
+					type: constants.POST_COMMENT
+				})
+			}
+		})
+		.catch(() => {
+			dispatch({
+				type: constants.POST_COMMENT_ERROR
 			})
 		})
 }
@@ -129,6 +239,39 @@ export const setVideo = ({ thumbnail, video }: SetVideoPayload): SetVideoAction 
 		},
 		type: constants.SET_VIDEO
 	})
+}
+
+export const unlikeComment = ({
+	bearer,
+	commentId,
+	responseId
+}: UnlikeCommentPayload): UnlikeCommentAction => (dispatch: AppDispatch) => {
+	axios
+		.post(
+			"/api/comment/unlike",
+			{
+				commentId,
+				responseId
+			},
+			{
+				headers: {
+					Authorization: bearer
+				}
+			}
+		)
+		.then(async (response) => {
+			const { data } = response
+			if (!data.error) {
+				dispatch({
+					payload: {
+						commentId,
+						responseId
+					},
+					type: constants.UNLIKE_COMMENT
+				})
+			}
+		})
+		.catch(() => null)
 }
 
 export const updateInteraction = ({

@@ -216,7 +216,7 @@ exports.findAll = async (req, res) => {
 				required: true
 			}
 		]
-		limit = 4
+		limit = 3
 		order = [["id", "DESC"]]
 	}
 

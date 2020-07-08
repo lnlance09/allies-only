@@ -40,6 +40,8 @@ module.exports = (sequelize, Sequelize) => {
 	})
 
 	User.associate = (models) => {
+		User.hasMany(models.comment, { foreignKey: "userId" })
+		User.hasMany(models.commentLike, { foreignKey: "userId" })
 		User.hasMany(models.interaction, { foreignKey: "userId" })
 	}
 

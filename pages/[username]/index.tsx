@@ -43,6 +43,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
 	}
 
 	const data = await axios.get(`${baseUrl}api/user/${params.username}`)
+	console.log("data", data.data)
 	if (data.data.error) {
 		initialUser.data = {}
 		initialUser.error = true
@@ -82,7 +83,7 @@ const User: React.FC = ({
 		if (typeof username !== "undefined") {
 			getUser({ callback: (userId: number) => searchInteractions({ userId }), username })
 		}
-	}, [getUser, username])
+	}, [username])
 
 	useEffect(() => {
 		const userData = parseJwt()
@@ -97,6 +98,7 @@ const User: React.FC = ({
 	}
 
 	const imgSrc = img === null || img === "" ? DefaultPic : `${s3BaseUrl}${img}`
+
 	const ProfilePic = () => {
 		if (currentUser.id === id) {
 			return (

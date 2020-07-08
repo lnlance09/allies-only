@@ -2,20 +2,16 @@
     .ui.input {
         width: 100%;
 
-        input {
-            border: none;
-            border-radius: 4px;
-        }
-
         .icon {
-            // color: $white;
+            color: $white;
         }
     }
 
     .results.transition {
         background: $invertedBackgroundColor !important;
-        border: solid 1px $fullBlack !important;
-        top: 53px;
+        border: none !important;
+        box-shadow: none !important;
+        top: 50px;
         width: 100% !important;
 
         .message.empty {
@@ -25,19 +21,34 @@
             }
         }
 
+        @media only screen and (max-width: 1025px) {
+            width: 120% !important;
+        }
+
         .category {
+            background: $invertedBackgroundColor !important;
             display: block !important;
             width: 100% !important;
+
+            .seeMoreSearchResults {
+                color: $lightGrey;
+                float: right;
+                font-size: 14px;
+            }
 
             .name {
                 background: lighten($invertedBackgroundColor, 3%) !important;
                 display: block !important;
                 padding: 0 !important;
                 width: 100% !important;
+
+                @media only screen and (max-width: 1025px) {
+                    background: $invertedBackgroundColor !important;
+                }
             }
 
             .results {
-                background: lighten($invertedBackgroundColor, 5%) !important;
+                background: $invertedBackgroundColor !important;
                 border: none !important;
                 display: block !important;
                 width: 100% !important;
@@ -47,6 +58,10 @@
                     display: block !important;
                     padding: 11px;
                     width: 100% !important;
+
+                    @media only screen and (max-width: 1025px) {
+                        background: $invertedBackgroundColor !important;
+                    }
 
                     .header {
                         margin-top: 0 !important;

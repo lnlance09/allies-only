@@ -33,6 +33,7 @@ module.exports = (sequelize, Sequelize) => {
 	Interaction.associate = (models) => {
 		Interaction.belongsTo(models.department, { foreignKey: "departmentId" })
 		Interaction.hasMany(models.officerInteraction, { foreignKey: "interactionId" })
+		Interaction.hasMany(models.comment, { foreignKey: "interactionId" })
 		Interaction.belongsTo(models.user, { foreignKey: "userId" })
 	}
 

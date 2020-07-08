@@ -1,12 +1,16 @@
 import {
+	GET_COMMENTS,
 	GET_INTERACTION,
+	LIKE_COMMENT,
 	RESET_INTERACTION_TO_INITIAL,
 	SEARCH_INTERACTIONS,
 	SET_INTERACTION_FETCH_ERROR,
 	SET_VIDEO,
+	UNLIKE_COMMENT,
 	UPLOAD_VIDEO,
 	UPDATE_INTERACTION
 } from "@redux/constants"
+import { Comment } from "./comment"
 import { Officer } from "./officer"
 import { Department } from "./department"
 import { User } from "./user"
@@ -37,9 +41,26 @@ export interface CreateInteractionPayload {
 	title?: string;
 }
 
+export interface GetCommentsPayload {
+	interactionId: number;
+	page: number;
+}
+
+export interface LikeCommentPayload {
+	bearer: string;
+	commentId: number;
+	responseId: number;
+}
+
 export interface SetVideoPayload {
 	thumbnail: string;
 	video: string;
+}
+
+export interface UnlikeCommentPayload {
+	bearer: string;
+	commentId: number;
+	responseId: number;
 }
 
 export interface UploadVideoPayload {
@@ -48,6 +69,17 @@ export interface UploadVideoPayload {
 }
 
 /* Reducers */
+export interface GetCommentsAction {
+	payload: {
+		comments: Comment[],
+		error: boolean,
+		hasMore: boolean,
+		msg: string,
+		page: number
+	};
+	type: typeof GET_COMMENTS;
+}
+
 export interface GetInteractionAction {
 	payload: {
 		error: boolean,
@@ -55,6 +87,14 @@ export interface GetInteractionAction {
 		interaction: Interaction
 	};
 	type: typeof GET_INTERACTION;
+}
+
+export interface LikeCommentAction {
+	payload: {
+		error: boolean,
+		msg: string
+	};
+	type: typeof LIKE_COMMENT;
 }
 
 export interface ResetInteractionAction {
@@ -81,6 +121,14 @@ export interface SetVideoAction {
 	type: typeof SET_VIDEO;
 }
 
+export interface UnlikeCommentAction {
+	payload: {
+		error: boolean,
+		msg: string
+	};
+	type: typeof UNLIKE_COMMENT;
+}
+
 export interface UpdateInteractionAction {
 	payload: {
 		error: boolean,
@@ -101,10 +149,13 @@ export interface UploadVideoAction {
 
 export type InteractionActionTypes =
 	| CreateInteractionPayload
+	| GetCommentsAction
 	| GetInteractionAction
+	| LikeCommentAction
 	| ResetInteractionAction
 	| SearchInteractionsAction
 	| SetInteractionErrorAction
 	| SetVideoAction
+	| UnlikeCommentAction
 	| UpdateInteractionAction
 	| UploadVideoAction
