@@ -11,7 +11,8 @@ const { thumbnail } = require("easyimage")
 const validator = require("validator")
 const waitOn = require("wait-on")
 /* eslint-enable */
-const CommentLike = db.commentLike
+const Comment = db.comment
+const CommentResponse = db.commentResponse
 const Interaction = db.interaction
 const User = db.user
 const Op = db.Sequelize.Op
@@ -333,8 +334,23 @@ exports.findOne = async (req, res) => {
 						userId: userData.id
 					}
 				}).then((count) => count)
-
 				userData.interactionCount = interactionCount
+
+				const commentCount = await Comment.count({
+					col: "comment.id",
+					distinct: true,
+					where: {
+						userId: userData.id
+					}
+				}).then((count) => count)
+				const responseCount = await CommentResponse.count({
+					col: "commentResponse.id",
+					distinct: true,
+					where: {
+						userId: userData.id
+					}
+				}).then((count) => count)
+				userData.commentCount = commentCount + responseCount
 
 				return res.status(200).send({
 					error: false,

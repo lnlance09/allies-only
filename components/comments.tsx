@@ -1,4 +1,13 @@
-import { Button, Comment, Form, Icon, TextArea, Visibility } from "semantic-ui-react"
+import {
+	Button,
+	Comment,
+	Header,
+	Form,
+	Icon,
+	Segment,
+	TextArea,
+	Visibility
+} from "semantic-ui-react"
 import { s3BaseUrl } from "@options/config"
 import { useRouter } from "next/router"
 import DefaultPic from "@public/images/avatar/large/joe.jpg"
@@ -9,6 +18,7 @@ import React, { useRef, useState, Fragment } from "react"
 import ReactTooltip from "react-tooltip"
 
 const CommentsSection: React.FC = ({
+	allowNewPosts,
 	authenticated,
 	bearer,
 	comments,
@@ -17,6 +27,8 @@ const CommentsSection: React.FC = ({
 	likeComment,
 	loadMoreComments,
 	postComment,
+	showNoResultsMsg,
+	showReplies,
 	unlikeComment,
 	userId
 }) => {
@@ -135,41 +147,43 @@ const CommentsSection: React.FC = ({
 
 	return (
 		<div className="commentsSection">
-			<div ref={blockRef}>
-				<Form className="lighter" inverted={inverted} size="big">
-					<TextArea
-						autoHeight
-						onChange={onChangeMessage}
-						placeholder="Post a comment"
-						ref={textAreaRef}
-						value={message}
-					/>
-					<Button
-						className="postCommentButton"
-						color="orange"
-						content="Post"
-						disabled={message.length === 0}
-						fluid
-						onClick={() => {
-							postComment({
-								bearer,
-								callback: () => setMessage(""),
-								interactionId,
-								message,
-								responseTo
-							})
-						}}
-						size="big"
-					/>
-				</Form>
-			</div>
+			{allowNewPosts && (
+				<div ref={blockRef}>
+					<Form className="lighter" inverted={inverted} size="big">
+						<TextArea
+							autoHeight
+							onChange={onChangeMessage}
+							placeholder="Post a comment"
+							ref={textAreaRef}
+							value={message}
+						/>
+						<Button
+							className="postCommentButton"
+							color="orange"
+							content="Post"
+							disabled={message.length === 0}
+							fluid
+							onClick={() => {
+								postComment({
+									bearer,
+									callback: () => setMessage(""),
+									interactionId,
+									message,
+									responseTo
+								})
+							}}
+							size="big"
+						/>
+					</Form>
+				</div>
+			)}
 
 			<Visibility
 				continuous
 				onBottomVisible={async () => {
 					if (comments.hasMore && !fetching) {
 						setFetching(true)
-						await loadMoreComments({ interactionId, page: comments.page })
+						await loadMoreComments({ interactionId, page: comments.page, userId })
 						setFetching(false)
 					}
 				}}
@@ -180,7 +194,7 @@ const CommentsSection: React.FC = ({
 							<Comment key={`individualComment${i}`}>
 								{SingleComment(comment, comment.id, false, `individualComment${i}`)}
 
-								{comment.responses.length > 0 && (
+								{comment.responses.length > 0 && showReplies && (
 									<Comment.Group size="big">
 										{comment.responses.map((response, x) => (
 											<Comment key={`replyComment${x}`}>
@@ -199,14 +213,14 @@ const CommentsSection: React.FC = ({
 					</Comment.Group>
 				) : (
 					<Fragment>
-						{/*
-					<Segment inverted={inverted} placeholder>
-						<Header icon textAlign="center">
-							<Icon color="yellow" inverted={inverted} name="comment" />
-							There aren&apos;t any comments yet
-						</Header>
-					</Segment>
-					*/}
+						{showNoResultsMsg && (
+							<Segment inverted={inverted} placeholder>
+								<Header icon textAlign="center">
+									<Icon color="yellow" inverted={inverted} name="comment" />
+									There aren&apos;t any comments yet
+								</Header>
+							</Segment>
+						)}
 					</Fragment>
 				)}
 			</Visibility>
@@ -215,6 +229,7 @@ const CommentsSection: React.FC = ({
 }
 
 CommentsSection.propTypes = {
+	allowNewPosts: PropTypes.bool,
 	authenticated: PropTypes.bool,
 	bearer: PropTypes.string,
 	comments: PropTypes.shape({
@@ -255,8 +270,16 @@ CommentsSection.propTypes = {
 	likeComment: PropTypes.func,
 	loadMoreComments: PropTypes.func,
 	postComment: PropTypes.func,
+	showNoResultsMsg: PropTypes.bool,
+	showReplies: PropTypes.bool,
 	unlikeComment: PropTypes.func,
 	userId: PropTypes.number
+}
+
+CommentsSection.defaultProps = {
+	allowNewPosts: true,
+	showNoResultsMsg: false,
+	showReplies: true
 }
 
 export default CommentsSection

@@ -9,7 +9,7 @@
 
     .results.transition {
         background: $invertedBackgroundColor !important;
-        border: none !important;
+        border: solid 1px rgba(255,255,255, 0.1) !important;
         box-shadow: none !important;
         top: 50px;
         width: 100% !important;
@@ -22,6 +22,7 @@
         }
 
         @media only screen and (max-width: 1025px) {
+            border: none !important;
             display: block !important;
             width: 120% !important;
         }
@@ -68,7 +69,7 @@
                         margin-top: 0 !important;
                     }
 
-                    &:hover {
+                    &:hover, &.active {
                         background: lighten($invertedBackgroundColor, 3%);
                     }
 

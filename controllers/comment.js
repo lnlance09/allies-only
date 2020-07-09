@@ -189,8 +189,11 @@ exports.delete = async (req, res) => {
 }
 
 exports.findAll = async (req, res) => {
-	const { interactionId, page } = req.query
+	const { interactionId, page, userId } = req.query
 	const { authenticated, user } = Auth.parseAuthentication(req)
+
+	const hasInteractionId = typeof interactionId !== "undefined" && interactionId !== ""
+	const hasUserId = typeof userId !== "undefined" && userId !== ""
 
 	const limit = 20
 	const offset = isNaN(page) ? 0 : page * limit
@@ -225,8 +228,8 @@ exports.findAll = async (req, res) => {
 				LEFT JOIN (
 					SELECT cr.id, cr.message, cr.responseTo, cr.userId, cr.createdAt, cr.updatedAt,
 					cl.responseId, u.img AS userImg, u.name AS userName, u.username AS userUsername,
-					COUNT(DISTINCT(cl.id)) AS likeCount,
-					${authenticated ? ` COUNT(DISTINCT(myCl.id)) AS likedByMe ` : ""}
+					COUNT(DISTINCT(cl.id)) AS likeCount
+					${authenticated ? `, COUNT(DISTINCT(myCl.id)) AS likedByMe ` : ""}
 					FROM commentResponses cr
 					INNER JOIN users u ON cr.userId = u.id
 					LEFT JOIN commentLikes cl ON cr.id = cl.responseId
@@ -237,13 +240,24 @@ exports.findAll = async (req, res) => {
 					}
 					GROUP BY cr.id
 				) r ON r.responseTo = c.id
-				WHERE interactionId = :interactionId
+				${hasInteractionId ? " WHERE interactionId = :interactionId " : ""}
+				${hasInteractionId && hasUserId ? " AND " : !hasInteractionId && hasUserId ? " WHERE " : ""}
+				${hasUserId ? " c.userId = :userId OR r.userId = :userId " : ""}
 				GROUP BY c.id
 				LIMIT :offset, :limit`
 
+	const replacements = { limit, offset }
+	if (hasInteractionId) {
+		replacements.interactionId = interactionId
+	}
+
+	if (hasUserId) {
+		replacements.userId = userId
+	}
+
 	db.sequelize
 		.query(sql, {
-			replacements: { interactionId, limit, offset },
+			replacements,
 			type: QueryTypes.SELECT
 		})
 		.then((comments) => {

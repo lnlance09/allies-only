@@ -5,7 +5,7 @@
 	}
 
 	.resultsList {
-		@media only screen and (max-width: 767px) {
+		@media only screen and (max-width: 1025px) {
 			padding: 0 !important;
 		}
 
@@ -20,7 +20,7 @@
 					background: lighten($invertedBackgroundColor, 3%);
 				}
 
-				@media only screen and (max-width: 767px) {
+				@media only screen and (max-width: 1025px) {
 					.image {
 						display: none !important;
 					}
@@ -33,7 +33,7 @@
 				}
 
 				.content {
-					@media only screen and (max-width: 767px) {
+					@media only screen and (max-width: 1025px) {
 						padding-top: 0 !important;
 					}
 

@@ -77,6 +77,8 @@ const Departments: React.FC = ({ departments, inverted, searchDepartments }) => 
 									}`}
 								>
 									<DebounceInput
+										autoCapitalize="none"
+										autoCorrect="off"
 										debounceTimeout={300}
 										minLength={2}
 										onChange={searchForResults}

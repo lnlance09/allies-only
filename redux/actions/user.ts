@@ -3,16 +3,19 @@ import {
 	ChangeProfilePicAction,
 	ChangeProfilePicPayload,
 	GetUserAction,
+	GetUserCommentsAction,
+	GetUserCommentsPayload,
 	GetUserPayload,
 	SetUserErrorAction
 } from "@interfaces/user"
 import { PaginationPayload } from "@interfaces/options"
+import { AppDispatch } from "@store/index"
 import axios from "axios"
 
 export const changeProfilePic = ({
 	bearer,
 	file
-}: ChangeProfilePicPayload): ChangeProfilePicAction => (dispatch) => {
+}: ChangeProfilePicPayload): ChangeProfilePicAction => (dispatch: AppDispatch) => {
 	const formData = new FormData()
 	formData.set("file", file)
 
@@ -39,7 +42,7 @@ export const changeProfilePic = ({
 export const getUser = ({
 	callback = () => null,
 	username
-}: GetUserPayload): GetUserAction | SetUserErrorAction => (dispatch) => {
+}: GetUserPayload): GetUserAction | SetUserErrorAction => (dispatch: AppDispatch) => {
 	axios
 		.get(`/api/user/${username}`)
 		.then(async (response) => {
@@ -60,7 +63,30 @@ export const getUser = ({
 		})
 }
 
-export const searchUsers = ({ page = 0, q = "" }: PaginationPayload): void => (dispatch) => {
+export const getUserComments = ({
+	page,
+	userId
+}: GetUserCommentsPayload): GetUserCommentsAction => (dispatch: AppDispatch) => {
+	axios
+		.get("/api/comment/search", {
+			params: {
+				page,
+				userId
+			}
+		})
+		.then(async (response) => {
+			const { data } = response
+			dispatch({
+				payload: data,
+				type: constants.GET_USER_COMMENTS
+			})
+		})
+		.catch(() => null)
+}
+
+export const searchUsers = ({ page = 0, q = "" }: PaginationPayload): void => (
+	dispatch: AppDispatch
+) => {
 	axios
 		.get("/api/user/search", {
 			params: {

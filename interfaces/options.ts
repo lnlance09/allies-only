@@ -1,4 +1,5 @@
 import { Authentication } from "./authentication"
+import { Comment } from "./comment"
 import { Department } from "./department"
 import { Interaction } from "./interaction"
 import { Officer } from "./officer"
@@ -64,6 +65,14 @@ export type ItemTypes = Department | Interaction | Officer | User
 export type ItemArrayTypes = Department[] | Interaction[] | Officer[] | User[]
 
 export interface IndividualItemPage extends Results {
+	comments?: {
+		error?: boolean,
+		errorMsg?: string,
+		hasMore: boolean,
+		loading: boolean,
+		page?: number,
+		results: Comment[]
+	};
 	data: ItemTypes;
 }
 

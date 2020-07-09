@@ -69,6 +69,8 @@ const Interactions: React.FC = ({ interactions, inverted, searchInteractions }) 
 
 					<div className={`ui icon input fluid big ${inverted ? "inverted" : ""}`}>
 						<DebounceInput
+							autoCapitalize="none"
+							autoCorrect="off"
 							debounceTimeout={300}
 							minLength={2}
 							onChange={searchForResults}
