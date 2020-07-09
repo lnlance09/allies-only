@@ -1,4 +1,7 @@
 import * as constants from "../constants"
+import { toast } from "react-toastify"
+import { getConfig } from "@options/toast"
+import { parseJwt, setToken } from "@utils/tokenFunctions"
 import {
 	ChangeProfilePicAction,
 	ChangeProfilePicPayload,
@@ -11,6 +14,9 @@ import {
 import { PaginationPayload } from "@interfaces/options"
 import { AppDispatch } from "@store/index"
 import axios from "axios"
+
+const toastConfig = getConfig()
+toast.configure(toastConfig)
 
 export const changeProfilePic = ({
 	bearer,
@@ -29,13 +35,21 @@ export const changeProfilePic = ({
 		})
 		.then((response) => {
 			const { data } = response
+			if (!data.error) {
+				const userData = parseJwt()
+				userData.img = data.img
+				if (userData) {
+					setToken(userData)
+				}
+			}
+
 			dispatch({
 				payload: data,
 				type: constants.CHANGE_PROFILE_PIC
 			})
 		})
 		.catch((error) => {
-			console.log(error)
+			toast.error(error.response.data.msg)
 		})
 }
 

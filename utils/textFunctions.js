@@ -5,3 +5,7 @@ export const formatPlural = (count, term) => {
 	}
 	return parseInt(count, 10) === 1 ? term : `${term}s`
 }
+
+export const formatTimestamp = (timestamp) => {
+	return `${timestamp.slice(0, -3).split(" ").join("T")}Z`
+}

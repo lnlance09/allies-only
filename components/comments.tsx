@@ -8,6 +8,7 @@ import {
 	TextArea,
 	Visibility
 } from "semantic-ui-react"
+import { formatTimestamp } from "@utils/textFunctions"
 import { s3BaseUrl } from "@options/config"
 import { useRouter } from "next/router"
 import DefaultPic from "@public/images/avatar/large/joe.jpg"
@@ -70,7 +71,10 @@ const CommentsSection: React.FC = ({
 					</Comment.Author>
 					<Comment.Metadata>
 						<div>
-							<Moment date={createdAt} fromNow />
+							<Moment
+								date={isReply ? formatTimestamp(createdAt) : createdAt}
+								fromNow
+							/>
 						</div>
 					</Comment.Metadata>
 					<Comment.Text>
