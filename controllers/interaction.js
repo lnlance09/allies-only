@@ -466,10 +466,10 @@ exports.saveVideo = async (req, res) => {
 			// console.log("info", info)
 		})
 
-		video.on("error", () => {
+		video.on("error", (err) => {
 			return res.status(500).send({
 				error: true,
-				msg: "That link is not valid",
+				msg: err || "That link is not valid",
 				video: false
 			})
 		})
