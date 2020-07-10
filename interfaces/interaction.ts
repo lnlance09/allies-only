@@ -42,8 +42,11 @@ export interface CreateInteractionPayload {
 }
 
 export interface GetCommentsPayload {
+	bearer?: string;
+	commentId?: number;
 	interactionId: number;
 	page: number;
+	replyId?: number;
 }
 
 export interface LikeCommentPayload {

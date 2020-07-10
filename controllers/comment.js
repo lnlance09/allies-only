@@ -189,11 +189,15 @@ exports.delete = async (req, res) => {
 }
 
 exports.findAll = async (req, res) => {
-	const { interactionId, page, userId } = req.query
+	const { commentId, interactionId, page, replyId } = req.query
 	const { authenticated, user } = Auth.parseAuthentication(req)
 
-	const hasInteractionId = typeof interactionId !== "undefined" && interactionId !== ""
-	const hasUserId = typeof userId !== "undefined" && userId !== ""
+	if (typeof interactionId === "undefined" || interactionId === "") {
+		return res.status(401).send({ error: true, msg: "Interaction is empty" })
+	}
+
+	const hasCommentId = typeof commentId !== "undefined" && commentId !== ""
+	const hasReplyId = typeof replyId !== "undefined" && replyId !== ""
 
 	const limit = 20
 	const offset = isNaN(page) ? 0 : page * limit
@@ -239,20 +243,22 @@ exports.findAll = async (req, res) => {
 							: ""
 					}
 					GROUP BY cr.id
+					${hasReplyId ? "ORDER BY cr.id = :replyId DESC" : ""}
+					${hasReplyId ? ", " : " ORDER BY "} likeCount DESC
 				) r ON r.responseTo = c.id
-				${hasInteractionId ? " WHERE interactionId = :interactionId " : ""}
-				${hasInteractionId && hasUserId ? " AND " : !hasInteractionId && hasUserId ? " WHERE " : ""}
-				${hasUserId ? " c.userId = :userId OR r.userId = :userId " : ""}
+				WHERE interactionId = :interactionId
 				GROUP BY c.id
+				${hasCommentId ? "ORDER BY c.id = :commentId DESC" : ""}
+				${hasCommentId ? ", " : " ORDER BY "} likeCount DESC
 				LIMIT :offset, :limit`
 
-	const replacements = { limit, offset }
-	if (hasInteractionId) {
-		replacements.interactionId = interactionId
+	const replacements = { interactionId, limit, offset }
+	if (hasCommentId) {
+		replacements.commentId = commentId
 	}
 
-	if (hasUserId) {
-		replacements.userId = userId
+	if (hasReplyId) {
+		replacements.replyId = replyId
 	}
 
 	db.sequelize
@@ -276,7 +282,7 @@ exports.findAll = async (req, res) => {
 			})
 
 			return res.status(200).send({
-				comments: comments,
+				comments,
 				error: false,
 				hasMore,
 				msg: "Success",

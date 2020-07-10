@@ -72,14 +72,18 @@ body {
 }
 
 .profileMenu {
+	margin-top: 26px !important;
+
 	.item {
-		display: inline-block !important;
-		text-align: center !important;
-		width: 50%;
+		// display: inline-block !important;
+		// text-align: center !important;
+		// width: 50%;
 	}
 
 	+ .searchResults {
-		margin-top: 26px !important;
+		@media only screen and (max-width: 1025px) {
+			margin-top: 26px !important;
+		}
 	}
 }
 
@@ -342,4 +346,16 @@ body {
 
 .rodneyKingImg {
 	border: solid 1px $lightGrey !important;
+}
+
+.interactionCommentSegment {
+	.ui.header.large {
+		img {
+			cursor: pointer;
+		}
+	}
+}
+
+.ui.placeholder {
+	border-radius: 4px;
 }

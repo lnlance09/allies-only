@@ -65,14 +65,18 @@ export const createInteraction = ({
 
 export const getComments = ({
 	bearer,
+	commentId,
 	interactionId,
-	page
+	page,
+	replyId
 }: GetCommentsPayload): GetCommentsAction => (dispatch: AppDispatch) => {
 	axios
 		.get("/api/comment/search", {
 			params: {
+				commentId,
 				interactionId,
-				page
+				page,
+				replyId
 			},
 			headers: {
 				Authorization: bearer

@@ -1,16 +1,6 @@
 import { searchInteractions } from "@actions/interaction"
 import { changeProfilePic, getUser, getUserComments } from "@actions/user"
-import {
-	Button,
-	Container,
-	Divider,
-	Grid,
-	Header,
-	Image,
-	Label,
-	Menu,
-	Placeholder
-} from "semantic-ui-react"
+import { Button, Container, Grid, Header, Image, Label, Menu, Placeholder } from "semantic-ui-react"
 import { RootState } from "@store/reducer"
 import { GetServerSideProps } from "next"
 import { initial } from "@reducers/user"
@@ -24,7 +14,7 @@ import { withTheme } from "@redux/ThemeProvider"
 import { compose } from "redux"
 import { baseUrl } from "@options/config"
 import axios from "axios"
-import Comments from "@components/comments"
+import InteractionComments from "@components/interactionComments"
 import DefaultLayout from "@layouts/default"
 import DefaultPic from "@public/images/avatar/large/joe.jpg"
 import ImageUpload from "@components/imageUpload"
@@ -190,7 +180,7 @@ const User: React.FC = ({
 												{initialUser.data.interactionCount}{" "}
 												{formatPlural(
 													initialUser.data.interactionCount,
-													"Interaction"
+													"interaction"
 												)}
 											</Label>
 
@@ -198,7 +188,7 @@ const User: React.FC = ({
 												{initialUser.data.commentCount}{" "}
 												{formatPlural(
 													initialUser.data.commentCount,
-													"Comment"
+													"comment"
 												)}
 											</Label>
 										</Fragment>
@@ -234,6 +224,7 @@ const User: React.FC = ({
 										Comments
 									</Menu.Item>
 								</Menu>
+
 								{activeItem === "interactions" && (
 									<SearchResults
 										hasMore={user.interactions.hasMore}
@@ -248,16 +239,12 @@ const User: React.FC = ({
 									/>
 								)}
 								{activeItem === "comments" && (
-									<Comments
-										allowNewPosts={false}
-										bearer={bearer}
+									<InteractionComments
 										comments={user.comments}
 										inverted={inverted}
 										loadMoreComments={({ userId, page }) =>
 											getUserComments({ userId, page })
 										}
-										showNoResultsMsg
-										showReplies={false}
 										userId={id}
 									/>
 								)}
@@ -300,28 +287,30 @@ User.propTypes = {
 			page: PropTypes.number,
 			results: PropTypes.arrayOf(
 				PropTypes.shape({
+					comments: PropTypes.shape({
+						createdAt: PropTypes.string,
+						id: PropTypes.number,
+						likeCount: PropTypes.number,
+						message: PropTypes.string,
+						respones: PropTypes.arrayOf(
+							PropTypes.shape({
+								createdAt: PropTypes.string,
+								id: PropTypes.number,
+								likeCount: PropTypes.number,
+								message: PropTypes.string,
+								userImg: PropTypes.string,
+								userName: PropTypes.string,
+								userUsername: PropTypes.string
+							})
+						),
+						userImg: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
+						userName: PropTypes.string,
+						userUsername: PropTypes.string
+					}),
 					createdAt: PropTypes.string,
-					interactionId: PropTypes.number,
-					likeCount: PropTypes.number,
-					likedByMe: PropTypes.number,
-					message: PropTypes.string,
-					respones: PropTypes.arrayOf(
-						PropTypes.shape({
-							createdAt: PropTypes.string,
-							id: PropTypes.number,
-							likeCount: PropTypes.number,
-							likedByMe: PropTypes.number,
-							message: PropTypes.string,
-							userImg: PropTypes.string,
-							userName: PropTypes.string,
-							userUsername: PropTypes.string
-						})
-					),
-					responseTo: PropTypes.number,
-					updatedAt: PropTypes.string,
-					userImg: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
-					userName: PropTypes.string,
-					userUsername: PropTypes.string
+					id: PropTypes.number,
+					img: PropTypes.string,
+					title: PropTypes.string
 				})
 			)
 		}),
@@ -332,7 +321,7 @@ User.propTypes = {
 			img: PropTypes.string,
 			interactionCount: PropTypes.number,
 			name: PropTypes.string,
-			status: PropTypes.number,
+			status: PropTypes.string,
 			username: PropTypes.string
 		}),
 		error: PropTypes.bool,

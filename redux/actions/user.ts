@@ -82,7 +82,7 @@ export const getUserComments = ({
 	userId
 }: GetUserCommentsPayload): GetUserCommentsAction => (dispatch: AppDispatch) => {
 	axios
-		.get("/api/comment/search", {
+		.get(`/api/user/${userId}/comments`, {
 			params: {
 				page,
 				userId

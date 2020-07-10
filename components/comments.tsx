@@ -15,19 +15,24 @@ import DefaultPic from "@public/images/avatar/large/joe.jpg"
 import LinkedText from "@components/linkedText"
 import Moment from "react-moment"
 import PropTypes from "prop-types"
-import React, { useRef, useState, Fragment } from "react"
+import React, { useEffect, useRef, useState, Fragment } from "react"
 import ReactTooltip from "react-tooltip"
 
 const CommentsSection: React.FC = ({
 	allowNewPosts,
+	allowReplies,
 	authenticated,
 	bearer,
 	comments,
+	highlighted,
+	highlightedCommentId,
+	highlightedReplyId,
 	interactionId,
 	inverted,
 	likeComment,
 	loadMoreComments,
 	postComment,
+	redirectToComment,
 	showNoResultsMsg,
 	showReplies,
 	unlikeComment,
@@ -41,6 +46,15 @@ const CommentsSection: React.FC = ({
 	const [message, setMessage] = useState("")
 	const [responseTo, setResponseTo] = useState(null)
 
+	useEffect(() => {
+		if (highlighted) {
+			window.scrollTo({
+				behavior: "smooth",
+				top: textAreaRef.current.offsetTop
+			})
+		}
+	}, [])
+
 	const onChangeMessage = (e, { value }) => {
 		setMessage(value)
 
@@ -52,6 +66,11 @@ const CommentsSection: React.FC = ({
 	const SingleComment = (comment, commentId: number, isReply: boolean, key: string) => {
 		const { createdAt, id, likeCount, likedByMe, message, userImg } = comment
 		const username = comment.userUsername
+		const isHighlighted =
+			highlighted &&
+			((comment.id === parseInt(highlightedCommentId, 10) &&
+				typeof highlightedReplyId === "undefined") ||
+				(comment.id === parseInt(highlightedReplyId, 10) && isReply))
 
 		return (
 			<Fragment>
@@ -65,17 +84,28 @@ const CommentsSection: React.FC = ({
 					size="tiny"
 					src={userImg ? `${s3BaseUrl}${userImg}` : DefaultPic}
 				/>
-				<Comment.Content>
+				<Comment.Content
+					className={`${isHighlighted ? "highlighted" : ""}`}
+					onClick={() => {
+						if (redirectToComment) {
+							router.push(
+								`/interactions/${interactionId}?commentId=${commentId}${
+									isReply ? `&replyId=${id}` : ""
+								}`
+							)
+						}
+					}}
+				>
 					<Comment.Author as="a" onClick={() => router.push(`/${username}`)}>
 						{username}
 					</Comment.Author>
 					<Comment.Metadata>
 						<div>
-							<Moment
-								date={isReply ? formatTimestamp(createdAt) : createdAt}
-								fromNow
-							/>
+							<Moment date={formatTimestamp(createdAt)} fromNow />
 						</div>
+						{isHighlighted && (
+							<span className="highlightedAlert">highlighted comment</span>
+						)}
 					</Comment.Metadata>
 					<Comment.Text>
 						<LinkedText text={message} />
@@ -119,21 +149,23 @@ const CommentsSection: React.FC = ({
 							</span>
 							{likeCount > 0 && <span className={`count`}>{likeCount}</span>}
 						</Comment.Action>
-						<Comment.Action>
-							<span
-								onClick={() => {
-									setMessage(`@${username} `)
-									setResponseTo(commentId)
-									window.scrollTo({
-										behavior: "smooth",
-										top: blockRef.current.offsetTop
-									})
-									textAreaRef.current.focus()
-								}}
-							>
-								<Icon inverted={inverted} name="reply" /> Reply
-							</span>
-						</Comment.Action>
+						{allowReplies && (
+							<Comment.Action>
+								<span
+									onClick={() => {
+										setMessage(`@${username} `)
+										setResponseTo(commentId)
+										window.scrollTo({
+											behavior: "smooth",
+											top: blockRef.current.offsetTop
+										})
+										textAreaRef.current.focus()
+									}}
+								>
+									<Icon inverted={inverted} name="reply" /> Reply
+								</span>
+							</Comment.Action>
+						)}
 					</Comment.Actions>
 				</Comment.Content>
 
@@ -194,14 +226,22 @@ const CommentsSection: React.FC = ({
 			>
 				{comments.results.length > 0 ? (
 					<Comment.Group size="big">
-						{comments.results.map((comment, i) => (
-							<Comment key={`individualComment${i}`}>
+						{comments.results.map((comment, i: number) => (
+							<Comment
+								className={`${redirectToComment ? "redirect" : ""}`}
+								key={`individualComment${i}`}
+								id={comment.id}
+							>
 								{SingleComment(comment, comment.id, false, `individualComment${i}`)}
 
 								{comment.responses.length > 0 && showReplies && (
 									<Comment.Group size="big">
-										{comment.responses.map((response, x) => (
-											<Comment key={`replyComment${x}`}>
+										{comment.responses.map((response, x: number) => (
+											<Comment
+												className={`${redirectToComment ? "redirect" : ""}`}
+												id={`${comment.id}${response.id}`}
+												key={`replyComment${x}`}
+											>
 												{SingleComment(
 													response,
 													comment.id,
@@ -234,6 +274,7 @@ const CommentsSection: React.FC = ({
 
 CommentsSection.propTypes = {
 	allowNewPosts: PropTypes.bool,
+	allowReplies: PropTypes.bool,
 	authenticated: PropTypes.bool,
 	bearer: PropTypes.string,
 	comments: PropTypes.shape({
@@ -269,11 +310,15 @@ CommentsSection.propTypes = {
 			})
 		)
 	}),
+	highlighted: PropTypes.bool,
+	highlightedCommentId: PropTypes.number,
+	highlightedReplyId: PropTypes.number,
 	interactionId: PropTypes.number,
 	inverted: PropTypes.bool,
 	likeComment: PropTypes.func,
 	loadMoreComments: PropTypes.func,
 	postComment: PropTypes.func,
+	redirectToComment: PropTypes.bool,
 	showNoResultsMsg: PropTypes.bool,
 	showReplies: PropTypes.bool,
 	unlikeComment: PropTypes.func,
@@ -282,6 +327,8 @@ CommentsSection.propTypes = {
 
 CommentsSection.defaultProps = {
 	allowNewPosts: true,
+	allowReplies: true,
+	redirectToComment: false,
 	showNoResultsMsg: false,
 	showReplies: true
 }

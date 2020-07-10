@@ -117,7 +117,7 @@ const Interaction: React.FC = ({
 	uploadVideo
 }) => {
 	const router = useRouter()
-	const { departmentId, officerId, slug } = router.query
+	const { commentId, departmentId, officerId, replyId, slug } = router.query
 
 	const [authenticated, setAuthenticated] = useState(null)
 	const [bearer, setBearer] = useState(null)
@@ -173,8 +173,10 @@ const Interaction: React.FC = ({
 						updateViews({ id: slug })
 						getComments({
 							bearer: localStorage.getItem("jwtToken"),
+							commentId,
 							interactionId: slug,
-							page: 0
+							page: 0,
+							replyId
 						})
 						setDescription(description)
 						setDepartment(departmentId)
@@ -740,6 +742,9 @@ const Interaction: React.FC = ({
 											bearer={bearer}
 											comments={interaction.comments}
 											interactionId={interaction.data.id}
+											highlighted={typeof commentId !== undefined}
+											highlightedCommentId={commentId}
+											highlightedReplyId={replyId}
 											inverted={inverted}
 											likeComment={({ bearer, commentId, responseId }) =>
 												likeComment({ bearer, commentId, responseId })
