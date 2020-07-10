@@ -359,3 +359,16 @@ body {
 .ui.placeholder {
 	border-radius: 4px;
 }
+
+.ui.segment.interactionDescription span {
+	line-height: 1.4 !important;
+	white-space: pre-wrap !important;
+
+	a {
+		padding-bottom: 2px !important;
+
+		&:hover {
+			border-bottom: solid 1px $white !important;
+		}
+	}
+}
