@@ -303,6 +303,7 @@ export const updateInteraction = ({
 		.then(async (response) => {
 			const { data } = response
 			if (!data.error) {
+				toast.success("Updated!")
 				callback(id)
 			}
 		})

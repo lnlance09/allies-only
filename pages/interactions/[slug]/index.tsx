@@ -547,7 +547,6 @@ const Interaction: React.FC = ({
 											controls
 											height="100%"
 											muted
-											onReady={(e) => console.log("e", e)}
 											playing
 											style={{ lineHeight: 0.8 }}
 											url={initialInteraction.data.video}

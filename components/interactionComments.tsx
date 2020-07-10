@@ -9,10 +9,9 @@ import React, { useState } from "react"
 
 const InteractionComments: React.FC = ({
 	comments,
-	hasMore,
 	inverted,
 	loading,
-	loadMore,
+	loadMoreComments,
 	page,
 	userId
 }) => {
@@ -33,9 +32,9 @@ const InteractionComments: React.FC = ({
 				<Visibility
 					continuous
 					onBottomVisible={async () => {
-						if (hasMore && !fetching) {
+						if (comments.hasMore && !fetching) {
 							setFetching(true)
-							await loadMore({ page, userId })
+							await loadMoreComments({ page: comments.page, userId })
 							setFetching(false)
 						}
 					}}
@@ -72,9 +71,6 @@ const InteractionComments: React.FC = ({
 									}}
 									interactionId={result.id}
 									inverted={inverted}
-									// loadMoreComments={({ interactionId, page }) =>
-									//	getComments({ interactionId, page })
-									//}
 									redirectToComment
 									userId={userId}
 								/>
@@ -121,11 +117,8 @@ InteractionComments.propTypes = {
 			})
 		)
 	}),
-	hasMore: PropTypes.bool,
 	inverted: PropTypes.bool,
-	loading: PropTypes.bool,
-	loadMore: PropTypes.func,
-	page: PropTypes.number,
+	loadMoreComments: PropTypes.func,
 	userId: PropTypes.number
 }
 
