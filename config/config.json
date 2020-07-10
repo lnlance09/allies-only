@@ -18,9 +18,9 @@
   },
   "production": {
     "username": "admin",
-    "password": "2Z>2:Z8t{56eHoq",
+    "password": "3[u9P_|D77u=28P",
     "database": "police",
-    "host": "police-test.cni5l9jtlymn.us-west-2.rds.amazonaws.com",
+    "host": "police.cni5l9jtlymn.us-west-2.rds.amazonaws.com",
     "dialect": "mysql",
     "dialectOptions": {
       "ssl": "Amazon RDS"

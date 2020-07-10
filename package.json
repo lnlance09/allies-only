@@ -7,7 +7,7 @@
     "dev": "cross-env node server.js",
     "dev:test": "NODE_ENV=test node server.js",
     "dev:prod": "NODE_ENV=production node server.js",
-    "start": "NODE_ENV=test cross-env node server.js",
+    "start": "cross-env node server.js",
     "start:test": "NODE_ENV=test cross-env node server.js",
     "start:prod": "NODE_ENV=production cross-env node server.js",
     "build": "next build",
