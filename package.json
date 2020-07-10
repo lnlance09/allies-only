@@ -10,7 +10,7 @@
     "start": "cross-env node server.js",
     "start:test": "NODE_ENV=test cross-env node server.js",
     "start:prod": "NODE_ENV=production cross-env node server.js",
-    "build": "next build",
+    "build": "NODE_ENV=production next build",
     "lint": "eslint '*/**/*.{js,ts,tsx}' --fix . && echo 'Lint complete.'",
     "prettify": "prettier --config ./.prettierrc --write '{components,lib,pages,redux,store,utils}/**/*.tsx'"
   },
