@@ -33,7 +33,7 @@ const DefaultLayout: React.FC = ({
 				<meta name="viewport" content="width=device-width, user-scalable=0" />
 				<meta name="theme-color" content="#000000" />
 
-				<meta property="fb:app_id" content="498572440350555" />
+				<meta property="fb:app_id" content="278970413183504" />
 				<meta property="og:description" content={description} />
 
 				{typeof video !== "undefined" && (
@@ -84,6 +84,12 @@ const DefaultLayout: React.FC = ({
 				<link rel="apple-touch-icon" sizes="128x128" href={`${baseUrl}favicon.ico`} />
 
 				<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDArCL_59nenZmhsD8v2NsbpuJzi9VRucg&libraries=places"></script>
+
+				<script>
+					var sc_project=12355929; var sc_invisible=1; var sc_security="473549b2"; var
+					sc_https=1;
+				</script>
+				<script src="https://www.statcounter.com/counter/counter.js" async></script>
 
 				<title>
 					{title} - {siteName}
