@@ -18,6 +18,10 @@
 
                 .metadata {
                     color: $lightGrey !important;
+
+                    .highlightedAlert {
+                        color: $invertedYellow;
+                    }
                 }
 
                 .text {
@@ -39,6 +43,18 @@
                             color: $invertedYellow;
                         }
                     }
+                }
+
+                &.highlighted {
+                    border: solid 1px $invertedYellow;
+                }
+            }
+
+            &.redirect {
+                cursor: pointer;
+
+                .content {
+                    background: lighten($invertedBackgroundColor, 7%) !important;
                 }
             }
 

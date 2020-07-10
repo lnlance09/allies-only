@@ -189,8 +189,15 @@ exports.delete = async (req, res) => {
 }
 
 exports.findAll = async (req, res) => {
-	const { interactionId, page } = req.query
+	const { commentId, interactionId, page, replyId } = req.query
 	const { authenticated, user } = Auth.parseAuthentication(req)
+
+	if (typeof interactionId === "undefined" || interactionId === "") {
+		return res.status(401).send({ error: true, msg: "Interaction is empty" })
+	}
+
+	const hasCommentId = typeof commentId !== "undefined" && commentId !== ""
+	const hasReplyId = typeof replyId !== "undefined" && replyId !== ""
 
 	const limit = 20
 	const offset = isNaN(page) ? 0 : page * limit
@@ -225,8 +232,8 @@ exports.findAll = async (req, res) => {
 				LEFT JOIN (
 					SELECT cr.id, cr.message, cr.responseTo, cr.userId, cr.createdAt, cr.updatedAt,
 					cl.responseId, u.img AS userImg, u.name AS userName, u.username AS userUsername,
-					COUNT(DISTINCT(cl.id)) AS likeCount,
-					${authenticated ? ` COUNT(DISTINCT(myCl.id)) AS likedByMe ` : ""}
+					COUNT(DISTINCT(cl.id)) AS likeCount
+					${authenticated ? `, COUNT(DISTINCT(myCl.id)) AS likedByMe ` : ""}
 					FROM commentResponses cr
 					INNER JOIN users u ON cr.userId = u.id
 					LEFT JOIN commentLikes cl ON cr.id = cl.responseId
@@ -236,14 +243,27 @@ exports.findAll = async (req, res) => {
 							: ""
 					}
 					GROUP BY cr.id
+					${hasReplyId ? "ORDER BY cr.id = :replyId DESC" : ""}
+					${hasReplyId ? ", " : " ORDER BY "} likeCount DESC
 				) r ON r.responseTo = c.id
 				WHERE interactionId = :interactionId
 				GROUP BY c.id
+				${hasCommentId ? "ORDER BY c.id = :commentId DESC" : ""}
+				${hasCommentId ? ", " : " ORDER BY "} likeCount DESC
 				LIMIT :offset, :limit`
+
+	const replacements = { interactionId, limit, offset }
+	if (hasCommentId) {
+		replacements.commentId = commentId
+	}
+
+	if (hasReplyId) {
+		replacements.replyId = replyId
+	}
 
 	db.sequelize
 		.query(sql, {
-			replacements: { interactionId, limit, offset },
+			replacements,
 			type: QueryTypes.SELECT
 		})
 		.then((comments) => {
@@ -262,7 +282,7 @@ exports.findAll = async (req, res) => {
 			})
 
 			return res.status(200).send({
-				comments: comments,
+				comments,
 				error: false,
 				hasMore,
 				msg: "Success",

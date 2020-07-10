@@ -51,17 +51,39 @@ body {
 }
 
 .searchModeContainer {
+	margin-left: 0 !important;
+	margin-right: 0 !important;
 	padding-bottom: 1em;
 	padding-top: 1em;
 
-	.thirteen.wide.column {
-		padding-right: 0;
+	.grid {
+		.row {
+			.thirteen.wide.column {
+				padding-right: 0;
+			}
+		
+			.closeSearchMode {
+				color: $lightGrey;
+				float: right;
+				line-height: 36px;
+			}
+		}
+	}
+}
+
+.profileMenu {
+	margin-top: 26px !important;
+
+	.item {
+		// display: inline-block !important;
+		// text-align: center !important;
+		// width: 50%;
 	}
 
-	.closeSearchMode {
-		color: $lightGrey;
-		float: right;
-		line-height: 36px;
+	+ .searchResults {
+		@media only screen and (max-width: 1025px) {
+			margin-top: 26px !important;
+		}
 	}
 }
 
@@ -73,7 +95,7 @@ body {
 	}
 
 	&.uploadSegment {
-		@media only screen and (max-width: 767px) {
+		@media only screen and (max-width: 1025px) {
 			padding: 0 !important;
 		}
 	}
@@ -124,7 +146,7 @@ body {
 		display: flex;
 	}
 
-	@media only screen and (max-width: 767px) {
+	@media only screen and (max-width: 1025px) {
 		&.ui.container {
 			margin-left: 0 !important;
 			margin-right: 0 !important;
@@ -140,13 +162,13 @@ body {
 		.column.four.leftColumn {
 			padding-left: 0;
 
-			@media only screen and (max-width: 767px) {
+			@media only screen and (max-width: 1025px) {
 				display: none;
 			}
 		}
 
 		.column.twelve.rightColumn {
-			@media only screen and (max-width: 767px) {
+			@media only screen and (max-width: 1025px) {
 				.ui.grid.stackable {
 					margin-left: 0 !important;
 					margin-right: 0 !important;
@@ -233,7 +255,7 @@ body {
 	padding-top: 25px !important;
 	width: 100% !important;
 
-	@media only screen and (max-width: 767px) {
+	@media only screen and (max-width: 1025px) {
 		&.ui.container {
 			margin: 0 !important;
 		}
@@ -256,11 +278,11 @@ body {
 }
 
 .Toastify__toast--error {
-	background: $invertedRed;
+	background: $red;
 	border-radius: 4px;
 }
 
-@media only screen and (max-width: 767px) {
+@media only screen and (max-width: 1025px) {
 	.pageDimmer {
 		.loader {
 			margin-top: 160px;
@@ -324,4 +346,16 @@ body {
 
 .rodneyKingImg {
 	border: solid 1px $lightGrey !important;
+}
+
+.interactionCommentSegment {
+	.ui.header.large {
+		img {
+			cursor: pointer;
+		}
+	}
+}
+
+.ui.placeholder {
+	border-radius: 4px;
 }

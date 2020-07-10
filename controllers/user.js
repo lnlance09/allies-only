@@ -4,14 +4,17 @@ const Aws = require("../utils/awsFunctions.js")
 const db = require("../models/index.js")
 const fs = require("fs")
 const Mail = require("../utils/mailFunctions.js")
+const parseJson = require("parse-json")
 const randomize = require("randomatic")
 const sha1 = require("sha1")
 const template = require("../utils/emails/registration.js")
-const { thumbnail } = require("easyimage")
 const validator = require("validator")
 const waitOn = require("wait-on")
+const { thumbnail } = require("easyimage")
+const { QueryTypes } = require("sequelize")
 /* eslint-enable */
-const CommentLike = db.commentLike
+const Comment = db.comment
+const CommentResponse = db.commentResponse
 const Interaction = db.interaction
 const User = db.user
 const Op = db.Sequelize.Op
@@ -67,16 +70,23 @@ exports.changeProfilePic = async (req, res) => {
 			}
 		)
 			.then(async () => {
-				await waitOn({
-					resources: [`https://alliesonly.s3-us-west-2.amazonaws.com/${filePath}`]
-				})
-				fs.unlinkSync(`uploads/${fileName}`)
+				try {
+					await waitOn({
+						resources: [`https://alliesonly.s3-us-west-2.amazonaws.com/${filePath}`]
+					})
+					fs.unlinkSync(`uploads/${fileName}`)
 
-				return res.status(200).send({
-					error: false,
-					img: filePath,
-					msg: "success"
-				})
+					return res.status(200).send({
+						error: false,
+						img: filePath,
+						msg: "success"
+					})
+				} catch (err) {
+					return res.status(500).send({
+						error: true,
+						msg: err.message || "There was an error"
+					})
+				}
 			})
 			.catch(() => {
 				return res.status(500).send({
@@ -326,8 +336,23 @@ exports.findOne = async (req, res) => {
 						userId: userData.id
 					}
 				}).then((count) => count)
-
 				userData.interactionCount = interactionCount
+
+				const commentCount = await Comment.count({
+					col: "comment.id",
+					distinct: true,
+					where: {
+						userId: userData.id
+					}
+				}).then((count) => count)
+				const responseCount = await CommentResponse.count({
+					col: "commentResponse.id",
+					distinct: true,
+					where: {
+						userId: userData.id
+					}
+				}).then((count) => count)
+				userData.commentCount = commentCount + responseCount
 
 				return res.status(200).send({
 					error: false,
@@ -345,6 +370,109 @@ exports.findOne = async (req, res) => {
 			return res.status(200).send({
 				error: true,
 				msg: err.message || "Some error occurred"
+			})
+		})
+}
+
+exports.getUserComments = async (req, res) => {
+	const { page } = req.query
+	const { id } = req.params
+
+	if (typeof id === "undefined" || id === "") {
+		return res.status(401).send({ error: true, msg: "User is empty" })
+	}
+
+	const limit = 20
+	const offset = isNaN(page) ? 0 : page * limit
+
+	const sql = `SELECT i.id, i.createdAt, i.img, i.title,
+				CONCAT('[',
+					GROUP_CONCAT(
+						DISTINCT JSON_OBJECT(
+							'id', c.id,
+							'createdAt', c.createdAt,
+							'likeCount', c.likeCount,
+							'message', c.message,
+							'responses', c.responses,
+							'userImg', c.userImg,
+							'userName', c.userName,
+							'userUsername', c.userUsername
+						)
+					),
+				']')
+				AS comments
+				FROM interactions i
+				LEFT JOIN (
+					SELECT c.id, c.interactionId, c.message, c.userId, r.responseUserId, c.createdAt, c.updatedAt,
+					u.img AS userImg, u.name AS userName, u.username AS userUsername,
+					COUNT(DISTINCT(cl.id)) AS likeCount,
+					CONCAT('[',
+						GROUP_CONCAT(
+							DISTINCT JSON_OBJECT(
+								'id', r.id,
+								'createdAt', r.createdAt,
+								'likeCount', r.likeCount,
+								'message', r.message,
+								'userImg', r.userImg,
+								'userName', r.userName,
+								'userUsername', r.userUsername
+							)
+						),
+					']')
+					AS responses
+					FROM comments c
+					INNER JOIN users u ON c.userId = u.id
+					LEFT JOIN commentLikes cl ON c.id = cl.responseId
+				
+					LEFT JOIN (
+						SELECT cr.id, cr.message, cr.responseTo, cr.userId, cr.userId AS responseUserId, cr.createdAt, cr.updatedAt,
+						u.img AS userImg, u.name AS userName, u.username AS userUsername,
+						COUNT(DISTINCT(cl.id)) AS likeCount
+						FROM commentResponses cr
+						INNER JOIN users u ON cr.userId = u.id
+						LEFT JOIN commentLikes cl ON cr.id = cl.responseId
+						GROUP BY cr.id
+					) r ON r.responseTo = c.id AND r.userId = :userId
+									
+					GROUP BY c.id, r.responseUserId
+				) c ON c.interactionId = i.id
+				WHERE c.userId = :userId OR c.responseUserId = :userId
+				GROUP BY i.id
+				LIMIT :offset, :limit`
+
+	db.sequelize
+		.query(sql, {
+			replacements: { limit, offset, userId: id },
+			type: QueryTypes.SELECT
+		})
+		.then((interactions) => {
+			const hasMore = interactions.length === limit
+
+			interactions.map((interaction, i) => {
+				const comments = parseJson(interaction.comments)
+				interactions[i].comments = comments
+				comments.map((c, x) => {
+					const responses = parseJson(c.responses)
+					if (responses.length === 1 ? responses[0].id === null : false) {
+						interactions[i].comments[x].responses = []
+					} else {
+						interactions[i].comments[x].responses = responses
+					}
+				})
+			})
+
+			return res.status(200).send({
+				comments: interactions,
+				error: false,
+				hasMore,
+				msg: "Success",
+				page: parseInt(page) + 1
+			})
+		})
+		.catch((err) => {
+			return res.status(200).send({
+				error: true,
+				msg: err.message || "An error occurred"
 			})
 		})
 }

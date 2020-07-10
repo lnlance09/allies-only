@@ -21,7 +21,7 @@ module.exports = {
 		}
 	},
 	signToken: function (data) {
-		const token = jwt.sign(data, jwtSecret, { expiresIn: 60 * 24 })
+		const token = jwt.sign(data, jwtSecret, { expiresIn: 60 * 60 * 336 })
 		return token
 	}
 }

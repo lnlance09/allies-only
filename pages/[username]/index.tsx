@@ -1,19 +1,11 @@
 import { searchInteractions } from "@actions/interaction"
-import { changeProfilePic, getUser } from "@actions/user"
-import {
-	Button,
-	Container,
-	Divider,
-	Grid,
-	Header,
-	Image,
-	Label,
-	Placeholder
-} from "semantic-ui-react"
+import { changeProfilePic, getUser, getUserComments } from "@actions/user"
+import { Button, Container, Grid, Header, Image, Label, Menu, Placeholder } from "semantic-ui-react"
 import { RootState } from "@store/reducer"
 import { GetServerSideProps } from "next"
 import { initial } from "@reducers/user"
 import { InitialPageState } from "@interfaces/options"
+import { formatPlural } from "@utils/textFunctions"
 import { s3BaseUrl } from "@options/config"
 import { parseJwt } from "@utils/tokenFunctions"
 import { useRouter } from "next/router"
@@ -22,6 +14,7 @@ import { withTheme } from "@redux/ThemeProvider"
 import { compose } from "redux"
 import { baseUrl } from "@options/config"
 import axios from "axios"
+import InteractionComments from "@components/interactionComments"
 import DefaultLayout from "@layouts/default"
 import DefaultPic from "@public/images/avatar/large/joe.jpg"
 import ImageUpload from "@components/imageUpload"
@@ -43,7 +36,6 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
 	}
 
 	const data = await axios.get(`${baseUrl}api/user/${params.username}`)
-	console.log("data", data.data)
 	if (data.data.error) {
 		initialUser.data = {}
 		initialUser.error = true
@@ -66,6 +58,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
 const User: React.FC = ({
 	changeProfilePic,
 	getUser,
+	getUserComments,
 	initialUser,
 	inverted,
 	searchInteractions,
@@ -76,12 +69,19 @@ const User: React.FC = ({
 
 	const { createdAt, id, img, interactionCount, name } = user.data
 
+	const [activeItem, setActiveItem] = useState("interactions")
 	const [bearer, setBearer] = useState(null)
 	const [currentUser, setCurrentUser] = useState({})
 
 	useEffect(() => {
 		if (typeof username !== "undefined") {
-			getUser({ callback: (userId: number) => searchInteractions({ userId }), username })
+			getUser({
+				callback: (userId: number) => {
+					searchInteractions({ page: 0, userId })
+					getUserComments({ page: 0, userId })
+				},
+				username
+			})
 		}
 	}, [username])
 
@@ -175,8 +175,21 @@ const User: React.FC = ({
 													Joined <Moment date={createdAt} fromNow />
 												</Header.Subheader>
 											</Header>
+
+											<Label color="yellow" size="large">
+												{initialUser.data.interactionCount}{" "}
+												{formatPlural(
+													initialUser.data.interactionCount,
+													"interaction"
+												)}
+											</Label>
+
 											<Label color="orange" size="large">
-												{interactionCount} interactions
+												{initialUser.data.commentCount}{" "}
+												{formatPlural(
+													initialUser.data.commentCount,
+													"comment"
+												)}
 											</Label>
 										</Fragment>
 									)}
@@ -184,20 +197,58 @@ const User: React.FC = ({
 							</Grid.Row>
 						</Grid>
 
-						<Divider section />
-
 						{!user.error && !user.loading && (
-							<SearchResults
-								hasMore={user.interactions.hasMore}
-								inverted={inverted}
-								justImages
-								loading={user.interactions.loading}
-								loadMore={({ page, userId }) => loadMore(page, userId)}
-								page={user.interactions.page}
-								results={user.interactions.results}
-								type="interactions"
-								userId={id}
-							/>
+							<Fragment>
+								<Menu
+									className="profileMenu"
+									fluid
+									inverted={inverted}
+									pointing
+									secondary
+									size="massive"
+								>
+									<Menu.Item
+										active={activeItem === "interactions"}
+										fitted="horizontally"
+										name="interactions"
+										onClick={() => setActiveItem("interactions")}
+									>
+										Interactions
+									</Menu.Item>
+									<Menu.Item
+										active={activeItem === "comments"}
+										fitted="horizontally"
+										name="comments"
+										onClick={() => setActiveItem("comments")}
+									>
+										Comments
+									</Menu.Item>
+								</Menu>
+
+								{activeItem === "interactions" && (
+									<SearchResults
+										hasMore={user.interactions.hasMore}
+										inverted={inverted}
+										justImages
+										loading={user.interactions.loading}
+										loadMore={({ page, userId }) => loadMore(page, userId)}
+										page={user.interactions.page}
+										results={user.interactions.results}
+										type="interactions"
+										userId={id}
+									/>
+								)}
+								{activeItem === "comments" && (
+									<InteractionComments
+										comments={user.comments}
+										inverted={inverted}
+										loadMoreComments={({ userId, page }) =>
+											getUserComments({ userId, page })
+										}
+										userId={id}
+									/>
+								)}
+							</Fragment>
 						)}
 					</Container>
 				)}
@@ -209,8 +260,10 @@ const User: React.FC = ({
 User.propTypes = {
 	changeProfilePic: PropTypes.func,
 	getUser: PropTypes.func,
+	getUserComments: PropTypes.func,
 	initialUser: PropTypes.shape({
 		data: PropTypes.shape({
+			commentCount: PropTypes.number,
 			createdAt: PropTypes.string,
 			id: PropTypes.number,
 			img: PropTypes.string,
@@ -226,13 +279,49 @@ User.propTypes = {
 	inverted: PropTypes.bool,
 	searchInteractions: PropTypes.func,
 	user: PropTypes.shape({
+		comments: PropTypes.shape({
+			error: PropTypes.bool,
+			errorMsg: PropTypes.string,
+			hasMore: PropTypes.bool,
+			loading: PropTypes.bool,
+			page: PropTypes.number,
+			results: PropTypes.arrayOf(
+				PropTypes.shape({
+					comments: PropTypes.shape({
+						createdAt: PropTypes.string,
+						id: PropTypes.number,
+						likeCount: PropTypes.number,
+						message: PropTypes.string,
+						respones: PropTypes.arrayOf(
+							PropTypes.shape({
+								createdAt: PropTypes.string,
+								id: PropTypes.number,
+								likeCount: PropTypes.number,
+								message: PropTypes.string,
+								userImg: PropTypes.string,
+								userName: PropTypes.string,
+								userUsername: PropTypes.string
+							})
+						),
+						userImg: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
+						userName: PropTypes.string,
+						userUsername: PropTypes.string
+					}),
+					createdAt: PropTypes.string,
+					id: PropTypes.number,
+					img: PropTypes.string,
+					title: PropTypes.string
+				})
+			)
+		}),
 		data: PropTypes.shape({
+			commentCount: PropTypes.number,
 			createdAt: PropTypes.string,
 			id: PropTypes.number,
 			img: PropTypes.string,
 			interactionCount: PropTypes.number,
 			name: PropTypes.string,
-			status: PropTypes.number,
+			status: PropTypes.string,
 			username: PropTypes.string
 		}),
 		error: PropTypes.bool,
@@ -260,6 +349,7 @@ User.propTypes = {
 User.defaultProps = {
 	changeProfilePic,
 	getUser,
+	getUserComments,
 	searchInteractions
 }
 
@@ -272,6 +362,7 @@ export default compose(
 	connect(mapStateToProps, {
 		changeProfilePic,
 		getUser,
+		getUserComments,
 		searchInteractions
 	}),
 	withTheme("dark")

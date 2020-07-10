@@ -11,7 +11,7 @@ import {
 	UpdateOfficerPayload
 } from "@interfaces/officer"
 import { GetItemPayload, PaginationPayload } from "@interfaces/options"
-import { AppDispatch } from "@store"
+import { AppDispatch } from "@store/index"
 import axios from "axios"
 import Router from "next/router"
 

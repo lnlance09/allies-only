@@ -254,7 +254,6 @@ exports.findOne = (req, res) => {
 		}
 	})
 		.then(async (data) => {
-			console.log("data", data)
 			if (data.length === 0) {
 				return res.status(200).send({
 					error: true,

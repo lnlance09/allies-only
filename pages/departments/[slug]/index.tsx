@@ -84,7 +84,7 @@ const Department: React.FC = ({
 	const router = useRouter()
 	const { slug } = router.query
 
-	const [activeItem, setActiveItem] = useState("officers")
+	const [activeItem, setActiveItem] = useState("interactions")
 	const [city, setCity] = useState("")
 	const [createMode, setCreateMode] = useState(slug === "create")
 	const [formLoading, setFormLoading] = useState(false)
@@ -316,23 +316,6 @@ const Department: React.FC = ({
 														size="big"
 													>
 														<List.Item
-															active={activeItem === "officers"}
-															onClick={() =>
-																setActiveItem("officers")
-															}
-														>
-															<b>
-																{
-																	initialDepartment.data
-																		.officerCount
-																}
-															</b>{" "}
-															{formatPlural(
-																initialDepartment.data.officerCount,
-																"officer"
-															)}
-														</List.Item>
-														<List.Item
 															active={activeItem === "interactions"}
 															onClick={() =>
 																setActiveItem("interactions")
@@ -348,6 +331,23 @@ const Department: React.FC = ({
 																initialDepartment.data
 																	.interactionCount,
 																"interaction"
+															)}
+														</List.Item>
+														<List.Item
+															active={activeItem === "officers"}
+															onClick={() =>
+																setActiveItem("officers")
+															}
+														>
+															<b>
+																{
+																	initialDepartment.data
+																		.officerCount
+																}
+															</b>{" "}
+															{formatPlural(
+																initialDepartment.data.officerCount,
+																"officer"
 															)}
 														</List.Item>
 													</List>

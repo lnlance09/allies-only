@@ -43,6 +43,7 @@ export const UPDATE_OFFICER_IMG = "officer:UPDATE_OFFICER_IMG"
 // User
 export const CHANGE_PROFILE_PIC = "user:CHANGE_PROFILE_PIC"
 export const GET_USER = "user:GET_USER"
+export const GET_USER_COMMENTS = "user:GET_USER_COMMENTS"
 export const SEARCH_USERS = "user:SEARCH_USERS"
 export const SET_USER_FETCH_ERROR = "user:SET_USER_FETCH_ERROR"
 export const UPDATE_USER = "user:UPDATE_USER"

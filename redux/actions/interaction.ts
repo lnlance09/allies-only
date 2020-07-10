@@ -18,7 +18,7 @@ import {
 	UploadVideoPayload
 } from "@interfaces/interaction"
 import { GetItemPayload, PaginationPayload } from "@interfaces/options"
-import { AppDispatch } from "@store"
+import { AppDispatch } from "@store/index"
 import axios from "axios"
 import Router from "next/router"
 
@@ -65,14 +65,18 @@ export const createInteraction = ({
 
 export const getComments = ({
 	bearer,
+	commentId,
 	interactionId,
-	page
+	page,
+	replyId
 }: GetCommentsPayload): GetCommentsAction => (dispatch: AppDispatch) => {
 	axios
 		.get("/api/comment/search", {
 			params: {
+				commentId,
 				interactionId,
-				page
+				page,
+				replyId
 			},
 			headers: {
 				Authorization: bearer
@@ -299,6 +303,7 @@ export const updateInteraction = ({
 		.then(async (response) => {
 			const { data } = response
 			if (!data.error) {
+				toast.success("Updated!")
 				callback(id)
 			}
 		})

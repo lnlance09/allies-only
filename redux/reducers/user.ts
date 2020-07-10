@@ -10,6 +10,12 @@ export const initial: InitialPageState = {
 		loading: true
 	},
 	user: {
+		comments: {
+			hasMore: true,
+			loading: true,
+			page: 0,
+			results: []
+		},
 		data: {},
 		error: false,
 		errorMsg: "",
@@ -52,6 +58,7 @@ const user = (state = initial, action: UserActionTypes): InitialPageState => {
 				user: {
 					...state.user,
 					data: {
+						commentCount: payload.user.commentCount,
 						createdAt: payload.user.createdAt,
 						id: payload.user.id,
 						img: payload.user.img,
@@ -62,6 +69,31 @@ const user = (state = initial, action: UserActionTypes): InitialPageState => {
 					},
 					error: false,
 					loading: false
+				}
+			}
+
+		case constants.GET_USER_COMMENTS:
+			if (payload.error) {
+				return {
+					...state
+				}
+			}
+
+			let commentResults = payload.comments
+			if (payload.page > 1) {
+				commentResults = [...state.user.comments.results, ...payload.comments]
+			}
+
+			return {
+				...state,
+				user: {
+					...state.user,
+					comments: {
+						hasMore: payload.hasMore,
+						loading: false,
+						page: payload.page,
+						results: commentResults
+					}
 				}
 			}
 
