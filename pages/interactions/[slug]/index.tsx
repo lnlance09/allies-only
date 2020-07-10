@@ -569,7 +569,11 @@ const Interaction: React.FC = ({
 												/>
 											)}
 										</Header>
-										<Segment className="lighter" inverted={inverted} size="big">
+										<Segment
+											className="lighter interactionDescription"
+											inverted={inverted}
+											size="big"
+										>
 											{editMode ? (
 												<Form inverted={inverted} size="big">
 													{descriptionField}
