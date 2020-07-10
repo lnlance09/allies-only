@@ -30,7 +30,7 @@ exports.create = async (req, res) => {
 		return res.status(422).send({ error: true, msg: "You must provide the department" })
 	}
 
-	if (!validator.isAlpha(firstName) || !validator.isAlpha(lastName)) {
+	if (!validator.isAlpha(firstName.trim()) || !validator.isAlpha(lastName.trim())) {
 		return res.status(422).send({ error: true, msg: "Names can only contain letters" })
 	}
 
