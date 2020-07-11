@@ -1,5 +1,5 @@
-export const baseUrl = "http://127.0.0.1:3000/"
-// export const baseUrl = "http://alliesonly.com/"
+// export const baseUrl = "http://127.0.0.1:3000/"
+export const baseUrl = "http://alliesonly.com/"
 export const s3BaseUrl = "https://alliesonly.s3-us-west-2.amazonaws.com/"
 // export const s3BaseUrl = "https://alliesonly.s3-accelerate.amazonaws.com/"
 export const siteName = "Allies Only"
