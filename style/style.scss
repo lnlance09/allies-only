@@ -210,8 +210,13 @@ body {
 
 .ui.active.visible.search.selection.dropdown {
 	.menu.visible.transition {
-		border: solid 1px rgba(0,0,0,0.5) !important;
+		background: $invertedBackgroundColor;
+		border: solid 1px rgba(255, 255, 255, 0.4) !important;
 		max-height: 260px;
+
+		.message {
+			color: $white !important;
+		}
 
 		&.upward {
 			border-bottom: none !important;
@@ -328,6 +333,12 @@ body {
 
 .mapboxgl-map {
 	border-radius: 4px !important;
+}
+
+.aboutPage {
+	p.ui.header {
+		font-weight: normal !important;
+	}
 }
 
 .aboutSection {

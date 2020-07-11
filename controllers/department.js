@@ -1,6 +1,7 @@
 /* eslint-disable */
 const Auth = require("../utils/authFunctions.js")
 const db = require("../models/index.js")
+const capitalize = require("capitalize")
 const slugify = require("slugify")
 const UsaStates = require("usa-states").UsaStates
 const validator = require("validator")
@@ -12,13 +13,16 @@ const Officer = db.officer
 const Op = db.Sequelize.Op
 
 exports.create = async (req, res) => {
-	const { city, name } = req.body
+	const { city } = req.body
+	let { name } = req.body
 
 	if (typeof name === "undefined" || name === "") {
 		return res.status(422).send({ error: true, msg: "You must provide a name" })
 	}
 
-	if (!validator.isAlpha(name.split(" ").join(""))) {
+	const _name = name.split(" ").join("").split("'").join("")
+	name = capitalize.words(name.trim())
+	if (!validator.isAlpha(_name)) {
 		return res
 			.status(401)
 			.send({ error: true, msg: "Department names can only contain letters" })

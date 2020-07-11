@@ -24,7 +24,9 @@
         @media only screen and (max-width: 1025px) {
             border: none !important;
             display: block !important;
-            width: 120% !important;
+            left: -5%;
+            max-width: none !important;
+            width: 130% !important;
         }
 
         .category {

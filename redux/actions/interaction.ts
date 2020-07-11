@@ -189,7 +189,8 @@ export const postComment = ({
 				})
 			}
 		})
-		.catch(() => {
+		.catch((error) => {
+			toast.error(error.response.data.msg)
 			dispatch({
 				type: constants.POST_COMMENT_ERROR
 			})

@@ -2,12 +2,13 @@
 const Auth = require("../utils/authFunctions.js")
 const Aws = require("../utils/awsFunctions.js")
 const db = require("../models/index.js")
+const capitalize = require("capitalize")
 const fs = require("fs")
 const randomize = require("randomatic")
 const slugify = require("slugify")
-const { thumbnail } = require("easyimage")
 const validator = require("validator")
 const waitOn = require("wait-on")
+const { thumbnail } = require("easyimage")
 /* eslint-enable */
 const Department = db.department
 const Officer = db.officer
@@ -15,7 +16,8 @@ const OfficerInteraction = db.officerInteraction
 const Op = db.Sequelize.Op
 
 exports.create = async (req, res) => {
-	const { department, firstName, lastName } = req.body
+	let { firstName, lastName } = req.body
+	const { department } = req.body
 	const { authenticated, user } = Auth.parseAuthentication(req)
 
 	if (typeof firstName === "undefined" || firstName === "") {
@@ -30,9 +32,14 @@ exports.create = async (req, res) => {
 		return res.status(422).send({ error: true, msg: "You must provide the department" })
 	}
 
-	if (!validator.isAlpha(firstName.trim()) || !validator.isAlpha(lastName.trim())) {
+	const _firstName = firstName.split(" ").join("").split("'").join("")
+	const _lastName = lastName.split(" ").join("").split("'").join("")
+	if (!validator.isAlpha(_firstName) || !validator.isAlpha(_lastName)) {
 		return res.status(422).send({ error: true, msg: "Names can only contain letters" })
 	}
+
+	firstName = capitalize.words(firstName.trim())
+	lastName = capitalize.words(lastName.trim())
 
 	const departmentCount = await Department.count({
 		col: "department.id",
