@@ -3,6 +3,8 @@ const express = require("express")
 const next = require("next")
 const bodyParser = require("body-parser")
 const fileupload = require("express-fileupload")
+const fs = require("fs")
+const https = require("https")
 const db = require("./models/index.js")
 const comments = require("./controllers/comment.js")
 const contact = require("./controllers/contact.js")
@@ -18,6 +20,11 @@ const port = parseInt(process.env.PORT, 10) || 3000
 const dev = process.env.NODE_ENV !== "production"
 const app = next({ dev })
 const handle = app.getRequestHandler()
+
+const httpsOptions = {
+	key: fs.readFileSync("./certificates/alliesonly.key"),
+	cert: fs.readFileSync("./certificates/alliesonly.crt")
+}
 
 app.prepare().then(() => {
 	const server = express()
@@ -79,10 +86,19 @@ app.prepare().then(() => {
 		return handle(req, res)
 	})
 
+	/*
 	server.listen(port, (err) => {
 		if (err) {
 			throw err
 		}
 		console.log(`> Ready on http://localhost:${port}`)
+	})
+	*/
+
+	https.createServer(httpsOptions, server).listen(port, (err) => {
+		if (err) {
+			throw err
+		}
+		console.log(`> Ready on https://localhost:${port}`)
 	})
 })
