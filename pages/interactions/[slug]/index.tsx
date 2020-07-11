@@ -640,7 +640,7 @@ const Interaction: React.FC = ({
 														className="interaction officersList"
 														inverted={inverted}
 														selection
-														size="big"
+														size="large"
 														verticalAlign="middle"
 													>
 														{interaction.data.officers.map(

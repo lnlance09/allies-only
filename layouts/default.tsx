@@ -6,7 +6,7 @@ import Footer from "@components/footer"
 import Head from "next/head"
 import Header from "@components/header"
 import PropTypes from "prop-types"
-import React, { Fragment, useState } from "react"
+import React, { Fragment, useEffect, useState } from "react"
 import Sidebar from "@components/sidebar"
 
 const DefaultLayout: React.FC = ({
@@ -24,6 +24,18 @@ const DefaultLayout: React.FC = ({
 }) => {
 	const [searchMode, setSearchMode] = useState(false)
 
+	useEffect(() => {
+		/*
+		const sc_project = 12355929
+		const sc_invisible = 1
+		const sc_security = "473549b2"
+		const sc_https = 1
+		*/
+		const script = document.createElement("script")
+		script.src = `https://www.statcounter.com/counter/counter.js`
+		script.async = true
+		document.body.appendChild(script)
+	}, [])
 	const { description, image, title, url, video } = seo
 	const fullUrl = `${baseUrl}${url}`
 
@@ -83,7 +95,12 @@ const DefaultLayout: React.FC = ({
 				<link rel="shortcut icon" href={`${baseUrl}favicon.ico`} />
 				<link rel="apple-touch-icon" sizes="128x128" href={`${baseUrl}favicon.ico`} />
 
-				<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDArCL_59nenZmhsD8v2NsbpuJzi9VRucg&libraries=places"></script>
+				<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDArCL_59nenZmhsD8v2NsbpuJzi9VRucg&amp;libraries=places"></script>
+
+				<script>
+					var sc_project = 12355929; var sc_invisible = 1; var sc_security =
+					&quot;473549b2&quot;
+				</script>
 
 				<title>
 					{title} - {siteName}
@@ -138,12 +155,6 @@ const DefaultLayout: React.FC = ({
 					{showFooter && <Footer />}
 				</Fragment>
 			)}
-
-			<script>
-				var sc_project=12355929; var sc_invisible=1; var sc_security="473549b2"; var
-				sc_https=1;
-			</script>
-			<script src="https://www.statcounter.com/counter/counter.js" async></script>
 		</div>
 	)
 }

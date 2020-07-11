@@ -190,7 +190,6 @@ const Autocomplete: React.FC = ({ category, disabled, mobileMode, placeholder, w
 				onResultSelect={onClick}
 				results={results}
 				resultRenderer={resultRenderer}
-				selectFirstResult
 			/>
 		</div>
 	)

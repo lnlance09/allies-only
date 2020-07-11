@@ -7,20 +7,13 @@ import Moment from "react-moment"
 import PropTypes from "prop-types"
 import React, { useState } from "react"
 
-const InteractionComments: React.FC = ({
-	comments,
-	inverted,
-	loading,
-	loadMoreComments,
-	page,
-	userId
-}) => {
+const InteractionComments: React.FC = ({ comments, inverted, loadMoreComments, userId }) => {
 	const router = useRouter()
 	const [fetching, setFetching] = useState(false)
 
 	return (
 		<div className="interactionComments">
-			{comments.results.length === 0 && !loading ? (
+			{comments.results.length === 0 && !comments.loading ? (
 				<Container textAlign="center">
 					<Segment inverted={inverted} placeholder>
 						<Header icon size="large">

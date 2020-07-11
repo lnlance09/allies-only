@@ -22,8 +22,8 @@ const handle = app.getRequestHandler()
 app.prepare().then(() => {
 	const server = express()
 	server.use(fileupload())
-	server.use(bodyParser.json({ limit: "50mb" }))
-	server.use(bodyParser.urlencoded({ extended: true, limit: "50mb" }))
+	server.use(bodyParser.json({ limit: "250mb" }))
+	server.use(bodyParser.urlencoded({ extended: true, limit: "250mb" }))
 	db.sequelize.sync()
 
 	// Comments
