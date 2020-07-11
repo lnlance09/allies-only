@@ -52,7 +52,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
 		}
 	}
 
-	const data = await axios.get(`${baseUrl}api/department/${params.slug}`)
+	const data = await axios.get(`/api/department/${params.slug}`)
 	if (data.data.error) {
 		initialDepartment.data = {}
 		initialDepartment.error = true
