@@ -45,6 +45,7 @@ import Comments from "@components/comments"
 import DefaultLayout from "@layouts/default"
 import DefaultPic from "@public/images/avatar/officer.png"
 import Dropzone from "react-dropzone"
+import https from "https"
 import Link from "next/link"
 import LinkedText from "@components/linkedText"
 import Moment from "react-moment"
@@ -74,7 +75,11 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
 		}
 	}
 
-	const data = await axios.get(`${baseUrl}api/interaction/${params.slug}`)
+	const data = await axios.get(`${baseUrl}api/interaction/${params.slug}`, {
+		httpsAgent: new https.Agent({
+			rejectUnauthorized: false
+		})
+	})
 	if (data.data.error) {
 		initialInteraction.data = {
 			department: {},

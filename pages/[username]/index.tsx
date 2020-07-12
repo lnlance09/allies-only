@@ -14,6 +14,7 @@ import { withTheme } from "@redux/ThemeProvider"
 import { compose } from "redux"
 import { baseUrl } from "@options/config"
 import axios from "axios"
+import https from "https"
 import InteractionComments from "@components/interactionComments"
 import DefaultLayout from "@layouts/default"
 import DefaultPic from "@public/images/avatar/large/joe.jpg"
@@ -35,7 +36,11 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
 		}
 	}
 
-	const data = await axios.get(`${baseUrl}api/user/${params.username}`)
+	const data = await axios.get(`${baseUrl}api/user/${params.username}`, {
+		httpsAgent: new https.Agent({
+			rejectUnauthorized: false
+		})
+	})
 	if (data.data.error) {
 		initialUser.data = {}
 		initialUser.error = true
