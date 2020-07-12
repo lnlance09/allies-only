@@ -88,10 +88,10 @@ const DefaultLayout: React.FC = ({
 				<script
 					dangerouslySetInnerHTML={{
 						__html: `var sc_project = 12355929; var sc_invisible = 1; var sc_security =
-						"473549b2";`
+						"473549b2"; var sc_https=1;`
 					}}
 				/>
-				<script async src="https://www.statcounter.com/counter/counter.js"></script>
+				<script async src="https://www.statcounter.com/counter/counter.js" />
 
 				<title>
 					{title} - {siteName}
