@@ -97,6 +97,16 @@ const DefaultLayout: React.FC = ({
 				<link rel="shortcut icon" href={`${baseUrl}favicon.ico`} />
 				<link rel="apple-touch-icon" sizes="128x128" href={`${baseUrl}favicon.ico`} />
 
+				<script
+					dangerouslySetInnerHTML={{
+						__html: `var sc_project=12356992; 
+						var sc_invisible=1; 
+						var sc_security="dd49a550"; 
+						var sc_https=1;`
+					}}
+				/>
+				<script async src="https://www.statcounter.com/counter/counter.js" />
+
 				<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDArCL_59nenZmhsD8v2NsbpuJzi9VRucg&amp;libraries=places"></script>
 
 				<title>
