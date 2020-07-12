@@ -374,6 +374,7 @@ body {
 .ui.segment.interactionDescription span {
 	line-height: 1.4 !important;
 	white-space: pre-wrap !important;
+	word-break: break-word !important;
 
 	a {
 		padding-bottom: 2px !important;
