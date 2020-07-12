@@ -438,7 +438,9 @@ exports.saveVideo = async (req, res) => {
 						fs.unlinkSync(video.file)
 
 						await waitOn({
-							resources: [`https://alliesonly.s3-us-west-2.amazonaws.com/${filePath}`]
+							resources: [
+								`https://alliesonly.s3-accelerate.amazonaws.com/${filePath}`
+							]
 						})
 						return res.status(200).send({
 							error: false,
@@ -515,7 +517,7 @@ exports.saveVideo = async (req, res) => {
 
 							await waitOn({
 								resources: [
-									`https://alliesonly.s3-us-west-2.amazonaws.com/${filePath}`
+									`https://alliesonly.s3-accelerate.amazonaws.com/${filePath}`
 								]
 							})
 							return res.status(200).send({
@@ -727,7 +729,7 @@ exports.uploadVideo = async (req, res) => {
 
 								await waitOn({
 									resources: [
-										`https://alliesonly.s3-us-west-2.amazonaws.com/${fileName}`
+										`https://alliesonly.s3-accelerate.amazonaws.com/${fileName}`
 									]
 								})
 								return res.status(200).send({
@@ -778,7 +780,9 @@ exports.uploadVideo = async (req, res) => {
 						fs.unlinkSync(`uploads/${fileId}${ext}`)
 
 						await waitOn({
-							resources: [`https://alliesonly.s3-us-west-2.amazonaws.com/${fileName}`]
+							resources: [
+								`https://alliesonly.s3-accelerate.amazonaws.com/${fileName}`
+							]
 						})
 						return res.status(200).send({
 							error: false,
