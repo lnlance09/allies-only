@@ -26,7 +26,10 @@ const DefaultLayout: React.FC = ({
 
 	useEffect(() => {
 		const scScript = document.createElement("script")
-		scScript.innerHTML = `var sc_project=12355929;var sc_invisible=1;var sc_security="473549b2";var sc_https=1;`
+		scScript.innerHTML = `var sc_project=12356992; 
+		var sc_invisible=1; 
+		var sc_security="dd49a550"; 
+		var sc_https=1;`
 		document.body.appendChild(scScript)
 
 		const script = document.createElement("script")
