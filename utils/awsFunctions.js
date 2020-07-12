@@ -6,7 +6,8 @@ const bucketName = "alliesonly"
 
 const s3 = new AWS.S3({
 	accessKeyId: "AKIA3KB7ZZF26C4NLY6O",
-	secretAccessKey: "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"
+	secretAccessKey: "+Vx/jgfwNZ/obO3vUpdGAqTHoTEqnaZlzmMFSf7A",
+	useAccelerateEndpoint: true
 })
 
 module.exports = {
