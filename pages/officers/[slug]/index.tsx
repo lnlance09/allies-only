@@ -28,6 +28,7 @@ import { baseUrl, s3BaseUrl } from "@options/config"
 import axios from "axios"
 import DefaultLayout from "@layouts/default"
 import DefaultPic from "@public/images/avatar/officer.png"
+import https from "https"
 import ImageUpload from "@components/imageUpload"
 import Link from "next/link"
 import PropTypes from "prop-types"
@@ -54,7 +55,11 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
 		}
 	}
 
-	const data = await axios.get(`${baseUrl}api/officer/${params.slug}`)
+	const data = await axios.get(`${baseUrl}api/officer/${params.slug}`, {
+		httpsAgent: new https.Agent({
+			rejectUnauthorized: false
+		})
+	})
 	if (data.data.error) {
 		initialOfficer.data = {}
 		initialOfficer.error = true
