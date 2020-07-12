@@ -86,19 +86,19 @@ app.prepare().then(() => {
 		return handle(req, res)
 	})
 
+	/*
 	server.listen(port, (err) => {
 		if (err) {
 			throw err
 		}
 		console.log(`> Ready on http://localhost:${port}`)
 	})
+	*/
 
-	/*
 	https.createServer(httpsOptions, server).listen(port, (err) => {
 		if (err) {
 			throw err
 		}
 		console.log(`> Ready on https://localhost:${port}`)
 	})
-	*/
 })
