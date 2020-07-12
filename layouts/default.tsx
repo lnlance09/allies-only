@@ -6,7 +6,7 @@ import Footer from "@components/footer"
 import Head from "next/head"
 import Header from "@components/header"
 import PropTypes from "prop-types"
-import React, { Fragment, useState } from "react"
+import React, { Fragment, useEffect, useState } from "react"
 import Sidebar from "@components/sidebar"
 
 const DefaultLayout: React.FC = ({
@@ -23,6 +23,17 @@ const DefaultLayout: React.FC = ({
 	useGrid
 }) => {
 	const [searchMode, setSearchMode] = useState(false)
+
+	useEffect(() => {
+		const scScript = document.createElement("script")
+		scScript.innerHTML = `var sc_project=12355929;var sc_invisible=1;var sc_security="473549b2";var sc_https=1;`
+		document.body.appendChild(scScript)
+
+		const script = document.createElement("script")
+		script.async = true
+		script.src = "https://www.statcounter.com/counter/counter.js"
+		document.body.appendChild(script)
+	}, [])
 
 	const { description, image, title, url, video } = seo
 	const fullUrl = `${baseUrl}${url}`
@@ -138,14 +149,6 @@ const DefaultLayout: React.FC = ({
 					{showFooter && <Footer />}
 				</Fragment>
 			)}
-
-			<script
-				dangerouslySetInnerHTML={{
-					__html: `var sc_project = 12355929; var sc_invisible = 1; var sc_security =
-						"473549b2"; var sc_https=1;`
-				}}
-			/>
-			<script async src="https://www.statcounter.com/counter/counter.js" />
 		</div>
 	)
 }
