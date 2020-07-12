@@ -85,14 +85,6 @@ const DefaultLayout: React.FC = ({
 
 				<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDArCL_59nenZmhsD8v2NsbpuJzi9VRucg&amp;libraries=places"></script>
 
-				<script
-					dangerouslySetInnerHTML={{
-						__html: `var sc_project = 12355929; var sc_invisible = 1; var sc_security =
-						"473549b2"; var sc_https=1;`
-					}}
-				/>
-				<script async src="https://www.statcounter.com/counter/counter.js" />
-
 				<title>
 					{title} - {siteName}
 				</title>
@@ -146,6 +138,14 @@ const DefaultLayout: React.FC = ({
 					{showFooter && <Footer />}
 				</Fragment>
 			)}
+
+			<script
+				dangerouslySetInnerHTML={{
+					__html: `var sc_project = 12355929; var sc_invisible = 1; var sc_security =
+						"473549b2"; var sc_https=1;`
+				}}
+			/>
+			<script async src="https://www.statcounter.com/counter/counter.js" />
 		</div>
 	)
 }
