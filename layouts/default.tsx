@@ -24,7 +24,6 @@ const DefaultLayout: React.FC = ({
 }) => {
 	const [searchMode, setSearchMode] = useState(false)
 
-	/*
 	useEffect(() => {
 		const scScript = document.createElement("script")
 		scScript.innerHTML = `var sc_project=12356992; 
@@ -38,7 +37,6 @@ const DefaultLayout: React.FC = ({
 		script.src = "https://www.statcounter.com/counter/counter.js"
 		document.body.appendChild(script)
 	}, [])
-	*/
 
 	const { description, image, title, url, video } = seo
 	const fullUrl = `${baseUrl}${url}`
@@ -99,6 +97,7 @@ const DefaultLayout: React.FC = ({
 				<link rel="shortcut icon" href={`${baseUrl}favicon.ico`} />
 				<link rel="apple-touch-icon" sizes="128x128" href={`${baseUrl}favicon.ico`} />
 
+				{/*
 				<script
 					dangerouslySetInnerHTML={{
 						__html: `var sc_project=12356992; 
@@ -108,6 +107,7 @@ const DefaultLayout: React.FC = ({
 					}}
 				/>
 				<script async src="https://www.statcounter.com/counter/counter.js" />
+				*/}
 
 				<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDArCL_59nenZmhsD8v2NsbpuJzi9VRucg&amp;libraries=places"></script>
 
