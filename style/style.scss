@@ -385,3 +385,11 @@ body {
 		}
 	}
 }
+
+.officerDepartmentLink {
+	padding-bottom: 2px;
+
+	&:hover {
+		border-bottom: solid 1px $lightGrey;
+	}
+}
