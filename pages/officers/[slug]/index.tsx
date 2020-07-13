@@ -9,6 +9,7 @@ import {
 	Form,
 	Grid,
 	Header,
+	Image,
 	Input,
 	List,
 	Loader
@@ -91,6 +92,7 @@ const Officer: React.FC = ({
 	const router = useRouter()
 	const { departmentId, slug } = router.query
 
+	const [authenticated, setAuthenticated] = useState(false)
 	const [bearer, setBearer] = useState(null)
 	const [createMode, setCreateMode] = useState(slug === "create")
 	const [department, setDepartment] = useState("")
@@ -103,6 +105,7 @@ const Officer: React.FC = ({
 		const getInitialProps = async () => {
 			const userData = parseJwt()
 			if (userData) {
+				setAuthenticated(true)
 				setBearer(localStorage.getItem("jwtToken"))
 			}
 
@@ -283,20 +286,34 @@ const Officer: React.FC = ({
 										<Grid>
 											<Grid.Row>
 												<Grid.Column width={5}>
-													<ImageUpload
-														bearer={bearer}
-														callback={(bearer, file, id) =>
-															updateImg({ bearer, file, id })
-														}
-														fluid
-														id={officer.data.id}
-														img={
-															officer.data.img === null
-																? DefaultPic
-																: officer.data.img
-														}
-														inverted={inverted}
-													/>
+													{authenticated ? (
+														<ImageUpload
+															bearer={bearer}
+															callback={(bearer, file, id) =>
+																updateImg({ bearer, file, id })
+															}
+															fluid
+															id={officer.data.id}
+															img={
+																officer.data.img === null
+																	? DefaultPic
+																	: officer.data.img
+															}
+															inverted={inverted}
+														/>
+													) : (
+														<Image
+															onError={(i) =>
+																(i.target.src = DefaultPic)
+															}
+															rounded
+															src={
+																officer.data.img === null
+																	? DefaultPic
+																	: officer.data.img
+															}
+														/>
+													)}
 												</Grid.Column>
 												<Grid.Column width={11}>
 													{!initialOfficer.loading && (

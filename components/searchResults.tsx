@@ -55,13 +55,17 @@ const SearchResults: React.FC = ({
 									<span>{meta}</span>
 								</Item.Meta>
 								<Item.Description>
-									<Label color="yellow">
-										{interactionCount}{" "}
-										{formatPlural(interactionCount, "interaction")}
-									</Label>
-									<Label color="orange">
-										{officerCount} {formatPlural(officerCount, "officer")}
-									</Label>
+									{interactionCount > 0 && (
+										<Label color="yellow">
+											{interactionCount}{" "}
+											{formatPlural(interactionCount, "interaction")}
+										</Label>
+									)}
+									{officerCount > 0 && (
+										<Label color="orange">
+											{officerCount} {formatPlural(officerCount, "officer")}
+										</Label>
+									)}
 								</Item.Description>
 							</Item.Content>
 						</Item>
@@ -126,10 +130,12 @@ const SearchResults: React.FC = ({
 								</Item.Header>
 								<Item.Meta>{result.departmentName}</Item.Meta>
 								<Item.Description>
-									<Label color="orange">
-										{result.interactionCount}{" "}
-										{formatPlural(result.interactionCount, "interaction")}
-									</Label>
+									{result.interactionCount > 0 && (
+										<Label color="orange">
+											{result.interactionCount}{" "}
+											{formatPlural(result.interactionCount, "interaction")}
+										</Label>
+									)}
 								</Item.Description>
 							</Item.Content>
 						</Item>
@@ -156,10 +162,12 @@ const SearchResults: React.FC = ({
 								<Item.Header>{result.name}</Item.Header>
 								<Item.Meta>@{result.username}</Item.Meta>
 								<Item.Description>
-									<Label color="orange">
-										{result.interactionCount}{" "}
-										{formatPlural(result.interactionCount, "interaction")}
-									</Label>
+									{result.interactionCount > 0 && (
+										<Label color="orange">
+											{result.interactionCount}{" "}
+											{formatPlural(result.interactionCount, "interaction")}
+										</Label>
+									)}
 								</Item.Description>
 							</Item.Content>
 						</Item>
