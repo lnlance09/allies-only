@@ -24,6 +24,7 @@ const DefaultLayout: React.FC = ({
 }) => {
 	const [searchMode, setSearchMode] = useState(false)
 
+	/*
 	useEffect(() => {
 		const scScript = document.createElement("script")
 		scScript.innerHTML = `var sc_project=12356992; 
@@ -37,6 +38,7 @@ const DefaultLayout: React.FC = ({
 		script.src = "https://www.statcounter.com/counter/counter.js"
 		document.body.appendChild(script)
 	}, [])
+	*/
 
 	const { description, image, title, url, video } = seo
 	const fullUrl = `${baseUrl}${url}`
