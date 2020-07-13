@@ -325,7 +325,7 @@ const Officer: React.FC = ({
 																	<Link
 																		href={`/departments/${initialOfficer.data.departmentSlug}`}
 																	>
-																		<a>
+																		<a className="officerDepartmentLink">
 																			{
 																				initialOfficer.data
 																					.departmentName
