@@ -13,6 +13,8 @@ const validator = require("validator")
 const waitOn = require("wait-on")
 const youtubedl = require("youtube-dl")
 /* eslint-enable */
+const Comment = db.comment
+const CommentResponse = db.commentResponse
 const Department = db.department
 const Interaction = db.interaction
 const Officer = db.officer
@@ -135,7 +137,19 @@ exports.findAll = (req, res) => {
 		[db.Sequelize.col("interaction.views"), "views"],
 		[db.Sequelize.col("department.name"), "departmentName"],
 		[db.Sequelize.col("department.slug"), "departmentSlug"],
-		[db.Sequelize.col("officerInteractions.officerId"), "officerId"]
+		[db.Sequelize.col("officerInteractions.officerId"), "officerId"],
+		[db.Sequelize.col("user.name"), "userName"],
+		[
+			db.Sequelize.fn("COUNT", db.Sequelize.fn("DISTINCT", db.Sequelize.col("comments.id"))),
+			"commentCount"
+		],
+		[
+			db.Sequelize.fn(
+				"COUNT",
+				db.Sequelize.fn("DISTINCT", db.Sequelize.col("comments->commentResponses.id"))
+			),
+			"responseCount"
+		]
 	]
 
 	const departmentWhere = {}
@@ -188,6 +202,19 @@ exports.findAll = (req, res) => {
 			model: User,
 			required: userRequired,
 			where: userWhere
+		},
+		{
+			attributes: [],
+			include: [
+				{
+					attributes: [],
+					model: CommentResponse,
+					required: false
+				}
+			],
+			model: Comment,
+			required: false,
+			subQuery: false
 		}
 	]
 

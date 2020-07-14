@@ -2,13 +2,17 @@ import {
 	CHANGE_PROFILE_PIC,
 	GET_USER,
 	GET_USER_COMMENTS,
+	UPDATE_USER,
 	SEARCH_USERS,
-	SET_USER_FETCH_ERROR
+	SET_USER_FETCH_ERROR,
+	SET_USER_UPDATE_ERROR
 } from "@redux/constants"
 import { Interaction, SearchInteractionsAction } from "./interaction"
 import { Comment } from "./comment"
 
 export interface User {
+	bio: string;
+	commentCount?: number;
 	createdAt?: string;
 	id: number;
 	img: string;
@@ -33,6 +37,12 @@ export interface GetUserPayload {
 export interface GetUserCommentsPayload {
 	page: number;
 	userId: number;
+}
+
+export interface UpdateUserPayload {
+	bearer: string;
+	bio: string;
+	callback: void;
 }
 
 /* Reducers */
@@ -79,6 +89,19 @@ export interface SetUserErrorAction {
 	type: typeof SET_USER_FETCH_ERROR;
 }
 
+export interface SetUserUpdateErrorAction {
+	type: typeof SET_USER_UPDATE_ERROR;
+}
+
+export interface UpdateUserAction {
+	payload: {
+		bio: string,
+		error: boolean,
+		msg: string
+	};
+	type: typeof UPDATE_USER;
+}
+
 export type UserActionTypes =
 	| ChangeProfilePicAction
 	| GetUserAction
@@ -86,3 +109,5 @@ export type UserActionTypes =
 	| SearchInteractionsAction
 	| SearchUsersAction
 	| SetUserErrorAction
+	| SetUserUpdateErrorAction
+	| UpdateUserAction

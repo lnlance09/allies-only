@@ -1,4 +1,14 @@
-import { Card, Container, Header, Image, Item, Label, Segment, Visibility } from "semantic-ui-react"
+import {
+	Card,
+	Container,
+	Header,
+	Icon,
+	Image,
+	Item,
+	Label,
+	Segment,
+	Visibility
+} from "semantic-ui-react"
 import { formatPlural } from "@utils/textFunctions"
 import { s3BaseUrl } from "@options/config"
 import AllyPic from "@public/images/avatar/large/joe.jpg"
@@ -83,6 +93,10 @@ const SearchResults: React.FC = ({
 				stackable
 			>
 				{results.map((result, i) => {
+					const totalCommentCount = parseInt(
+						result.commentCount + result.responseCount,
+						10
+					)
 					return (
 						<Card
 							fluid
@@ -98,11 +112,17 @@ const SearchResults: React.FC = ({
 								<Card.Header>{result.title}</Card.Header>
 								<Card.Meta>
 									<Moment date={result.createdAt} fromNow />•{" "}
-									<span>{result.departmentName}</span>
+									<span>{result.userName}</span>
 								</Card.Meta>
 								<Card.Description className="interactionDescription">
 									{result.description}
 								</Card.Description>
+							</Card.Content>
+							<Card.Content extra>
+								<Icon inverted={inverted} name="comment" />
+								<span className="commentCount">
+									{totalCommentCount} {formatPlural(totalCommentCount, "comment")}
+								</span>
 							</Card.Content>
 						</Card>
 					)
@@ -159,16 +179,19 @@ const SearchResults: React.FC = ({
 								src={result.img === null ? AllyPic : `${s3BaseUrl}${result.img}`}
 							/>
 							<Item.Content>
-								<Item.Header>{result.name}</Item.Header>
-								<Item.Meta>@{result.username}</Item.Meta>
-								<Item.Description>
-									{result.interactionCount > 0 && (
+								<Item.Header>
+									{result.name}{" "}
+									<span className="username">@{result.username}</span>
+								</Item.Header>
+								<Item.Meta>
+									<span style={{ display: "block", marginTop: "10px" }}>
 										<Label color="orange">
 											{result.interactionCount}{" "}
 											{formatPlural(result.interactionCount, "interaction")}
 										</Label>
-									)}
-								</Item.Description>
+									</span>
+								</Item.Meta>
+								<Item.Description>{result.bio}</Item.Description>
 							</Item.Content>
 						</Item>
 					)
@@ -221,23 +244,47 @@ SearchResults.propTypes = {
 		PropTypes.oneOfType([
 			PropTypes.bool,
 			PropTypes.shape({
-				caption: PropTypes.string,
+				bio: PropTypes.string,
+				commentCount: PropTypes.number,
 				createdAt: PropTypes.string,
-				createdBy: PropTypes.number,
 				id: PropTypes.number,
 				img: PropTypes.string,
-				likes: PropTypes.number,
+				interactionCount: PropTypes.number,
 				name: PropTypes.string,
-				s3Link: PropTypes.string,
-				templateName: PropTypes.string,
-				username: PropTypes.string,
-				views: PropTypes.number
+				status: PropTypes.number,
+				username: PropTypes.string
+			}),
+			PropTypes.shape({
+				city: PropTypes.string,
+				county: PropTypes.string,
+				id: PropTypes.number,
+				interactionCount: PropTypes.number,
+				lat: PropTypes.string,
+				lon: PropTypes.string,
+				name: PropTypes.string,
+				officerCount: PropTypes.number,
+				state: PropTypes.string,
+				type: PropTypes.number
 			}),
 			PropTypes.shape({
 				createdAt: PropTypes.string,
+				commentCount: PropTypes.number,
+				description: PropTypes.string,
 				img: PropTypes.string,
-				name: PropTypes.string,
-				username: PropTypes.string
+				userName: PropTypes.string,
+				video: PropTypes.string
+			}),
+			PropTypes.shape({
+				createdAt: PropTypes.string,
+				departmentId: PropTypes.number,
+				departmentName: PropTypes.string,
+				departmentSlug: PropTypes.string,
+				firstName: PropTypes.string,
+				id: PropTypes.number,
+				img: PropTypes.string,
+				interactionCount: PropTypes.number,
+				lastName: PropTypes.string,
+				position: PropTypes.string
 			})
 		])
 	),

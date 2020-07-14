@@ -9,7 +9,8 @@ import {
 	GetUserCommentsAction,
 	GetUserCommentsPayload,
 	GetUserPayload,
-	SetUserErrorAction
+	SetUserErrorAction,
+	UpdateUserPayload
 } from "@interfaces/user"
 import { PaginationPayload } from "@interfaces/options"
 import { AppDispatch } from "@store/index"
@@ -118,6 +119,37 @@ export const searchUsers = ({ page = 0, q = "" }: PaginationPayload): void => (
 		.catch(() => {
 			dispatch({
 				type: constants.SET_USER_FETCH_ERROR
+			})
+		})
+}
+
+export const updateUser = ({ bearer, bio, callback = () => null }: UpdateUserPayload): void => (
+	dispatch: AppDispatch
+) => {
+	const formData = new FormData()
+	formData.set("bio", bio)
+
+	axios
+		.post("/api/user/update", formData, {
+			headers: {
+				Authorization: bearer
+			}
+		})
+		.then((response) => {
+			const { data } = response
+			if (!data.error) {
+				toast.success("Updated")
+				callback()
+			}
+
+			dispatch({
+				payload: data,
+				type: constants.UPDATE_USER
+			})
+		})
+		.catch(() => {
+			dispatch({
+				type: constants.SET_USER_UPDATE_ERROR
 			})
 		})
 }

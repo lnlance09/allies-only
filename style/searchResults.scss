@@ -44,6 +44,11 @@
 					.meta {
 						color: $offWhite !important;
 					}
+
+					.description {
+						color: $white;
+						font-size: 15px;
+					}
 				}
 			}
 
@@ -78,6 +83,16 @@
 						overflow: hidden;
 						-webkit-box-orient: vertical;
 						-webkit-line-clamp: 3;
+					}
+
+					&.extra {
+						background: lighten($invertedBackgroundColor, 4%) !important;
+
+						.commentCount {
+							color: $white;
+							font-size: 15px;
+							padding: 0 4px;
+						}
 					}
 				}
 			}

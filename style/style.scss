@@ -393,3 +393,11 @@ body {
 		border-bottom: solid 1px $lightGrey;
 	}
 }
+
+.header {
+	span.username {
+		color: darken($lightGrey, 4%) !important;
+		font-size: 14px !important;
+		line-height: 20px !important;
+	}
+}

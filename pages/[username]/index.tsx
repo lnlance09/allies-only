@@ -1,11 +1,20 @@
 import { searchInteractions } from "@actions/interaction"
-import { changeProfilePic, getUser, getUserComments } from "@actions/user"
-import { Button, Container, Grid, Header, Image, Label, Menu, Placeholder } from "semantic-ui-react"
+import { changeProfilePic, getUser, getUserComments, updateUser } from "@actions/user"
+import {
+	Button,
+	Container,
+	Grid,
+	Header,
+	Image,
+	Menu,
+	Placeholder,
+	Form,
+	TextArea
+} from "semantic-ui-react"
 import { RootState } from "@store/reducer"
 import { GetServerSideProps } from "next"
 import { initial } from "@reducers/user"
 import { InitialPageState } from "@interfaces/options"
-import { formatPlural } from "@utils/textFunctions"
 import { s3BaseUrl } from "@options/config"
 import { parseJwt } from "@utils/tokenFunctions"
 import { useRouter } from "next/router"
@@ -67,16 +76,19 @@ const User: React.FC = ({
 	initialUser,
 	inverted,
 	searchInteractions,
+	updateUser,
 	user
 }) => {
 	const router = useRouter()
 	const username = router.asPath.substr(1)
 
-	const { createdAt, id, img, interactionCount, name } = user.data
+	const { createdAt, id, img, name } = user.data
 
 	const [activeItem, setActiveItem] = useState("interactions")
+	const [bio, setBio] = useState(initialUser.data.bio)
 	const [bearer, setBearer] = useState(null)
 	const [currentUser, setCurrentUser] = useState({})
+	const [editingBio, setEditingBio] = useState(false)
 
 	useEffect(() => {
 		if (typeof username !== "undefined") {
@@ -176,26 +188,74 @@ const User: React.FC = ({
 										<Fragment>
 											<Header as="h1" inverted={inverted}>
 												{name}
+
+												{currentUser.id === id && (
+													<Button
+														color={editingBio ? "red" : "yellow"}
+														compact
+														content={editingBio ? "Cancel" : "Edit"}
+														icon="pencil"
+														inverted={inverted}
+														onClick={() => setEditingBio(!editingBio)}
+														style={{ float: "right" }}
+													/>
+												)}
+
 												<Header.Subheader>
 													Joined <Moment date={createdAt} fromNow />
 												</Header.Subheader>
 											</Header>
 
-											<Label color="yellow" size="large">
-												{initialUser.data.interactionCount}{" "}
-												{formatPlural(
-													initialUser.data.interactionCount,
-													"interaction"
-												)}
-											</Label>
-
-											<Label color="orange" size="large">
-												{initialUser.data.commentCount}{" "}
-												{formatPlural(
-													initialUser.data.commentCount,
-													"comment"
-												)}
-											</Label>
+											{currentUser.id === id ? (
+												<Fragment>
+													{editingBio ? (
+														<Form
+															inverted={inverted}
+															style={{ marginTop: "12px" }}
+														>
+															<TextArea
+																fluid
+																onChange={(e, { value }) =>
+																	setBio(value)
+																}
+																rows={6}
+																value={bio}
+															/>
+															<Button
+																color="orange"
+																content="Update"
+																fluid
+																maxLength={340}
+																onClick={() =>
+																	updateUser({
+																		bearer,
+																		bio,
+																		callback: () =>
+																			setEditingBio(false)
+																	})
+																}
+																style={{ marginTop: "12px" }}
+															/>
+														</Form>
+													) : (
+														<Header
+															as="p"
+															inverted={inverted}
+															style={{ fontWeight: "normal" }}
+														>
+															{user.data.bio}
+														</Header>
+													)}
+												</Fragment>
+											) : (
+												<Header
+													as="p"
+													inverted={inverted}
+													style={{ fontWeight: "normal" }}
+												>
+													{user.data.bio}
+												</Header>
+											)}
 										</Fragment>
 									)}
 								</Grid.Column>
@@ -268,6 +328,7 @@ User.propTypes = {
 	getUserComments: PropTypes.func,
 	initialUser: PropTypes.shape({
 		data: PropTypes.shape({
+			bio: PropTypes.string,
 			commentCount: PropTypes.number,
 			createdAt: PropTypes.string,
 			id: PropTypes.number,
@@ -283,6 +344,7 @@ User.propTypes = {
 	}),
 	inverted: PropTypes.bool,
 	searchInteractions: PropTypes.func,
+	updateUser: PropTypes.func,
 	user: PropTypes.shape({
 		comments: PropTypes.shape({
 			error: PropTypes.bool,
@@ -320,6 +382,7 @@ User.propTypes = {
 			)
 		}),
 		data: PropTypes.shape({
+			bio: PropTypes.string,
 			commentCount: PropTypes.number,
 			createdAt: PropTypes.string,
 			id: PropTypes.number,
@@ -355,7 +418,8 @@ User.defaultProps = {
 	changeProfilePic,
 	getUser,
 	getUserComments,
-	searchInteractions
+	searchInteractions,
+	updateUser
 }
 
 const mapStateToProps = (state: RootState, ownProps: InitialPageState) => ({
@@ -368,7 +432,8 @@ export default compose(
 		changeProfilePic,
 		getUser,
 		getUserComments,
-		searchInteractions
+		searchInteractions,
+		updateUser
 	}),
 	withTheme("dark")
 )(User)
