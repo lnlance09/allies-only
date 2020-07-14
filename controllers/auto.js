@@ -1,6 +1,7 @@
 /* eslint-disable */
 const db = require("../models/index.js")
 const faker = require("faker")
+const Names = require("../utils/nameFunctions.js")
 const rn = require("random-number")
 const sha1 = require("sha1")
 /* eslint-enable */
@@ -47,8 +48,8 @@ exports.createUsers = async (req, res) => {
 		// console.log("image", image)
 		const random = Math.floor(Math.random() * 10) + 1
 		const email = faker.internet.email()
-		const firstName = faker.name.firstName()
-		const lastName = faker.name.lastName()
+		const firstName = Names.getFirstName()
+		const lastName = Names.getLastName()
 		const name = `${firstName} ${lastName}`
 		const status = random > 8 ? 1 : 2
 
@@ -73,8 +74,7 @@ exports.createUsers = async (req, res) => {
 			username
 		}
 
-		console.log(userData)
-
+		// console.log(userData)
 		User.create(userData)
 			.then(() => {
 				console.log(`User ${name}, ${email} created!`)
