@@ -210,11 +210,12 @@ const User: React.FC = ({
 												<Fragment>
 													{editingBio ? (
 														<Form
+															className="editBioForm"
 															inverted={inverted}
-															style={{ marginTop: "12px" }}
 														>
 															<TextArea
 																fluid
+																maxLength={280}
 																onChange={(e, { value }) =>
 																	setBio(value)
 																}
@@ -225,7 +226,6 @@ const User: React.FC = ({
 																color="orange"
 																content="Update"
 																fluid
-																maxLength={340}
 																onClick={() =>
 																	updateUser({
 																		bearer,
@@ -234,14 +234,13 @@ const User: React.FC = ({
 																			setEditingBio(false)
 																	})
 																}
-																style={{ marginTop: "12px" }}
 															/>
 														</Form>
 													) : (
 														<Header
 															as="p"
+															className="userBio desktop"
 															inverted={inverted}
-															style={{ fontWeight: "normal" }}
 														>
 															{user.data.bio}
 														</Header>
@@ -250,8 +249,8 @@ const User: React.FC = ({
 											) : (
 												<Header
 													as="p"
+													className="userBio desktop"
 													inverted={inverted}
-													style={{ fontWeight: "normal" }}
 												>
 													{user.data.bio}
 												</Header>
@@ -261,6 +260,10 @@ const User: React.FC = ({
 								</Grid.Column>
 							</Grid.Row>
 						</Grid>
+
+						<Header as="p" className="userBio mobile" inverted={inverted}>
+							{user.data.bio}
+						</Header>
 
 						{!user.error && !user.loading && (
 							<Fragment>
