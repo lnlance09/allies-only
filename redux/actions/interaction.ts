@@ -204,6 +204,7 @@ export const resetToInitial = (): ResetInteractionAction => (dispatch: AppDispat
 }
 
 export const searchInteractions = ({
+	callback = () => null,
 	departmentId,
 	exclude,
 	officerId,
@@ -228,6 +229,7 @@ export const searchInteractions = ({
 				payload: data,
 				type: constants.SEARCH_INTERACTIONS
 			})
+			callback()
 		})
 		.catch((error) => {
 			console.log(error)

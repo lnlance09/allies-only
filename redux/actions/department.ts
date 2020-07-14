@@ -68,9 +68,11 @@ export const getDepartment = ({
 		})
 }
 
-export const searchDepartments = ({ page = 0, q }: PaginationPayload): SearchDepartmentsAction => (
-	dispatch: AppDispatch
-) => {
+export const searchDepartments = ({
+	callback = () => null,
+	page = 0,
+	q
+}: PaginationPayload): SearchDepartmentsAction => (dispatch: AppDispatch) => {
 	axios
 		.get("/api/department/search", {
 			params: {
@@ -84,6 +86,7 @@ export const searchDepartments = ({ page = 0, q }: PaginationPayload): SearchDep
 				payload: data,
 				type: constants.SEARCH_DEPARTMENTS
 			})
+			callback()
 		})
 		.catch((error) => {
 			console.log(error)

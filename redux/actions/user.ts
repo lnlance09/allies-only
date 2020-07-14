@@ -99,9 +99,11 @@ export const getUserComments = ({
 		.catch(() => null)
 }
 
-export const searchUsers = ({ page = 0, q = "" }: PaginationPayload): void => (
-	dispatch: AppDispatch
-) => {
+export const searchUsers = ({
+	callback = () => null,
+	page = 0,
+	q = ""
+}: PaginationPayload): void => (dispatch: AppDispatch) => {
 	axios
 		.get("/api/user/search", {
 			params: {
@@ -109,12 +111,13 @@ export const searchUsers = ({ page = 0, q = "" }: PaginationPayload): void => (
 				q
 			}
 		})
-		.then((response) => {
+		.then(async (response) => {
 			const { data } = response
 			dispatch({
 				payload: data,
 				type: constants.SEARCH_USERS
 			})
+			callback()
 		})
 		.catch(() => {
 			dispatch({

@@ -87,6 +87,7 @@ export const resetToInitial = (): ResetOfficerAction => (dispatch: AppDispatch):
 }
 
 export const searchOfficers = ({
+	callback = () => null,
 	departmentId = null,
 	page = 0,
 	q = null
@@ -105,6 +106,7 @@ export const searchOfficers = ({
 				payload: data,
 				type: constants.SEARCH_OFFICERS
 			})
+			callback()
 		})
 		.catch((error) => {
 			console.log(error)

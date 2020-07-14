@@ -25,10 +25,6 @@ const Allies: React.FC = ({ inverted, searchUsers, users }) => {
 		setSearchVal(q)
 	}, [q])
 
-	const loadMore = (page, q) => {
-		return searchUsers({ page, q })
-	}
-
 	const searchForResults = (e) => {
 		const q = e.target.value
 		setSearchVal(q)
@@ -76,7 +72,7 @@ const Allies: React.FC = ({ inverted, searchUsers, users }) => {
 						hasMore={users.hasMore}
 						inverted={inverted}
 						loading={users.loading}
-						loadMore={({ page, q }) => loadMore(page, q)}
+						loadMore={({ callback, page, q }) => searchUsers({ callback, page, q })}
 						page={users.page}
 						q={searchVal}
 						results={users.results}

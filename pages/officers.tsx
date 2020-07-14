@@ -25,10 +25,6 @@ const Officers: React.FC = ({ inverted, officers, searchOfficers }) => {
 		setSearchVal(q)
 	}, [q])
 
-	const loadMore = (page, q) => {
-		return searchOfficers({ page, q })
-	}
-
 	const searchForResults = (e) => {
 		const q = e.target.value
 		setSearchVal(q)
@@ -86,7 +82,7 @@ const Officers: React.FC = ({ inverted, officers, searchOfficers }) => {
 						hasMore={officers.hasMore}
 						inverted={inverted}
 						loading={officers.loading}
-						loadMore={({ page, q }) => loadMore(page, q)}
+						loadMore={({ callback, page, q }) => searchOfficers({ callback, page, q })}
 						page={officers.page}
 						q={searchVal}
 						results={officers.results}
