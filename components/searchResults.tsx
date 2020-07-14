@@ -215,9 +215,9 @@ const SearchResults: React.FC = ({
 					continuous
 					onBottomVisible={async () => {
 						if (hasMore && !fetching) {
-							setFetching(true)
+							await setFetching(true)
 							await loadMore({ departmentId, officerId, page, q, userId })
-							setFetching(false)
+							await setFetching(false)
 						}
 					}}
 				>
