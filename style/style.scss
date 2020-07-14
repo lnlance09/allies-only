@@ -85,6 +85,10 @@ body {
 			margin-top: 26px !important;
 		}
 	}
+
+	@media only screen and (max-width: 1025px) {
+		margin-top: 0 !important;
+	}
 }
 
 .segment.inverted {
@@ -179,6 +183,8 @@ body {
 }
 
 .gridList {
+	margin-top: 8px !important;
+
 	&.inverted {
 		.item {
 			color: $white;
@@ -330,6 +336,12 @@ body {
 	.moreInteractionsHeader {
 		margin-bottom: 40px !important;
 	}
+
+	.officersPage {
+		.gridList {
+			display: none !important;
+		}
+	}
 }
 
 .mapboxgl-map {
@@ -399,5 +411,33 @@ body {
 		color: darken($lightGrey, 4%) !important;
 		font-size: 14px !important;
 		line-height: 20px !important;
+	}
+}
+
+.editBioForm {
+	margin-top: 12px !important;
+
+	.ui.button {
+		margin-top: 12px !important;
+	}
+}
+
+.userBio {
+	font-weight: normal !important;
+
+	&.mobile {
+		display: none;
+	}
+
+	@media only screen and (max-width: 1025px) {
+		&.desktop {
+			display: none;
+		}
+
+		&.mobile {
+			display: inline-block;
+			font-size: 15px !important;
+		}
+
 	}
 }

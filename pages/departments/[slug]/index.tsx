@@ -286,7 +286,7 @@ const Department: React.FC = ({
 														</Header.Subheader>
 													</Header>
 
-													<div style={{ marginTop: "22px" }}>
+													<div>
 														<Button
 															color="yellow"
 															compact
