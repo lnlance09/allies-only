@@ -25,10 +25,6 @@ const Interactions: React.FC = ({ interactions, inverted, searchInteractions }) 
 		setSearchVal(q)
 	}, [q])
 
-	const loadMore = (page, q) => {
-		return searchInteractions({ page, q })
-	}
-
 	const searchForResults = (e) => {
 		const q = e.target.value
 		setSearchVal(q)
@@ -86,7 +82,9 @@ const Interactions: React.FC = ({ interactions, inverted, searchInteractions }) 
 						hasMore={interactions.hasMore}
 						inverted={inverted}
 						loading={interactions.loading}
-						loadMore={({ page, q }) => loadMore(page, q)}
+						loadMore={({ callback, page, q }) =>
+							searchInteractions({ callback, page, q })
+						}
 						page={interactions.page}
 						q={searchVal}
 						results={interactions.results}

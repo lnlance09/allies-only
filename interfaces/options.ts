@@ -20,6 +20,7 @@ export interface GetItemPayload {
 }
 
 export interface PaginationPayload {
+	callback?: void;
 	departmentId?: number;
 	exclude: number[];
 	officerId?: number;

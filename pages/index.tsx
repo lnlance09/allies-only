@@ -17,10 +17,6 @@ const Home: React.FC = ({ interactions, inverted, searchInteractions }) => {
 		searchInteractions({ page: 0 })
 	}, [])
 
-	const loadMore = (page) => {
-		return searchInteractions({ page })
-	}
-
 	return (
 		<Provider store={store}>
 			<DefaultLayout
@@ -49,7 +45,9 @@ const Home: React.FC = ({ interactions, inverted, searchInteractions }) => {
 							hasMore={interactions.hasMore}
 							inverted={inverted}
 							loading={interactions.loading}
-							loadMore={({ page, q }) => loadMore(page, q)}
+							loadMore={({ callback, page }) =>
+								searchInteractions({ callback, page })
+							}
 							page={interactions.page}
 							results={interactions.results}
 							type="interactions"
