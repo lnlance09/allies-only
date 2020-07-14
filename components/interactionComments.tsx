@@ -39,7 +39,7 @@ const InteractionComments: React.FC = ({ comments, inverted, loadMoreComments, u
 								key={`interactionCommentResult${result.id}`}
 								inverted={inverted}
 							>
-								<Header inverted={inverted} size="large">
+								<Header inverted={inverted}>
 									<Image
 										onClick={() => router.push(`/interactions/${result.id}`)}
 										onError={(i) => (i.target.src = DefaultPic)}

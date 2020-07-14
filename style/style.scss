@@ -376,6 +376,10 @@ body {
 	.ui.header.large {
 		img {
 			cursor: pointer;
+
+			@media only screen and (max-width: 1025px) {
+				display: none !important;
+			}
 		}
 	}
 }
