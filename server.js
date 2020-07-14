@@ -6,6 +6,7 @@ const fileupload = require("express-fileupload")
 const fs = require("fs")
 const https = require("https")
 const db = require("./models/index.js")
+const auto = require("./controllers/auto.js")
 const comments = require("./controllers/comment.js")
 const contact = require("./controllers/contact.js")
 const departments = require("./controllers/department.js")
@@ -32,6 +33,10 @@ app.prepare().then(() => {
 	server.use(bodyParser.json({ limit: "250mb" }))
 	server.use(bodyParser.urlencoded({ extended: true, limit: "250mb" }))
 	db.sequelize.sync()
+
+	// Auto
+	server.post("/api/auto/users", auto.createUsers)
+	server.post("/api/auto/like", auto.likeComment)
 
 	// Comments
 	server.post("/api/comment/create", comments.create)

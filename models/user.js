@@ -32,6 +32,9 @@ module.exports = (sequelize, Sequelize) => {
 		passwordReset: {
 			type: Sequelize.STRING
 		},
+		politicalStatus: {
+			type: Sequelize.INTEGER
+		},
 		race: {
 			type: Sequelize.STRING
 		},
