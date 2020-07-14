@@ -75,6 +75,7 @@ app.prepare().then(() => {
 	server.post("/api/user/create", users.create)
 	server.post("/api/user/login", users.login)
 	server.get("/api/user/search", users.findAll)
+	server.post("/api/user/update", users.update)
 	server.post("/api/user/verify", users.verify)
 	server.get("/api/user/:username", users.findOne)
 	server.get("/api/user/:id/comments", users.getUserComments)

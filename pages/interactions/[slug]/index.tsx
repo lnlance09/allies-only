@@ -934,7 +934,10 @@ Interaction.propTypes = {
 				PropTypes.bool,
 				PropTypes.shape({
 					createdAt: PropTypes.string,
+					commentCount: PropTypes.number,
 					description: PropTypes.string,
+					img: PropTypes.string,
+					userName: PropTypes.string,
 					video: PropTypes.string
 				})
 			])

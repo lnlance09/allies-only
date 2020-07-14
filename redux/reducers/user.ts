@@ -58,6 +58,7 @@ const user = (state = initial, action: UserActionTypes): InitialPageState => {
 				user: {
 					...state.user,
 					data: {
+						bio: payload.user.bio === null ? "" : payload.user.bio,
 						commentCount: payload.user.commentCount,
 						createdAt: payload.user.createdAt,
 						id: payload.user.id,
@@ -134,6 +135,18 @@ const user = (state = initial, action: UserActionTypes): InitialPageState => {
 
 		case constants.SET_USER_FETCH_ERROR:
 			return initial
+
+		case constants.UPDATE_USER:
+			return {
+				...state,
+				user: {
+					...state.user,
+					data: {
+						...state.user.data,
+						bio: payload.bio
+					}
+				}
+			}
 
 		default:
 			return state

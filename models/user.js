@@ -7,6 +7,10 @@ module.exports = (sequelize, Sequelize) => {
 			type: Sequelize.INTEGER,
 			unique: true
 		},
+		bio: {
+			defaultValue: "",
+			type: Sequelize.TEXT
+		},
 		email: {
 			type: Sequelize.STRING
 		},

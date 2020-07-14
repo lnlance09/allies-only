@@ -230,6 +230,7 @@ exports.findAll = async (req, res) => {
 	let limit = 20
 	let order = [[db.Sequelize.col("interactionCount"), "DESC"]]
 	let attributes = [
+		"bio",
 		"createdAt",
 		"id",
 		"img",
@@ -318,7 +319,7 @@ exports.findOne = async (req, res) => {
 	const { username } = req.params
 
 	User.findAll({
-		attributes: ["createdAt", "id", "img", "name", "race", "username"],
+		attributes: ["bio", "createdAt", "id", "img", "name", "race", "username"],
 		limit: 1,
 		raw: true,
 		where: {
@@ -494,6 +495,7 @@ exports.login = async (req, res) => {
 
 	User.findAll({
 		attributes: [
+			"bio",
 			"createdAt",
 			"email",
 			"emailVerified",
@@ -532,6 +534,37 @@ exports.login = async (req, res) => {
 			return res.status(500).send({
 				error: true,
 				msg: err.message || "Some error occurred"
+			})
+		})
+}
+
+exports.update = async (req, res) => {
+	const { bio } = req.body
+	const { authenticated, user } = Auth.parseAuthentication(req)
+
+	if (!authenticated) {
+		return res.status(401).send({ error: true, msg: "You must be logged in" })
+	}
+
+	const updateData = {}
+	if (bio !== user.data.id && typeof bio !== "undefined") {
+		updateData.bio = bio
+	}
+
+	User.update(updateData, {
+		where: { id: user.data.id }
+	})
+		.then(async () => {
+			return res.status(200).send({
+				bio,
+				error: false,
+				msg: "Success"
+			})
+		})
+		.catch(() => {
+			return res.status(500).send({
+				error: true,
+				msg: "There was an error"
 			})
 		})
 }
