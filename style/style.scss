@@ -445,3 +445,25 @@ body {
 
 	}
 }
+
+.aboutAttachedHeader {
+	background: lighten($invertedBackgroundColor, 4%) !important;
+	font-style: italic;
+
+	a {
+		padding-bottom: 0 !important;
+	}
+
+	.image {
+		cursor: pointer !important;
+	}
+}
+
+.interactionsPage {
+	.interactionDescription.page {
+		border: none !important;
+		border-bottom: solid 1px lighten($invertedBackgroundColor, 18%) !important;
+		border-top-left-radius: 4px !important;
+		border-top-right-radius: 4px !important;
+	}
+}

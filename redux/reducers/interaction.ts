@@ -87,6 +87,7 @@ const interaction = (state = initial, action: InteractionActionTypes): InitialPa
 						title: interaction.title,
 						user: interaction.user,
 						video: interaction.video,
+						updatedAt: interaction.updatedAt,
 						views: interaction.views
 					},
 					error: false,

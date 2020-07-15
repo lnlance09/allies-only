@@ -40,6 +40,7 @@ import { parseJwt } from "@utils/tokenFunctions"
 import { withTheme } from "@redux/ThemeProvider"
 import { compose } from "redux"
 import { baseUrl } from "@options/config"
+import AllyPic from "@public/images/avatar/large/joe.jpg"
 import axios from "axios"
 import Comments from "@components/comments"
 import DefaultLayout from "@layouts/default"
@@ -49,6 +50,7 @@ import https from "https"
 import Link from "next/link"
 import LinkedText from "@components/linkedText"
 import Moment from "react-moment"
+import numeral from "numeral"
 import PropTypes from "prop-types"
 import React, { useEffect, useState, Fragment } from "react"
 import ReactPlayer from "react-player"
@@ -538,16 +540,13 @@ const Interaction: React.FC = ({
 													date={initialInteraction.data.createdAt}
 													fromNow
 												/>{" "}
-												• By{" "}
-												<Link
-													href={`/${initialInteraction.data.user.username}`}
-												>
-													<a>{initialInteraction.data.user.name}</a>
-												</Link>{" "}
-												• {initialInteraction.data.views} views
+												•{" "}
+												{numeral(initialInteraction.data.views).format(
+													"0.0a"
+												)}{" "}
+												views
 											</Header.Subheader>
 										</Header>
-
 										<ReactPlayer
 											controls
 											height="100%"
@@ -557,7 +556,6 @@ const Interaction: React.FC = ({
 											url={initialInteraction.data.video}
 											width="100%"
 										/>
-
 										<Header as="h2" inverted>
 											About
 											{user.id === interaction.data.user.id && (
@@ -575,7 +573,8 @@ const Interaction: React.FC = ({
 											)}
 										</Header>
 										<Segment
-											className="lighter interactionDescription"
+											attached
+											className="lighter interactionDescription page"
 											inverted={inverted}
 											size="big"
 										>
@@ -598,6 +597,41 @@ const Interaction: React.FC = ({
 												</Fragment>
 											)}
 										</Segment>
+										<Header
+											className="aboutAttachedHeader"
+											attached="bottom"
+											inverted={inverted}
+											size="large"
+										>
+											<Image
+												avatar
+												onClick={() =>
+													router.push(
+														`/${initialInteraction.data.user.username}`
+													)
+												}
+												onError={(i) => (i.target.src = AllyPic)}
+												src={
+													interaction.data.user.img === null
+														? AllyPic
+														: interaction.data.user.img
+												}
+											/>
+											<Header.Content>
+												<Link
+													href={`/${initialInteraction.data.user.username}`}
+												>
+													<a>{initialInteraction.data.user.name}</a>
+												</Link>
+												<Header.Subheader>
+													Edited{" "}
+													<Moment
+														date={initialInteraction.data.updatedAt}
+														fromNow
+													/>
+												</Header.Subheader>
+											</Header.Content>
+										</Header>
 
 										<Header as="h2" inverted>
 											Police Department
@@ -630,7 +664,6 @@ const Interaction: React.FC = ({
 												</List>
 											)}
 										</Segment>
-
 										<Header as="h2" inverted>
 											Officers Involved
 										</Header>
@@ -716,7 +749,6 @@ const Interaction: React.FC = ({
 												</div>
 											)}
 										</Segment>
-
 										{(editMode || (!hasOfficers && officersClicked)) && (
 											<Fragment>
 												<Button
@@ -741,7 +773,6 @@ const Interaction: React.FC = ({
 												/>
 											</Fragment>
 										)}
-
 										<Header as="h2" inverted size="huge">
 											Comments
 										</Header>
@@ -780,7 +811,6 @@ const Interaction: React.FC = ({
 											}
 											userId={user.id}
 										/>
-
 										<Header
 											as="h3"
 											className="moreInteractionsHeader"
@@ -788,7 +818,6 @@ const Interaction: React.FC = ({
 											inverted={inverted}
 											size="huge"
 										/>
-
 										{!interaction.error && !interaction.loading && (
 											<SearchResults
 												hasMore={interactions.hasMore}
@@ -850,6 +879,7 @@ Interaction.propTypes = {
 				name: PropTypes.string,
 				username: PropTypes.string
 			}),
+			updatedAt: PropTypes.string,
 			video: PropTypes.string,
 			views: PropTypes.number
 		}),
@@ -912,6 +942,7 @@ Interaction.propTypes = {
 			),
 			thumbnail: PropTypes.string,
 			title: PropTypes.string,
+			updatedAt: PropTypes.string,
 			user: PropTypes.shape({
 				id: PropTypes.number,
 				img: PropTypes.string,
