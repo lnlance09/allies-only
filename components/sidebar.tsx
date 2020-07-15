@@ -199,6 +199,7 @@ const Sidebar: React.FC = ({
 					<List.Item>© 2020, Allies Only</List.Item>
 				</List>
 
+				{/*
 				{allyCount !== null && !authenticated && (
 					<div style={{ textAlign: "center" }}>
 						<Statistic inverted={inverted}>
@@ -209,6 +210,7 @@ const Sidebar: React.FC = ({
 						</Statistic>
 					</div>
 				)}
+				*/}
 			</div>
 		</Provider>
 	)
