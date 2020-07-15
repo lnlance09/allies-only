@@ -7,7 +7,7 @@ import { useRouter } from "next/router"
 import { Provider, connect } from "react-redux"
 import axios from "axios"
 import Link from "next/link"
-import NumberFormat from "react-number-format"
+import numeral from "numeral"
 import PropTypes from "prop-types"
 import React, { Fragment, useEffect, useState } from "react"
 import Router from "next/router"
@@ -203,11 +203,7 @@ const Sidebar: React.FC = ({
 					<div style={{ textAlign: "center" }}>
 						<Statistic inverted={inverted}>
 							<Statistic.Value>
-								<NumberFormat
-									displayType={"text"}
-									thousandSeparator={true}
-									value={allyCount}
-								/>
+								{numeral(allyCount).format(allyCount > 999 ? "0.0a" : "0a")}
 							</Statistic.Value>
 							<Statistic.Label>Allies</Statistic.Label>
 						</Statistic>
