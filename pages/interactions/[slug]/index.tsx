@@ -668,6 +668,7 @@ const Interaction: React.FC = ({
 												>
 													<Image
 														avatar
+														className="departmentAvatar"
 														onError={(i) => (i.target.src = DefaultPic)}
 														src={
 															interaction.data.department.img === null
