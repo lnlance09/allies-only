@@ -113,21 +113,20 @@
                 display: none;
             }
         }
+    }
 
-        .sidebar.ui.labeled.icon.menu .item {
-            background: lighten($invertedBackgroundColor, 2%) !important;
-            font-weight: bold !important;
-            line-height: 24px !important;
-            opacity: 1 !important;
-            text-align: left !important;
+    .sidebar.ui.labeled.icon.menu .item {
+        background: lighten($invertedBackgroundColor, 2%) !important;
+        font-weight: bold !important;
+        line-height: 24px !important;
+        text-align: left !important;
 
-            .icon {
-                color: $invertedYellow;
-                display: inline;
-                font-size: 24px !important;
-                padding-right: 16px;
-                vertical-align: middle;
-            }
+        .icon {
+            color: $invertedYellow;
+            display: inline;
+            font-size: 24px !important;
+            padding-right: 16px;
+            vertical-align: middle;
         }
     }
 }
