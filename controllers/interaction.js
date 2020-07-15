@@ -133,6 +133,7 @@ exports.findAll = (req, res) => {
 		[db.Sequelize.col("interaction.id"), "id"],
 		[db.Sequelize.col("interaction.img"), "img"],
 		[db.Sequelize.col("interaction.title"), "title"],
+		[db.Sequelize.col("interaction.updatedAt"), "updatedAt"],
 		[db.Sequelize.col("interaction.video"), "video"],
 		[db.Sequelize.col("interaction.views"), "views"],
 		[db.Sequelize.col("department.name"), "departmentName"],
@@ -272,6 +273,7 @@ exports.findOne = (req, res) => {
 			[db.Sequelize.col("interaction.id"), "id"],
 			[db.Sequelize.col("interaction.img"), "img"],
 			[db.Sequelize.col("interaction.title"), "title"],
+			[db.Sequelize.col("interaction.updatedAt"), "updatedAt"],
 			[db.Sequelize.col("interaction.video"), "video"],
 			[db.Sequelize.col("interaction.views"), "views"],
 			[db.Sequelize.col("user.id"), "userId"],
@@ -351,14 +353,15 @@ exports.findOne = (req, res) => {
 				img: firstRow["img"],
 				officers: [],
 				title: firstRow["title"],
-				video: firstRow["video"],
-				views: firstRow["views"],
 				user: {
 					id: firstRow["userId"],
 					img: firstRow["userImg"],
 					name: firstRow["userName"],
 					username: firstRow["username"]
-				}
+				},
+				video: firstRow["video"],
+				views: firstRow["views"],
+				updatedAt: firstRow["updatedAt"]
 			}
 
 			const officerIds = []
@@ -660,6 +663,7 @@ exports.update = async (req, res) => {
 	}
 
 	Interaction.update(updateData, {
+		silent: typeof description === "undefined",
 		where: { id }
 	})
 		.then(() => {
@@ -679,7 +683,17 @@ exports.update = async (req, res) => {
 exports.updateViews = async (req, res) => {
 	const { id } = req.params
 
-	Interaction.increment("views", { where: { id } })
+	Interaction.update(
+		{
+			views: db.Sequelize.literal("views + 1")
+		},
+		{
+			silent: true,
+			where: {
+				id
+			}
+		}
+	)
 
 	return res.status(200).send({
 		error: false,
