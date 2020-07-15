@@ -1,4 +1,4 @@
-import { createDepartment, getDepartment } from "@actions/department"
+import { changeDepartmentPic, createDepartment, getDepartment } from "@actions/department"
 import { searchInteractions } from "@actions/interaction"
 import { searchOfficers } from "@actions/officer"
 import {
@@ -10,6 +10,7 @@ import {
 	Form,
 	Grid,
 	Header,
+	Image,
 	Input,
 	List,
 	Loader
@@ -21,14 +22,16 @@ import { InitialPageState } from "@interfaces/options"
 import { formatPlural } from "@utils/textFunctions"
 import { Provider, connect } from "react-redux"
 import { fetchCities } from "@options/cities"
+import { parseJwt } from "@utils/tokenFunctions"
 import { useRouter } from "next/router"
 import { withTheme } from "@redux/ThemeProvider"
 import { compose } from "redux"
 import { baseUrl, s3BaseUrl } from "@options/config"
 import axios from "axios"
 import DefaultLayout from "@layouts/default"
+import DefaultPic from "@public/images/placeholders/placeholder-dark.jpg"
 import https from "https"
-import MapBox from "@components/mapBox"
+import ImageUpload from "@components/imageUpload"
 import PropTypes from "prop-types"
 import React, { useEffect, useState, Fragment } from "react"
 import SearchResults from "@components/searchResults"
@@ -78,6 +81,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
 }
 
 const Department: React.FC = ({
+	changeDepartmentPic,
 	createDepartment,
 	department,
 	getDepartment,
@@ -89,9 +93,13 @@ const Department: React.FC = ({
 	const router = useRouter()
 	const { slug } = router.query
 
+	const { id, img } = department.data
+
 	const [activeItem, setActiveItem] = useState("interactions")
+	const [bearer, setBearer] = useState(null)
 	const [city, setCity] = useState("")
 	const [createMode, setCreateMode] = useState(slug === "create")
+	const [currentUser, setCurrentUser] = useState({})
 	const [formLoading, setFormLoading] = useState(false)
 	const [locationOptions, setLocationOptions] = useState([])
 	const [name, setName] = useState("")
@@ -119,6 +127,14 @@ const Department: React.FC = ({
 		getInitialProps()
 	}, [slug])
 
+	useEffect(() => {
+		const userData = parseJwt()
+		if (userData) {
+			setBearer(localStorage.getItem("jwtToken"))
+			setCurrentUser(userData)
+		}
+	}, [bearer])
+
 	const addDepartment = () => {
 		setFormLoading(true)
 		createDepartment({ callback: () => setFormLoading(false), city, name })
@@ -142,9 +158,47 @@ const Department: React.FC = ({
 		setCity(value)
 	}
 
+	const imgSrc = img === null || img === "" ? DefaultPic : `${s3BaseUrl}${img}`
+
+	const ProfilePic = () => {
+		if (currentUser.email === "lnlance09@gmail.com") {
+			return (
+				<ImageUpload
+					bearer={bearer}
+					callback={(bearer: string, file: string) =>
+						changeDepartmentPic({ bearer, file, id })
+					}
+					fluid
+					id={id}
+					img={imgSrc === null ? DefaultPic : imgSrc}
+					inverted={inverted}
+				/>
+			)
+		}
+
+		return <Image onError={(i) => (i.target.src = DefaultPic)} rounded src={imgSrc} />
+	}
+
 	let results = department.officers
 	if (activeItem === "interactions") {
 		results = department.interactions
+	}
+
+	let seoImage = {
+		height: 500,
+		src: `${s3BaseUrl}logos/logo.png`,
+		width: 500
+	}
+
+	if (!createMode && !initialDepartment.error) {
+		seoImage = {
+			height: 500,
+			src:
+				initialDepartment.data.img === null
+					? `${s3BaseUrl}logos/logo.png`
+					: `${s3BaseUrl}${initialDepartment.data.img}`,
+			width: 500
+		}
 	}
 
 	return (
@@ -157,11 +211,7 @@ const Department: React.FC = ({
 						: initialDepartment.error
 						? "Not found"
 						: `Keep tabs on the ${initialDepartment.data.name} and their interactions with civilians in their jurisdiction`,
-					image: {
-						height: 500,
-						src: `${s3BaseUrl}logos/logo.png`,
-						width: 500
-					},
+					image: seoImage,
 					title: createMode
 						? "Add a department"
 						: initialDepartment.error
@@ -244,22 +294,8 @@ const Department: React.FC = ({
 									<Fragment>
 										<Grid className="departmentGrid">
 											<Grid.Row>
-												<Grid.Column className="mapColumn" width={4}>
-													<MapBox
-														lat={parseFloat(
-															initialDepartment.data.lat,
-															10
-														)}
-														lng={parseFloat(
-															initialDepartment.data.lon,
-															10
-														)}
-														zoom={
-															initialDepartment.data.type === 1
-																? 4
-																: 9
-														}
-													/>
+												<Grid.Column className="imgColumn" width={4}>
+													{ProfilePic()}
 												</Grid.Column>
 												<Grid.Column width={12}>
 													<Header as="h1" inverted={inverted}>
@@ -387,12 +423,14 @@ const Department: React.FC = ({
 }
 
 Department.propTypes = {
+	changeDepartmentPic: PropTypes.func,
 	createDepartment: PropTypes.func,
 	department: PropTypes.shape({
 		data: PropTypes.shape({
 			city: PropTypes.string,
 			county: PropTypes.string,
 			id: PropTypes.number,
+			img: PropTypes.string,
 			interactionCount: PropTypes.number,
 			lat: PropTypes.string,
 			lon: PropTypes.string,
@@ -440,6 +478,7 @@ Department.propTypes = {
 			city: PropTypes.string,
 			county: PropTypes.string,
 			id: PropTypes.number,
+			img: PropTypes.string,
 			interactionCount: PropTypes.number,
 			lat: PropTypes.string,
 			lon: PropTypes.string,
@@ -458,6 +497,7 @@ Department.propTypes = {
 }
 
 Department.defaultProps = {
+	changeDepartmentPic,
 	createDepartment,
 	department: {
 		data: {},
@@ -497,6 +537,7 @@ const mapStateToProps = (state: RootState, ownProps: InitialPageState) => ({
 
 export default compose(
 	connect(mapStateToProps, {
+		changeDepartmentPic,
 		createDepartment,
 		getDepartment,
 		searchInteractions,

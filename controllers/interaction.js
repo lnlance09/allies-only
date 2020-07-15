@@ -9,7 +9,6 @@ const path = require("path")
 const randomize = require("randomatic")
 const save = require("instagram-save")
 const slugify = require("slugify")
-const validator = require("validator")
 const waitOn = require("wait-on")
 const youtubedl = require("youtube-dl")
 /* eslint-enable */
@@ -281,6 +280,7 @@ exports.findOne = (req, res) => {
 			[db.Sequelize.col("user.name"), "userName"],
 			[db.Sequelize.col("user.username"), "username"],
 			[db.Sequelize.col("department.id"), "departmentId"],
+			[db.Sequelize.col("department.img"), "departmentImg"],
 			[db.Sequelize.col("department.name"), "departmentName"],
 			[db.Sequelize.col("department.slug"), "departmentSlug"],
 			[db.Sequelize.col("officerInteractions->officers.firstName"), "officerFirstName"],
@@ -345,6 +345,7 @@ exports.findOne = (req, res) => {
 				createdAt: firstRow["createdAt"],
 				department: {
 					id: firstRow["departmentId"],
+					img: firstRow["departmentImg"],
 					name: firstRow["departmentName"],
 					slug: firstRow["departmentSlug"]
 				},

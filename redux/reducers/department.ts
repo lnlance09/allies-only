@@ -42,6 +42,18 @@ const department = (state = initial, action: DepartmentActionTypes): InitialPage
 	const { payload } = action
 
 	switch (action.type) {
+		case constants.CHANGE_DEPARTMENT_PIC:
+			return {
+				...state,
+				department: {
+					...state.department,
+					data: {
+						...state.department.data,
+						img: payload.img
+					}
+				}
+			}
+
 		case constants.GET_DEPARTMENT:
 			const { department } = payload
 			return {

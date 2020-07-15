@@ -9,6 +9,7 @@ export const SET_VERIFICATION_ERROR = "authentication:SET_VERIFICATION_ERROR"
 export const VERIFY_EMAIL = "authentication:VERIFY_EMAIL"
 
 // Deparment
+export const CHANGE_DEPARTMENT_PIC = "department:CHANGE_DEPARTMENT_PIC"
 export const GET_DEPARTMENT = "department:GET_DEPARTMENT"
 export const RESET_DEPARTMENT_TO_INITIAL = "department:RESET_DEPARTMENT_TO_INITIAL"
 export const SEARCH_DEPARTMENTS = "department:SEARCH_DEPARTMENTS"

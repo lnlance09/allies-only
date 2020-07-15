@@ -43,6 +43,7 @@ app.prepare().then(() => {
 	server.post("/api/contact/send", contact.send)
 
 	// Departments
+	server.post("/api/department/changePic", departments.changePic)
 	server.post("/api/department/create", departments.create)
 	server.get("/api/department/search", departments.findAll)
 	server.get("/api/department/:id", departments.findOne)
