@@ -100,40 +100,40 @@ const PageHeader: React.FC = ({ basicHeader, loading, toggleSearchMode }) => {
 						</Menu>
 					)}
 				</Container>
-
-				<Sidebar
-					as={Menu}
-					animation="push"
-					borderless
-					direction="bottom"
-					icon="labeled"
-					inverted
-					onHide={() => setSidebarVisible(false)}
-					size="massive"
-					style={{ textAlign: "left" }}
-					vertical
-					visible={sidebarVisible}
-				>
-					<Menu.Item as="a" onClick={() => router.push("/")}>
-						<Icon name="home" size="small" />
-						Home
-					</Menu.Item>
-					<Menu.Item as="a" onClick={() => toggleSearchMode()}>
-						<Icon name="search" size="small" />
-						Search
-					</Menu.Item>
-					{authenticated && (
-						<Menu.Item as="a" onClick={() => router.push(`/${user.username}`)}>
-							<Icon name="user" size="small" />
-							Profile
-						</Menu.Item>
-					)}
-					<Menu.Item as="a" onClick={() => router.push("/interactions/create")}>
-						<Icon name="plus" size="small" />
-						Add an interaction
-					</Menu.Item>
-				</Sidebar>
 			</div>
+
+			<Sidebar
+				as={Menu}
+				animation="push"
+				borderless
+				direction="bottom"
+				icon="labeled"
+				inverted
+				onHide={() => setSidebarVisible(false)}
+				size="massive"
+				style={{ textAlign: "left" }}
+				vertical
+				visible={sidebarVisible}
+			>
+				<Menu.Item as="a" onClick={() => router.push("/")}>
+					<Icon name="home" size="small" />
+					Home
+				</Menu.Item>
+				<Menu.Item as="a" onClick={() => toggleSearchMode()}>
+					<Icon name="search" size="small" />
+					Search
+				</Menu.Item>
+				{authenticated && (
+					<Menu.Item as="a" onClick={() => router.push(`/${user.username}`)}>
+						<Icon name="user" size="small" />
+						Profile
+					</Menu.Item>
+				)}
+				<Menu.Item as="a" onClick={() => router.push("/interactions/create")}>
+					<Icon name="plus" size="small" />
+					Add an interaction
+				</Menu.Item>
+			</Sidebar>
 		</div>
 	)
 }
