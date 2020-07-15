@@ -36,6 +36,7 @@ import {
 import { RootState } from "@store/reducer"
 import { GetServerSideProps } from "next"
 import { initial } from "@reducers/interaction"
+import { CopyToClipboard } from "react-copy-to-clipboard"
 import { DropdownOption, InitialPageState } from "@interfaces/options"
 import { Provider, connect } from "react-redux"
 import { fetchDepartments } from "@options/departments"
@@ -46,6 +47,8 @@ import { parseJwt } from "@utils/tokenFunctions"
 import { withTheme } from "@redux/ThemeProvider"
 import { compose } from "redux"
 import { baseUrl } from "@options/config"
+import { toast } from "react-toastify"
+import { getConfig } from "@options/toast"
 import AllyPic from "@public/images/avatar/large/joe.jpg"
 import axios from "axios"
 import Comments from "@components/comments"
@@ -63,6 +66,9 @@ import ReactPlayer from "react-player"
 import SearchResults from "@components/searchResults"
 import store from "@store"
 import VideoInput from "@components/videoInput"
+
+const toastConfig = getConfig()
+toast.configure(toastConfig)
 
 export const getServerSideProps: GetServerSideProps = async ({ params }) => {
 	const initialInteraction = initial.initialInteraction
@@ -814,6 +820,20 @@ const Interaction: React.FC = ({
 														size="big"
 													/>
 												</EmailShareButton>
+											</List.Item>
+											<List.Item>
+												<CopyToClipboard
+													onCopy={() => toast.success("Copied!")}
+													text={`${window.location.origin}/interactions/${slug}`}
+												>
+													<Button
+														circular
+														color="red"
+														icon="paperclip"
+														onClick={() => {}}
+														size="big"
+													/>
+												</CopyToClipboard>
 											</List.Item>
 										</List>
 

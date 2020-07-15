@@ -80,7 +80,7 @@ body {
 		// width: 50%;
 	}
 
-	+ .searchResults {
+	+ .searchResults, + .interactionComments {
 		@media only screen and (max-width: 1025px) {
 			margin-top: 26px !important;
 		}
@@ -366,13 +366,20 @@ body {
 	border: solid 1px $lightGrey !important;
 }
 
-.interactionCommentSegment {
-	.ui.header {
-		img {
-			cursor: pointer;
-
-			@media only screen and (max-width: 1025px) {
-				display: none !important;
+.interactionComments {
+	.container {
+		margin-left: 0 !important;
+		margin-right: 0 !important;
+	}
+	
+	.interactionCommentSegment {
+		.ui.header {
+			img {
+				cursor: pointer;
+	
+				@media only screen and (max-width: 1025px) {
+					display: none !important;
+				}
 			}
 		}
 	}
