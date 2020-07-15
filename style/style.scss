@@ -462,6 +462,15 @@ body {
 	}
 }
 
+.ui.button.reddit {
+	background: $reddit;
+	color: $white;
+
+	&:hover {
+		background: darken($reddit, 4%);
+	}
+}
+
 .clickHeader {
 	cursor: pointer;
 	margin-bottom: 0;
