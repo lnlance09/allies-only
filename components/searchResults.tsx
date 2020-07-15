@@ -194,7 +194,6 @@ const SearchResults: React.FC = ({
 										<Label color="orange">
 											{result.interactionCount}{" "}
 											{formatPlural(result.interactionCount, "interaction")}{" "}
-											views
 										</Label>
 									</span>
 								</Item.Meta>
