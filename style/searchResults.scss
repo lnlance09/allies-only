@@ -54,7 +54,7 @@
 
 			.card {
 				background: $invertedBackgroundColor !important;
-				border: none;
+				border: solid 1px $lightenedBorderColor !important;
 				box-shadow: none;
 				cursor: pointer;
 				
@@ -69,6 +69,7 @@
 
 				.content {
 					background: lighten($invertedBackgroundColor, 6%);
+					border-top: solid 1px $lightenedBorderColor !important;
 
 					.header, .meta, .description {
 						color: $white;
@@ -86,7 +87,7 @@
 					}
 
 					&.extra {
-						background: lighten($invertedBackgroundColor, 4%) !important;
+						border-top: solid 1px $lightenedBorderColor !important;
 
 						.commentCount {
 							color: $white;

@@ -319,12 +319,6 @@ body {
 		}
 	}
 
-	.interaction.officersList {
-		img {
-			display: none !important;
-		}
-	}
-
 	#optionalInteractionUpload {
 		display: none;
 	}
@@ -462,8 +456,17 @@ body {
 .interactionsPage {
 	.interactionDescription.page {
 		border: none !important;
-		border-bottom: solid 1px lighten($invertedBackgroundColor, 18%) !important;
+		border-bottom: solid 1px $lightenedBorderColor !important;
 		border-top-left-radius: 4px !important;
 		border-top-right-radius: 4px !important;
+	}
+}
+
+.clickHeader {
+	cursor: pointer;
+	margin-bottom: 0;
+
+	&:not(:first-of-type) {
+		margin-top: 5px !important;
 	}
 }

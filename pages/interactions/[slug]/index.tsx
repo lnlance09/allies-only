@@ -22,7 +22,6 @@ import {
 	Icon,
 	Image,
 	Input,
-	List,
 	Loader,
 	Segment,
 	TextArea
@@ -542,7 +541,9 @@ const Interaction: React.FC = ({
 												/>{" "}
 												•{" "}
 												{numeral(initialInteraction.data.views).format(
-													"0.0a"
+													initialInteraction.data.views > 999
+														? "0.0a"
+														: "0a"
 												)}{" "}
 												views
 											</Header.Subheader>
@@ -614,7 +615,7 @@ const Interaction: React.FC = ({
 												src={
 													interaction.data.user.img === null
 														? AllyPic
-														: interaction.data.user.img
+														: `${s3BaseUrl}${interaction.data.user.img}`
 												}
 											/>
 											<Header.Content>
@@ -642,26 +643,17 @@ const Interaction: React.FC = ({
 													<Form.Field>{departmentField}</Form.Field>
 												</Form>
 											) : (
-												<List
+												<Header
+													className="clickHeader"
 													inverted={inverted}
-													selection
-													size="big"
-													verticalAlign="middle"
+													onClick={() =>
+														router.push(
+															`/departments/${interaction.data.department.slug}`
+														)
+													}
 												>
-													<List.Item
-														onClick={() =>
-															router.push(
-																`/departments/${interaction.data.department.slug}`
-															)
-														}
-													>
-														<List.Content>
-															<List.Header>
-																{interaction.data.department.name}
-															</List.Header>
-														</List.Content>
-													</List.Item>
-												</List>
+													{interaction.data.department.name}
+												</Header>
 											)}
 										</Segment>
 										<Header as="h2" inverted>
@@ -674,48 +666,37 @@ const Interaction: React.FC = ({
 										>
 											{hasOfficers ? (
 												<Fragment>
-													<List
-														className="interaction officersList"
-														inverted={inverted}
-														selection
-														size="large"
-														verticalAlign="middle"
-													>
-														{interaction.data.officers.map(
-															(officer) => (
-																<List.Item
-																	key={`officerInvolved${officer.slug}`}
-																	onClick={() =>
-																		router.push(
-																			`/officers/${officer.slug}`
-																		)
-																	}
-																>
-																	<Image
-																		onError={(i) =>
-																			(i.target.src = DefaultPic)
-																		}
-																		rounded
-																		size="tiny"
-																		src={
-																			officer.img === null
-																				? DefaultPic
-																				: `${s3BaseUrl}${officer.img}`
-																		}
-																	/>
-																	<List.Content verticalAlign="top">
-																		<List.Header>
-																			{officer.firstName}{" "}
-																			{officer.lastName}
-																		</List.Header>
-																		<List.Description>
-																			{officer.departmentName}
-																		</List.Description>
-																	</List.Content>
-																</List.Item>
-															)
-														)}
-													</List>
+													{interaction.data.officers.map((officer) => (
+														<Header
+															className="clickHeader"
+															key={`officerInvolved${officer.slug}`}
+															inverted={inverted}
+															onClick={() =>
+																router.push(
+																	`/officers/${officer.slug}`
+																)
+															}
+														>
+															<Image
+																avatar
+																onError={(i) =>
+																	(i.target.src = DefaultPic)
+																}
+																src={
+																	officer.img === null
+																		? DefaultPic
+																		: `${s3BaseUrl}${officer.img}`
+																}
+															/>
+															<Header.Content verticalAlign="top">
+																{officer.firstName}{" "}
+																{officer.lastName}
+																<Header.Subheader>
+																	{officer.departmentName}
+																</Header.Subheader>
+															</Header.Content>
+														</Header>
+													))}
 													{editMode && (
 														<Form size="big">{officerField}</Form>
 													)}

@@ -14,6 +14,7 @@ import { s3BaseUrl } from "@options/config"
 import AllyPic from "@public/images/avatar/large/joe.jpg"
 import DefaultPic from "@public/images/placeholders/placeholder-dark.jpg"
 import Moment from "react-moment"
+import numeral from "numeral"
 import OfficerPic from "@public/images/avatar/officer.png"
 import PropTypes from "prop-types"
 import React, { useState } from "react"
@@ -112,7 +113,12 @@ const SearchResults: React.FC = ({
 								<Card.Header>{result.title}</Card.Header>
 								<Card.Meta>
 									<Moment date={result.createdAt} fromNow />•{" "}
-									<span>{result.userName}</span>
+									<span>
+										{numeral(result.views).format(
+											result.views > 999 ? "0.0a" : "0a"
+										)}{" "}
+										views
+									</span>
 								</Card.Meta>
 								<Card.Description className="interactionDescription">
 									{result.description}
@@ -187,7 +193,8 @@ const SearchResults: React.FC = ({
 									<span style={{ display: "block", marginTop: "10px" }}>
 										<Label color="orange">
 											{result.interactionCount}{" "}
-											{formatPlural(result.interactionCount, "interaction")}
+											{formatPlural(result.interactionCount, "interaction")}{" "}
+											views
 										</Label>
 									</span>
 								</Item.Meta>
