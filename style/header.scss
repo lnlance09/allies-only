@@ -115,9 +115,10 @@
         }
 
         .sidebar.ui.labeled.icon.menu .item {
-            background: lighten($invertedBackgroundColor, 3%) !important;
+            background: lighten($invertedBackgroundColor, 2%) !important;
             font-weight: bold !important;
             line-height: 24px !important;
+            opacity: 1 !important;
             text-align: left !important;
 
             .icon {

@@ -691,9 +691,6 @@ const Interaction: React.FC = ({
 															<Header.Content verticalAlign="top">
 																{officer.firstName}{" "}
 																{officer.lastName}
-																<Header.Subheader>
-																	{officer.departmentName}
-																</Header.Subheader>
 															</Header.Content>
 														</Header>
 													))}
