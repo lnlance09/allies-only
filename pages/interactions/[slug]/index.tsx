@@ -776,6 +776,7 @@ const Interaction: React.FC = ({
 											</List.Item>
 											<List.Item>
 												<TwitterShareButton
+													title={interaction.data.title}
 													url={`${window.location.origin}/interactions/${slug}`}
 												>
 													<Button
@@ -788,7 +789,9 @@ const Interaction: React.FC = ({
 											</List.Item>
 											<List.Item>
 												<RedditShareButton
+													title={interaction.data.title}
 													url={`${window.location.origin}/interactions/${slug}`}
+													via="@onlyallies"
 												>
 													<Button
 														circular
@@ -800,6 +803,10 @@ const Interaction: React.FC = ({
 											</List.Item>
 											<List.Item>
 												<EmailShareButton
+													body={`${interaction.data.description}
+													
+													${slug}`}
+													subject={interaction.data.title}
 													url={`${window.location.origin}/interactions/${slug}`}
 												>
 													<Button
