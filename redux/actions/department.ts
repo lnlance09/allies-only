@@ -18,6 +18,31 @@ import Router from "next/router"
 const toastConfig = getConfig()
 toast.configure(toastConfig)
 
+export const changeDepartmentPic = ({ bearer, file, id }) => (dispatch: AppDispatch) => {
+	const formData = new FormData()
+	formData.set("file", file)
+	formData.set("id", id)
+
+	axios
+		.post("/api/department/changePic", formData, {
+			headers: {
+				Authorization: bearer,
+				"Content-Type": "multipart/form-data",
+				enctype: "multipart/form-data"
+			}
+		})
+		.then((response) => {
+			const { data } = response
+			dispatch({
+				payload: data,
+				type: constants.CHANGE_DEPARTMENT_PIC
+			})
+		})
+		.catch((error) => {
+			toast.error(error.response.data.msg)
+		})
+}
+
 export const createDepartment = ({
 	callback = () => null,
 	city,

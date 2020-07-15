@@ -53,13 +53,14 @@ import AllyPic from "@public/images/avatar/large/joe.jpg"
 import axios from "axios"
 import Comments from "@components/comments"
 import DefaultLayout from "@layouts/default"
-import DefaultPic from "@public/images/avatar/officer.png"
+import DefaultPic from "@public/images/placeholders/placeholder-dark.jpg"
 import Dropzone from "react-dropzone"
 import https from "https"
 import Link from "next/link"
 import LinkedText from "@components/linkedText"
 import Moment from "react-moment"
 import numeral from "numeral"
+import OfficerPic from "@public/images/avatar/officer.png"
 import PropTypes from "prop-types"
 import React, { useEffect, useState, Fragment } from "react"
 import ReactPlayer from "react-player"
@@ -665,10 +666,22 @@ const Interaction: React.FC = ({
 														)
 													}
 												>
-													{interaction.data.department.name}
+													<Image
+														avatar
+														onError={(i) => (i.target.src = DefaultPic)}
+														src={
+															interaction.data.department.img === null
+																? DefaultPic
+																: `${s3BaseUrl}${interaction.data.department.img}`
+														}
+													/>
+													<Header.Content>
+														{interaction.data.department.name}
+													</Header.Content>
 												</Header>
 											)}
 										</Segment>
+
 										<Header as="h2" inverted>
 											Officers Involved
 										</Header>
@@ -693,11 +706,11 @@ const Interaction: React.FC = ({
 															<Image
 																avatar
 																onError={(i) =>
-																	(i.target.src = DefaultPic)
+																	(i.target.src = OfficerPic)
 																}
 																src={
 																	officer.img === null
-																		? DefaultPic
+																		? OfficerPic
 																		: `${s3BaseUrl}${officer.img}`
 																}
 															/>
@@ -764,6 +777,7 @@ const Interaction: React.FC = ({
 												/>
 											</Fragment>
 										)}
+
 										<Header as="h2" inverted>
 											Share
 										</Header>
@@ -830,7 +844,6 @@ const Interaction: React.FC = ({
 														circular
 														color="red"
 														icon="paperclip"
-														onClick={() => {}}
 														size="big"
 													/>
 												</CopyToClipboard>
@@ -920,6 +933,7 @@ Interaction.propTypes = {
 			createdAt: PropTypes.string,
 			department: PropTypes.shape({
 				id: PropTypes.number,
+				img: PropTypes.string,
 				name: PropTypes.string,
 				slug: PropTypes.string
 			}),

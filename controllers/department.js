@@ -1,16 +1,104 @@
 /* eslint-disable */
 const Auth = require("../utils/authFunctions.js")
+const Aws = require("../utils/awsFunctions.js")
 const db = require("../models/index.js")
 const capitalize = require("capitalize")
+const fs = require("fs")
+const randomize = require("randomatic")
 const slugify = require("slugify")
 const UsaStates = require("usa-states").UsaStates
 const validator = require("validator")
+const waitOn = require("wait-on")
+const { thumbnail } = require("easyimage")
 /* eslint-enable */
 const Department = db.department
 const Interaction = db.interaction
 const Location = db.location
 const Officer = db.officer
 const Op = db.Sequelize.Op
+
+exports.changePic = async (req, res) => {
+	const { id } = req.body
+	const { file } = req.files
+	const { authenticated, user } = Auth.parseAuthentication(req)
+
+	if (!authenticated) {
+		return res.status(401).send({ error: true, msg: "You must be logged in" })
+	}
+
+	if (user.data.email !== "lnlance09@gmail.com") {
+		return res.status(401).send({ error: true, msg: "You don't have permissions" })
+	}
+
+	if (typeof file === "undefined") {
+		return res.status(401).send({ error: true, msg: "You must include a picture" })
+	}
+
+	const image = file.data
+	const timestamp = new Date().getTime()
+	const fileName = `${randomize("aa", 24)}-${timestamp}-${file.name}`
+
+	fs.writeFile(`uploads/${fileName}`, image, "buffer", (err) => {
+		if (err) {
+			return res.status(500).send({
+				error: true,
+				msg: "There was an error"
+			})
+		}
+	})
+
+	const thumbnailInfo = await thumbnail({
+		src: `uploads/${fileName}`,
+		width: 250,
+		height: 250
+	})
+
+	fs.readFile(thumbnailInfo.path, async (err, data) => {
+		if (err) {
+			return res.status(500).send({
+				error: true,
+				msg: "There was an error"
+			})
+		}
+
+		const filePath = `departments/${fileName}`
+		await Aws.uploadToS3(data, filePath, false)
+
+		Department.update(
+			{
+				img: filePath
+			},
+			{
+				where: { id }
+			}
+		)
+			.then(async () => {
+				try {
+					await waitOn({
+						resources: [`https://alliesonly.s3-us-west-2.amazonaws.com/${filePath}`]
+					})
+					fs.unlinkSync(`uploads/${fileName}`)
+
+					return res.status(200).send({
+						error: false,
+						img: filePath,
+						msg: "success"
+					})
+				} catch (err) {
+					return res.status(500).send({
+						error: true,
+						msg: err.message || "There was an error"
+					})
+				}
+			})
+			.catch(() => {
+				return res.status(500).send({
+					error: true,
+					msg: "There was an error"
+				})
+			})
+	})
+}
 
 exports.create = async (req, res) => {
 	const { city } = req.body
@@ -110,6 +198,7 @@ exports.findAll = (req, res) => {
 		"city",
 		"county",
 		"id",
+		"img",
 		"lat",
 		"lon",
 		"name",
@@ -169,6 +258,7 @@ exports.findAll = (req, res) => {
 		attributes = [
 			"city",
 			"id",
+			"img",
 			"name",
 			"slug",
 			"state",
@@ -219,6 +309,7 @@ exports.findOne = (req, res) => {
 			"city",
 			"county",
 			"id",
+			"img",
 			"lat",
 			"lon",
 			"name",

@@ -60,6 +60,10 @@ const SearchResults: React.FC = ({
 							key={`resultsListItem${id}`}
 							onClick={() => Router.push(`/departments/${slug}`)}
 						>
+							<Item.Image
+								onError={(i) => (i.target.src = DefaultPic)}
+								src={result.img === null ? DefaultPic : `${s3BaseUrl}${result.img}`}
+							/>
 							<Item.Content>
 								<Item.Header>{name}</Item.Header>
 								<Item.Meta>
@@ -270,6 +274,7 @@ SearchResults.propTypes = {
 				city: PropTypes.string,
 				county: PropTypes.string,
 				id: PropTypes.number,
+				img: PropTypes.string,
 				interactionCount: PropTypes.number,
 				lat: PropTypes.string,
 				lon: PropTypes.string,

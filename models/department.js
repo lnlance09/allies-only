@@ -15,6 +15,9 @@ module.exports = (sequelize, Sequelize) => {
 			county: {
 				type: Sequelize.STRING
 			},
+			img: {
+				type: Sequelize.STRING
+			},
 			lat: {
 				type: Sequelize.STRING
 			},
