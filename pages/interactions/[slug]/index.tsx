@@ -22,10 +22,17 @@ import {
 	Icon,
 	Image,
 	Input,
+	List,
 	Loader,
 	Segment,
 	TextArea
 } from "semantic-ui-react"
+import {
+	EmailShareButton,
+	FacebookShareButton,
+	RedditShareButton,
+	TwitterShareButton
+} from "react-share"
 import { RootState } from "@store/reducer"
 import { GetServerSideProps } from "next"
 import { initial } from "@reducers/interaction"
@@ -751,6 +758,60 @@ const Interaction: React.FC = ({
 												/>
 											</Fragment>
 										)}
+										<Header as="h2" inverted>
+											Share
+										</Header>
+										<List horizontal>
+											<List.Item>
+												<FacebookShareButton
+													url={`${window.location.origin}/interactions/${slug}`}
+												>
+													<Button
+														circular
+														color="facebook"
+														icon="facebook f"
+														size="big"
+													/>
+												</FacebookShareButton>
+											</List.Item>
+											<List.Item>
+												<TwitterShareButton
+													url={`${window.location.origin}/interactions/${slug}`}
+												>
+													<Button
+														circular
+														color="twitter"
+														icon="twitter"
+														size="big"
+													/>
+												</TwitterShareButton>
+											</List.Item>
+											<List.Item>
+												<RedditShareButton
+													url={`${window.location.origin}/interactions/${slug}`}
+												>
+													<Button
+														circular
+														className="reddit"
+														icon="reddit alien"
+														size="big"
+													/>
+												</RedditShareButton>
+											</List.Item>
+											<List.Item>
+												<EmailShareButton
+													url={`${window.location.origin}/interactions/${slug}`}
+												>
+													<Button
+														circular
+														color="blue"
+														icon="mail"
+														size="big"
+													/>
+												</EmailShareButton>
+											</List.Item>
+										</List>
+
 										<Header as="h2" inverted size="huge">
 											Comments
 										</Header>
