@@ -135,13 +135,24 @@ exports.findAll = (req, res) => {
 		[db.Sequelize.col("interaction.updatedAt"), "updatedAt"],
 		[db.Sequelize.col("interaction.video"), "video"],
 		[db.Sequelize.col("interaction.views"), "views"],
+		[db.Sequelize.col("department.img"), "departmentImg"],
 		[db.Sequelize.col("department.name"), "departmentName"],
 		[db.Sequelize.col("department.slug"), "departmentSlug"],
 		[db.Sequelize.col("officerInteractions.officerId"), "officerId"],
-		[db.Sequelize.col("user.name"), "userName"],
+		[db.Sequelize.col("officerInteractions->officers.firstName"), "officerFirstName"],
+		[db.Sequelize.col("officerInteractions->officers.id"), "officerId"],
+		[db.Sequelize.col("officerInteractions->officers.img"), "officerImg"],
+		[db.Sequelize.col("officerInteractions->officers.lastName"), "officerLastName"],
 		[
 			db.Sequelize.fn("COUNT", db.Sequelize.fn("DISTINCT", db.Sequelize.col("comments.id"))),
 			"commentCount"
+		],
+		[
+			db.Sequelize.fn(
+				"COUNT",
+				db.Sequelize.fn("DISTINCT", db.Sequelize.col("officerInteractions.officerId"))
+			),
+			"officerCount"
 		],
 		[
 			db.Sequelize.fn(
@@ -193,6 +204,14 @@ exports.findAll = (req, res) => {
 		},
 		{
 			attributes: ["officerId"],
+			include: [
+				{
+					as: "officers",
+					attributes: [],
+					model: Officer,
+					required: true
+				}
+			],
 			model: OfficerInteraction,
 			required: officerRequired,
 			where: officerWhere
