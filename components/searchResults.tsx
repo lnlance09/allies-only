@@ -116,23 +116,81 @@ const SearchResults: React.FC = ({
 							<Card.Content>
 								<Card.Header>{result.title}</Card.Header>
 								<Card.Meta>
-									<Moment date={result.createdAt} fromNow />•{" "}
-									<span>
-										{numeral(result.views).format(
-											result.views > 999 ? "0.0a" : "0a"
-										)}{" "}
-										views
-									</span>
+									<Moment date={result.createdAt} fromNow />
 								</Card.Meta>
 								<Card.Description className="interactionDescription">
 									{result.description}
 								</Card.Description>
 							</Card.Content>
 							<Card.Content extra>
-								<Icon inverted={inverted} name="comment" />
-								<span className="commentCount">
-									{totalCommentCount} {formatPlural(totalCommentCount, "comment")}
-								</span>
+								<Header size="tiny">
+									<Image
+										avatar
+										onError={(i) => (i.target.src = DefaultPic)}
+										rounded
+										src={
+											result.departmentImg === null
+												? DefaultPic
+												: `${s3BaseUrl}${result.departmentImg}`
+										}
+									/>
+									<Header.Content>{result.departmentName}</Header.Content>
+								</Header>
+							</Card.Content>
+							<Card.Content extra>
+								{result.officerCount === 0 ? (
+									<Header size="tiny">
+										<Header.Content>
+											<Icon color="yellow" name="warning" size="large" />
+											<span>Officer(s) remain unidentified</span>
+										</Header.Content>
+									</Header>
+								) : (
+									<Header size="tiny">
+										<Image
+											avatar
+											onError={(i) => (i.target.src = DefaultPic)}
+											rounded
+											src={
+												result.officerImg === null
+													? DefaultPic
+													: `${s3BaseUrl}${result.officerImg}`
+											}
+										/>
+										<Header.Content>
+											{result.officerFirstName} {result.officerLastName}{" "}
+											{result.officerCount > 1 && (
+												<span>
+													+ {result.officerCount - 1} more{" "}
+													{formatPlural(
+														result.officerCount - 1,
+														"officer"
+													)}
+												</span>
+											)}
+										</Header.Content>
+									</Header>
+								)}
+							</Card.Content>
+							<Card.Content extra>
+								<div className="counts">
+									<Icon inverted={inverted} name="comment" />
+									<span className="commentCount">
+										{numeral(totalCommentCount).format(
+											totalCommentCount > 999 ? "0.0a" : "0a"
+										)}{" "}
+										{formatPlural(totalCommentCount, "comment")}
+									</span>
+								</div>
+								<div className="counts">
+									<Icon inverted={inverted} name="eye" />
+									<span className="commentCount">
+										{numeral(result.views).format(
+											result.views > 999 ? "0.0a" : "0a"
+										)}{" "}
+										{formatPlural(result.views, "view")}
+									</span>
+								</div>
 							</Card.Content>
 						</Card>
 					)
