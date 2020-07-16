@@ -1,9 +1,11 @@
 .pageSidebar {
+    position: sticky;
+    top: 80px;
+
     .ui.inverted.menu.globalSidebar {
         background: $white;
         box-shadow: none;
         margin-top: 0;
-        width: 100%;
         z-index: 1001 !important;
 
         &.inverted {
@@ -26,12 +28,13 @@
 
             &.active {
                 background: lighten($invertedBackgroundColor, 4%) !important;
+                border-radius: 4px !important;
                 color: $invertedYellow !important;
             }
 
             &:hover {
                 background: lighten($invertedBackgroundColor, 3%) !important;
-                
+                border-radius: 4px !important;
             }
         }
     }

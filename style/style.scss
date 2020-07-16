@@ -150,10 +150,17 @@ body {
 		display: flex;
 	}
 
-	@media only screen and (max-width: 1025px) {
+	@media only screen and (max-width: 768px) {
 		&.ui.container {
 			margin-left: 0 !important;
 			margin-right: 0 !important;
+		}
+	}
+
+	@media only screen and (max-width: 1025px) {
+		&.ui.container {
+			margin-left: auto !important;
+			margin-right: auto !important;
 		}
 	}
 
@@ -174,9 +181,11 @@ body {
 		.column.twelve.rightColumn {
 			@media only screen and (max-width: 1025px) {
 				.ui.grid.stackable {
-					margin-left: 0 !important;
+					// margin-left: 0 !important;
 					margin-right: 0 !important;
 				}
+
+				width: 100% !important;
 			}
 		}
 	}
