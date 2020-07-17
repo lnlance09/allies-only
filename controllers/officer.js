@@ -110,7 +110,7 @@ exports.findAll = async (req, res) => {
 	let limit = 20
 	let order = [
 		[db.Sequelize.col("interactionCount"), "DESC"],
-		[db.Sequelize.col("lastName"), "DESC"]
+		[db.Sequelize.col("lastName"), "ASC"]
 	]
 	let where = {
 		[Op.or]: [
