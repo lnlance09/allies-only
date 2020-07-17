@@ -154,10 +154,6 @@ const Officer: React.FC = ({
 		setDepartmentOptions(departmentOptions)
 	}
 
-	const loadMore = (page, officerId) => {
-		return searchInteractions({ officerId, page })
-	}
-
 	const selectDepartment = (e, { value }) => {
 		setDepartment(value)
 	}
@@ -249,8 +245,8 @@ const Officer: React.FC = ({
 						<Button
 							color="yellow"
 							content="Add"
+							disabled={firstName === "" || lastName === "" || department === ""}
 							fluid
-							inverted={inverted}
 							loading={formLoading}
 							onClick={addOfficer}
 							size="big"
@@ -381,7 +377,7 @@ const Officer: React.FC = ({
 												inverted={inverted}
 												loading={officer.interactions.loading}
 												loadMore={({ page, officerId }) =>
-													loadMore(page, officerId)
+													searchInteractions({ officerId, page })
 												}
 												officerId={officer.data.id}
 												page={officer.interactions.page}

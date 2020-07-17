@@ -146,14 +146,6 @@ const Department: React.FC = ({
 		setLocationOptions(locationOptions)
 	}
 
-	const loadMore = (page: number, departmentId: number) => {
-		if (activeItem === "officers") {
-			return searchOfficers({ departmentId, page })
-		}
-
-		return searchInteractions({ departmentId, page })
-	}
-
 	const selectCity = (e, { value }) => {
 		setCity(value)
 	}
@@ -258,8 +250,8 @@ const Department: React.FC = ({
 						<Button
 							color="yellow"
 							content="Add"
+							disabled={city === "" || name == ""}
 							fluid
-							inverted={inverted}
 							loading={formLoading}
 							onClick={addDepartment}
 							size="big"
@@ -403,9 +395,13 @@ const Department: React.FC = ({
 												hasMore={results.hasMore}
 												inverted={inverted}
 												loading={results.loading}
-												loadMore={({ page, departmentId }) =>
-													loadMore(page, departmentId)
-												}
+												loadMore={({ page, departmentId }) => {
+													if (activeItem === "officers") {
+														searchOfficers({ departmentId, page })
+													}
+
+													searchInteractions({ departmentId, page })
+												}}
 												page={results.page}
 												results={results.results}
 												type={activeItem}
