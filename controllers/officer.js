@@ -108,7 +108,10 @@ exports.findAll = async (req, res) => {
 	const { departmentId, forAutocomplete, forOptions, page, q } = req.query
 
 	let limit = 20
-	let order = [[db.Sequelize.col("interactionCount"), "DESC"]]
+	let order = [
+		[db.Sequelize.col("interactionCount"), "DESC"],
+		[db.Sequelize.col("lastName"), "DESC"]
+	]
 	let where = {
 		[Op.or]: [
 			{
