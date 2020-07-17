@@ -112,7 +112,6 @@ const Authentication: React.FC = (props) => {
 				color="yellow"
 				content="Next"
 				fluid
-				inverted={props.inverted}
 				onClick={() => {
 					setStatusSelected(true)
 				}}
@@ -140,7 +139,6 @@ const Authentication: React.FC = (props) => {
 						content="Verify"
 						disabled={verificationCode.length !== 4}
 						fluid
-						inverted={props.inverted}
 						size="big"
 						type="submit"
 					/>
@@ -177,7 +175,6 @@ const Authentication: React.FC = (props) => {
 							color="yellow"
 							content="Sign in"
 							fluid
-							inverted={props.inverted}
 							loading={loadingLogin && !props.loginError}
 							onClick={submitLoginForm}
 							size="big"
@@ -240,7 +237,6 @@ const Authentication: React.FC = (props) => {
 						color="yellow"
 						content="Create an account"
 						fluid
-						inverted={props.inverted}
 						loading={loadingRegistration && !props.registerError}
 						onClick={submitRegistrationForm}
 						size="big"

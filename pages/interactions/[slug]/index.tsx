@@ -513,7 +513,6 @@ const Interaction: React.FC = ({
 							content="Add"
 							disabled={interaction.data.video === null}
 							fluid
-							inverted={inverted}
 							loading={formLoading}
 							onClick={addInteraction}
 							size="big"
@@ -580,7 +579,7 @@ const Interaction: React.FC = ({
 													content={editMode ? "Cancel" : "Edit"}
 													floated="right"
 													icon={editMode ? "close" : "pencil"}
-													inverted
+													inverted={inverted}
 													onClick={() => {
 														setEditMode(!editMode)
 													}}
@@ -735,10 +734,6 @@ const Interaction: React.FC = ({
 													<Divider horizontal inverted={inverted}>
 														<Header inverted={inverted}>OR</Header>
 													</Divider>
-													<p>
-														Don&apos;t see the officer you&apos;re
-														looking for? Add them.
-													</p>
 													<Button
 														color="orange"
 														content="Add an officer"
@@ -751,6 +746,10 @@ const Interaction: React.FC = ({
 														}
 														size="big"
 													/>
+													<p style={{ marginTop: "13px" }}>
+														Don&apos;t see the officer you&apos;re
+														looking for? Add them.
+													</p>
 												</div>
 											)}
 										</Segment>
@@ -760,7 +759,6 @@ const Interaction: React.FC = ({
 													color="yellow"
 													content="Save"
 													fluid
-													inverted={inverted}
 													onClick={() =>
 														updateInteraction({
 															bearer,

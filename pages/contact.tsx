@@ -65,7 +65,6 @@ const Contact: React.FC = ({ inverted }) => {
 					color="yellow"
 					content="Send"
 					disabled={msg.length === 0}
-					inverted={inverted}
 					fluid
 					onClick={() => sendMessage()}
 					size="big"
