@@ -6,6 +6,7 @@ import {
 	Image,
 	Item,
 	Label,
+	Placeholder,
 	Segment,
 	Visibility
 } from "semantic-ui-react"
@@ -17,7 +18,7 @@ import Moment from "react-moment"
 import numeral from "numeral"
 import OfficerPic from "@public/images/avatar/officer.png"
 import PropTypes from "prop-types"
-import React, { useState } from "react"
+import React, { useState, Fragment } from "react"
 import Router from "next/router"
 
 const SearchResults: React.FC = ({
@@ -38,7 +39,21 @@ const SearchResults: React.FC = ({
 	const renderDepartmentsList = () => {
 		return (
 			<Item.Group className={`resultsList ${inverted ? "inverted" : ""}`}>
-				{results.map((result) => {
+				{results.map((result, i) => {
+					if (result.id === null) {
+						return (
+							<Segment inverted key={`resultsListItem${i}`}>
+								<Placeholder fluid inverted>
+									<Placeholder.Paragraph>
+										<Placeholder.Line length="very short" />
+										<Placeholder.Line length="medium" />
+										<Placeholder.Line length="short" />
+									</Placeholder.Paragraph>
+								</Placeholder>
+							</Segment>
+						)
+					}
+
 					const {
 						city,
 						id,
@@ -98,100 +113,131 @@ const SearchResults: React.FC = ({
 				stackable
 			>
 				{results.map((result, i) => {
-					const totalCommentCount = parseInt(
-						result.commentCount + result.responseCount,
-						10
-					)
+					let totalCommentCount = 0
+					if (result.id !== null) {
+						totalCommentCount = parseInt(result.commentCount + result.responseCount, 10)
+					}
+
 					return (
 						<Card
 							fluid
 							key={`interaction${i}`}
 							onClick={() => Router.push(`/interactions/${result.id}`)}
 						>
-							<Image
-								onError={(i) => (i.target.src = DefaultPic)}
-								src={result.img === null ? DefaultPic : result.img}
-								wrapped={false}
-							/>
-							<Card.Content>
-								<Card.Header>{result.title}</Card.Header>
-								<Card.Meta>
-									<Moment date={result.createdAt} fromNow />
-								</Card.Meta>
-								<Card.Description className="interactionDescription">
-									{result.description}
-								</Card.Description>
-							</Card.Content>
-							<Card.Content extra>
-								<Header size="tiny">
-									<Image
-										avatar
-										onError={(i) => (i.target.src = DefaultPic)}
-										rounded
-										src={
-											result.departmentImg === null
-												? DefaultPic
-												: `${s3BaseUrl}${result.departmentImg}`
-										}
-									/>
-									<Header.Content>{result.departmentName}</Header.Content>
-								</Header>
-							</Card.Content>
-							<Card.Content extra>
-								{result.officerCount === 0 ? (
-									<Header size="tiny">
-										<Header.Content>
-											<Icon color="yellow" name="warning" size="large" />
-											<span>Officer(s) remain unidentified</span>
-										</Header.Content>
-									</Header>
+							{result.id === null ? (
+								<Placeholder className="placeholderCard" inverted>
+									<Placeholder.Image square />
+								</Placeholder>
+							) : (
+								<Image
+									onError={(i) => (i.target.src = DefaultPic)}
+									src={result.img === null ? DefaultPic : result.img}
+									wrapped={false}
+								/>
+							)}
+
+							<Card.Content className={`${result.id === null ? "loading" : ""}`}>
+								{result.id === null ? (
+									<Placeholder inverted>
+										<Placeholder.Header>
+											<Placeholder.Line length="very long" />
+											<Placeholder.Line length="medium" />
+										</Placeholder.Header>
+										<Placeholder.Paragraph>
+											<Placeholder.Line length="short" />
+										</Placeholder.Paragraph>
+									</Placeholder>
 								) : (
-									<Header size="tiny">
-										<Image
-											avatar
-											onError={(i) => (i.target.src = DefaultPic)}
-											rounded
-											src={
-												result.officerImg === null
-													? DefaultPic
-													: `${s3BaseUrl}${result.officerImg}`
-											}
-										/>
-										<Header.Content>
-											{result.officerFirstName} {result.officerLastName}{" "}
-											{result.officerCount > 1 && (
-												<span>
-													+ {result.officerCount - 1} more{" "}
-													{formatPlural(
-														result.officerCount - 1,
-														"officer"
-													)}
-												</span>
-											)}
-										</Header.Content>
-									</Header>
+									<Fragment>
+										<Card.Header>{result.title}</Card.Header>
+										<Card.Meta>
+											<Moment date={result.createdAt} fromNow />
+										</Card.Meta>
+										<Card.Description className="interactionDescription">
+											{result.description}
+										</Card.Description>
+									</Fragment>
 								)}
 							</Card.Content>
-							<Card.Content extra>
-								<div className="counts">
-									<Icon inverted={inverted} name="comment" />
-									<span className="commentCount">
-										{numeral(totalCommentCount).format(
-											totalCommentCount > 999 ? "0.0a" : "0a"
-										)}{" "}
-										{formatPlural(totalCommentCount, "comment")}
-									</span>
-								</div>
-								<div className="counts">
-									<Icon inverted={inverted} name="eye" />
-									<span className="commentCount">
-										{numeral(result.views).format(
-											result.views > 999 ? "0.0a" : "0a"
-										)}{" "}
-										{formatPlural(result.views, "view")}
-									</span>
-								</div>
-							</Card.Content>
+							{result.id !== null && (
+								<Fragment>
+									<Card.Content extra>
+										<Header size="tiny">
+											<Image
+												avatar
+												onError={(i) => (i.target.src = DefaultPic)}
+												rounded
+												src={
+													result.departmentImg === null
+														? DefaultPic
+														: `${s3BaseUrl}${result.departmentImg}`
+												}
+											/>
+											<Header.Content>{result.departmentName}</Header.Content>
+										</Header>
+									</Card.Content>
+									<Card.Content extra>
+										{result.officerCount === 0 ? (
+											<Header size="tiny">
+												<Header.Content>
+													<Icon
+														color="yellow"
+														name="warning"
+														size="large"
+													/>
+													<span>Officer(s) remain unidentified</span>
+												</Header.Content>
+											</Header>
+										) : (
+											<Header size="tiny">
+												<Image
+													avatar
+													onError={(i) => (i.target.src = DefaultPic)}
+													rounded
+													src={
+														result.officerImg === null
+															? DefaultPic
+															: `${s3BaseUrl}${result.officerImg}`
+													}
+												/>
+												<Header.Content>
+													{result.officerFirstName}{" "}
+													{result.officerLastName}{" "}
+													{result.officerCount > 1 && (
+														<span>
+															+ {result.officerCount - 1} more{" "}
+															{formatPlural(
+																result.officerCount - 1,
+																"officer"
+															)}
+														</span>
+													)}
+												</Header.Content>
+											</Header>
+										)}
+									</Card.Content>
+									<Card.Content extra>
+										<div className="counts">
+											<Icon inverted={inverted} name="comment" />
+											<span className="commentCount">
+												{numeral(totalCommentCount).format(
+													totalCommentCount > 999 ? "0.0a" : "0a"
+												)}{" "}
+												{formatPlural(totalCommentCount, "comment")}
+											</span>
+										</div>
+										<div className="counts">
+											<Icon inverted={inverted} name="eye" />
+											<span className="commentCount">
+												{numeral(result.views).format(
+													result.views > 999 ? "0.0a" : "0a"
+												)}{" "}
+												{formatPlural(result.views, "view")}
+											</span>
+										</div>
+									</Card.Content>
+								</Fragment>
+							)}
 						</Card>
 					)
 				})}
@@ -202,7 +248,21 @@ const SearchResults: React.FC = ({
 	const renderOfficersList = () => {
 		return (
 			<Item.Group className={`resultsList ${inverted ? "inverted" : ""}`}>
-				{results.map((result) => {
+				{results.map((result, i) => {
+					if (result.id === null) {
+						return (
+							<Segment inverted key={`resultsListItem${i}`}>
+								<Placeholder fluid inverted>
+									<Placeholder.Paragraph>
+										<Placeholder.Line length="very short" />
+										<Placeholder.Line length="medium" />
+										<Placeholder.Line length="short" />
+									</Placeholder.Paragraph>
+								</Placeholder>
+							</Segment>
+						)
+					}
+
 					return (
 						<Item
 							key={`resultsListItem${result.id}`}
@@ -236,7 +296,21 @@ const SearchResults: React.FC = ({
 	const renderUsersList = () => {
 		return (
 			<Item.Group className={`resultsList ${inverted ? "inverted" : ""}`}>
-				{results.map((result) => {
+				{results.map((result, i) => {
+					if (result.id === null) {
+						return (
+							<Segment inverted key={`resultsListItem${i}`}>
+								<Placeholder fluid inverted>
+									<Placeholder.Paragraph>
+										<Placeholder.Line length="very short" />
+										<Placeholder.Line length="medium" />
+										<Placeholder.Line length="short" />
+									</Placeholder.Paragraph>
+								</Placeholder>
+							</Segment>
+						)
+					}
+
 					return (
 						<Item
 							key={`resultsListItem${result.id}`}

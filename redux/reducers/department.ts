@@ -12,7 +12,7 @@ export const initial: InitialPageState = {
 			errorMsg: "",
 			hasMore: false,
 			loading: true,
-			results: []
+			results: [{ id: null }, { id: null }, { id: null }, { id: null }]
 		},
 		loading: true,
 		officers: {
@@ -20,7 +20,7 @@ export const initial: InitialPageState = {
 			errorMsg: "",
 			hasMore: false,
 			loading: true,
-			results: []
+			results: [{ id: null }, { id: null }, { id: null }, { id: null }]
 		}
 	},
 	departments: {
@@ -28,7 +28,7 @@ export const initial: InitialPageState = {
 		errorMsg: "",
 		hasMore: false,
 		loading: true,
-		results: []
+		results: [{ id: null }, { id: null }, { id: null }, { id: null }]
 	},
 	initialDepartment: {
 		data: {},

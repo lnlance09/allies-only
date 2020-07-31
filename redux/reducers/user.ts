@@ -23,7 +23,7 @@ export const initial: InitialPageState = {
 			hasMore: true,
 			loading: true,
 			page: 0,
-			results: []
+			results: [{ id: null }, { id: null }, { id: null }, { id: null }]
 		},
 		loading: true
 	},
@@ -32,7 +32,7 @@ export const initial: InitialPageState = {
 		errorMsg: "",
 		hasMore: false,
 		loading: true,
-		results: []
+		results: [{ id: null }, { id: null }, { id: null }, { id: null }]
 	}
 }
 
