@@ -38,7 +38,7 @@ export const initial: InitialPageState = {
 		errorMsg: "",
 		hasMore: false,
 		loading: true,
-		results: []
+		results: [{ id: null }, { id: null }, { id: null }, { id: null }]
 	}
 }
 

@@ -10,6 +10,18 @@
 		}
 
 		&.inverted {
+			.ui.segment {
+				// background: lighten($invertedBackgroundColor, 4%) !important;
+
+				.placeholder {
+					background: $invertedBackgroundColor !important;
+
+					.line {
+						background: lighten($invertedBackgroundColor, 4%) !important;
+					}
+				}
+			}
+
 			.item {
 				background: lighten($invertedBackgroundColor, 4%);
 				border: none;
@@ -68,6 +80,10 @@
 					overflow-y: hidden;
 				}
 
+				.placeholderCard {
+					height: 250px !important;
+				}
+
 				.content {
 					background: lighten($invertedBackgroundColor, 6%);
 					border-top: solid 1px $lightenedBorderColor !important;
@@ -78,6 +94,10 @@
 						a {
 							color: $white;
 						}
+					}
+
+					&.loading {
+						background: $invertedBackgroundColor !important;
 					}
 
 					.description {
