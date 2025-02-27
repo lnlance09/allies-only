@@ -5,8 +5,8 @@ const AWS = require("aws-sdk")
 const bucketName = "alliesonly"
 
 const s3 = new AWS.S3({
-	accessKeyId: "AKIA3KB7ZZF26C4NLY6O",
-	secretAccessKey: "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",
+	accessKeyId: "",
+	secretAccessKey: "",
 	useAccelerateEndpoint: true
 })
 
